@@ -40,9 +40,9 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ### Jean Doe
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/vanillajohn.png" width="200px">
 
-[[github](http://github.com/johndoe)]
+[[github](https://github.com/Vanillajohn)]
 [[portfolio](team/johndoe.md)]
 
 * Role: Developer
