@@ -47,7 +47,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ### Alfred Chew
 
-<img src="images/Alfred_chew.png" width="200px">
+<img src="images/Polar1605.png" width="200px">
 
 [[github](https://github.com/Polar1605)]
 [[portfolio](https://www.linkedin.com/in/alfred-chew-23292a267/)]
