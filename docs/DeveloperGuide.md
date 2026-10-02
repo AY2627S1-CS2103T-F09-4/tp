@@ -261,33 +261,89 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Target user profile**:
 
-* has a need to manage a significant number of contacts
+* needs to manage large numbers of contacts
+* needs to manage different kinds of contacts (students, parents, coworkers)
+* needs to manage information within contacts
 * prefers desktop apps over other types of applications
 * can type fast
 * prefers typing to mouse interactions
 * is reasonably comfortable using CLI apps
 
-**Value proposition**: Manage contacts faster than with a typical mouse-driven GUI application.
+**Value proposition**: optimize creating and tracking student information, including classes, 
+deliverables, improvement, parents, locations, etc.
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                     | So that I can…​                                                        |
-| -------- | ------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `* * *`  | new user                                   | see usage instructions         | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person               |                                                                        |
-| `* * *`  | user                                       | delete a person                | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name          | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details   | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name           | locate a person easily                                                 |
-
-*{More to be added}*
+| Priority | As a …​                          | I want to …​                                                                                    | So that I can…​                                                                              |
+|----------|----------------------------------|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| `* * *`  | user                             | do basic functionality like creating a student profile and adding and deleting data             | add / delete students and any info I submitted for them                                      |
+| `* * *`  | regular user                     | view the schedule of a day                                                                      | summarize activities I might have from multiple students                                     |
+| `* * *`  | regular user                     | add parent profiles in addition to student ones                                                 | track their requirements as well                                                             |
+| `* * *`  | regular user                     | add images                                                                                      | tell the students apart                                                                      |
+| `* * *`  | regular user                     | search up information about my clients                                                          | See details about my clients                                                                 |
+| `* *`    | first time user                  | have some sample data                                                                           | explore the features                                                                         |
+| `* *`    | first time user                  | have user guide or help sheet                                                                   | know what features are available                                                             |
+| `* *`    | user                             | edit already submitted data                                                                     | update the data I have in case things change                                                 |
+| `* *`    | regular user                     | view dates as that little popup calendar instead of manually inputting dates                    | organize things easily and more efficiently                                                  |
+| `* *`    | regular user                     | search for information based on keywords                                                        | quickly find it rather than comb through the entire app                                      |
+| `* *`    | returning user                   | have suggested questions I can ask to make the app useful (payment, food, address, number, etc) | remember what I should do to make app useful                                                 |
+| `* *`    | regular user                     | set some info the app will regularly remind me every time the app opens                         | not forget about them or where they might be, and have the functionality to close it as well |
+| `* *`    | experienced user                 | track my student's data and have it formatted into useful statistics                            | evaluate their performance                                                                   |
+| `* *`    | tutor who is very forgetful      | recieve notifications about tasks that need my attention                                        | not be as sloppy in my work                                                                  |
+| `* *`    | tutor                            | mark attendance for each scheduled session                                                      | have an accurate record of completed sessions                                                |
+| `* *`    | tutor who likes to procrastinate | organise tasks into an eisenhower matrix                                                        | know which tasks to prioritise                                                               |
+| `* *`    | regular user                     | filter and sort the student list by subject, grade level, etc                                   | quickly group and manage specific subsets of students                                        |
+| `* *`    | power user                       | use keyboard shortcut commands for common actions                                               | navigate the application faster without relying on a mouse                                   |
+| `* *`    | regular user                     | submit suggestions and feedback                                                                 | get changes that I want implemented                                                          |
+| `*`      | user who studies CS              | change the path of the app's data file                                                          | organize everything on my computer                                                           |
+| `*`      | user with a bad sleep schedule   | view the app in a dark mode version of the ui                                                   | not hurt my eyes                                                                             |
 
 ### Use cases
 
 (For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+
+**Use case: UC01 - Add a Student**
+
+**MSS**
+
+1.  User requests to add a student with specific details
+2.  Tutoria adds the student and indicates success
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. User input is invalid
+    * 1a1. Tutoria shows the relevant error message
+
+    Use case ends.
+
+
+**Use case: UC02 - Viewing a day's schedule**
+
+**MSS**
+
+1.  User requests to view the schedule of a specific date
+2.  Tutoria shows the relevant information occurring on that date
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. User input is invalid
+    * 1a1. Tutoria shows the relevant error message
+
+  Use case ends.
+
+* 2a. The date has no relevant information
+
+    * 2a1. Tutoria shows that nothing is occurring on that date
+
+    Use case ends.
+
 
 **Use case: Delete a person**
 
