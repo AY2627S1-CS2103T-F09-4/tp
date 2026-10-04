@@ -2,7 +2,7 @@
 
 [![CI Status](https://github.com/AY2627S1-CS2103T-F09-4/tp/workflows/Java%20CI/badge.svg)](https://github.com/AY2627S1-CS2103T-F09-4/tp/actions)
 
-![Ui](docs/images/UI.png)
+![Ui](docs/images/Ui.png)
 
 ## Table of Contents
 
