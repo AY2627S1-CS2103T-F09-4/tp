@@ -40,6 +40,20 @@ public class AddressBookParserTest {
     }
 
     @Test
+    public void parseCommand_addWithGradeLevel() throws Exception {
+        Person person = new PersonBuilder().withGradeLevel("Sec 3").build();
+        AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
+        assertEquals(new AddCommand(person), command);
+    }
+
+    @Test
+    public void parseCommand_replacedCommandWords_throwsParseException() {
+        // "add" and "delete" were replaced by "add-student" and "delete-student"
+        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("add n/Amy"));
+        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("delete 1"));
+    }
+
+    @Test
     public void parseCommand_clear() throws Exception {
         assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD) instanceof ClearCommand);
         assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD + " 3") instanceof ClearCommand);

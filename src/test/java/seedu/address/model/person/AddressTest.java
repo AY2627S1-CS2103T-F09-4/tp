@@ -28,6 +28,10 @@ public class AddressTest {
         assertFalse(Address.isValidAddress("")); // empty string
         assertFalse(Address.isValidAddress(" ")); // spaces only
 
+        // address length limit
+        assertFalse(Address.isValidAddress("a".repeat(201))); // 201 characters
+        assertTrue(Address.isValidAddress("a".repeat(200))); // exactly 200 characters
+
         // valid addresses
         assertTrue(Address.isValidAddress("Blk 456, Den Road, #01-355"));
         assertTrue(Address.isValidAddress("-")); // one character
