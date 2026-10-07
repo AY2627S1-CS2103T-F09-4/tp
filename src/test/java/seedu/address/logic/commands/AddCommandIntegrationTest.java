@@ -45,4 +45,26 @@ public class AddCommandIntegrationTest {
                 AddCommand.MESSAGE_DUPLICATE_PERSON);
     }
 
+    @Test
+    public void execute_sameNameDifferentCaseAndPhone_throwsCommandException() {
+        Person personInList = model.getAddressBook().getPersonList().get(0);
+        Person differentCaseName = new PersonBuilder(personInList)
+                .withName(personInList.getName().fullName.toUpperCase())
+                .withSubject("Biology").build();
+        assertCommandFailure(new AddCommand(differentCaseName), model, AddCommand.MESSAGE_DUPLICATE_PERSON);
+    }
+
+    @Test
+    public void execute_sameNameDifferentPhone_success() {
+        Person personInList = model.getAddressBook().getPersonList().get(0);
+        Person sameNameDifferentPhone = new PersonBuilder(personInList).withPhone("80000000").build();
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.addPerson(sameNameDifferentPhone);
+
+        assertCommandSuccess(new AddCommand(sameNameDifferentPhone), model,
+                String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(sameNameDifferentPhone)),
+                expectedModel);
+    }
+
 }
