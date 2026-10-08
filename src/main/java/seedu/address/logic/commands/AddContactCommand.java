@@ -10,6 +10,9 @@ import seedu.address.model.Model;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 
+/**
+ * Adds a parent contact to the address book.
+ */
 public class AddContactCommand extends Command {
     public static final String COMMAND_WORD = "add-parent";
     public static final String MESSAGE_USAGE = COMMAND_WORD
@@ -23,21 +26,31 @@ public class AddContactCommand extends Command {
     private final ParentContact contact;
     private final Index linkIndex;
 
+    /**
+     * Creates a command to add a parent contact and optionally link it to a student.
+     */
     public AddContactCommand(ParentContact contact, Index linkIndex) {
-        this.contact = requireNonNull(contact); this.linkIndex = linkIndex;
+        this.contact = requireNonNull(contact);
+        this.linkIndex = linkIndex;
     }
 
-    @Override public CommandResult execute(Model model) throws CommandException {
+    @Override
+    public CommandResult execute(Model model) throws CommandException {
         String studentId = null;
         if (linkIndex != null) {
             List<Person> students = model.getFilteredPersonList();
-            if (linkIndex.getZeroBased() >= students.size()) throw new CommandException(MESSAGE_INVALID_LINK);
+            if (linkIndex.getZeroBased() >= students.size()) {
+                throw new CommandException(MESSAGE_INVALID_LINK);
+            }
             Person student = students.get(linkIndex.getZeroBased());
             studentId = student.getName().fullName + "|" + student.getPhone().value;
         }
-        ParentContact toAdd = new ParentContact(contact.getId(), contact.getName(), contact.getPhone(),
-                contact.getEmail(), studentId, contact.getRequirements());
-        if (model.hasParentContact(toAdd)) throw new CommandException(MESSAGE_DUPLICATE);
+        ParentContact toAdd = new ParentContact(
+                contact.getId(), contact.getName(), contact.getPhone(), contact.getEmail(),
+                studentId, contact.getRequirements());
+        if (model.hasParentContact(toAdd)) {
+            throw new CommandException(MESSAGE_DUPLICATE);
+        }
         final String resolvedStudentId = studentId;
         if (resolvedStudentId != null && model.getParentContactList().stream()
                 .anyMatch(p -> resolvedStudentId.equals(p.getLinkedStudentId()))) {

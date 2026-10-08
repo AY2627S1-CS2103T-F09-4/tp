@@ -1,6 +1,10 @@
 package seedu.address.logic.parser;
 
-import static seedu.address.logic.parser.CliSyntax.*;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_LINK;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_REQUIREMENT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +17,10 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Phone;
 
+/** Parses input arguments for adding a parent contact. */
 public class AddContactCommandParser implements Parser<AddContactCommand> {
-    @Override public AddContactCommand parse(String args) throws ParseException {
+    @Override
+    public AddContactCommand parse(String args) throws ParseException {
         ArgumentMultimap map = ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL,
                 PREFIX_LINK, PREFIX_REQUIREMENT);
         if (!map.getPreamble().isEmpty() || map.getValue(PREFIX_NAME).isEmpty()

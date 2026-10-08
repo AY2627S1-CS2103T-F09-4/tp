@@ -1,5 +1,8 @@
 package seedu.address.ui;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -8,28 +11,39 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import seedu.address.logic.Logic;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 
 /** Card for a parent contact, including a clickable linked-student chip. */
 public class ParentContactCard extends UiPart<HBox> {
+    /**
+     * Creates a card for displaying a parent contact.
+     */
     public ParentContactCard(ParentContact contact, int displayedIndex, Logic logic, Runnable selectStudent) {
         super("ParentContactCard.fxml");
         HBox root = getRoot();
         root.setSpacing(0);
         VBox photoBox;
         ImageView photo = new ImageView();
-        photo.setFitHeight(72); photo.setFitWidth(72); photo.setPreserveRatio(true);
+        photo.setFitHeight(72);
+        photo.setFitWidth(72);
+        photo.setPreserveRatio(true);
         if (contact.getPhotoPath().isPresent()) {
             try {
-                Image image = new Image(Path.of(contact.getPhotoPath().value).toUri().toString(), 72, 72, true, true, true);
-                if (!image.isError()) photo.setImage(image);
-            } catch (InvalidPathException ignored) { }
+                Image image = new Image(
+                        Path.of(contact.getPhotoPath().value).toUri().toString(),
+                        72, 72, true, true, true);
+                if (!image.isError()) {
+                    photo.setImage(image);
+                }
+            } catch (InvalidPathException ignored) {
+                // Ignore invalid photo paths and fall back to the placeholder.
+            }
         }
-        if (photo.getImage() == null) photo.setImage(null);
+        if (photo.getImage() == null) {
+            photo.setImage(null);
+        }
         photoBox = new VBox(4);
         photoBox.setAlignment(Pos.CENTER);
         photoBox.setMinHeight(105);

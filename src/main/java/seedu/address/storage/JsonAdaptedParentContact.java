@@ -28,16 +28,22 @@ class JsonAdaptedParentContact {
             @JsonProperty("linkedStudentId") String linkedStudentId,
             @JsonProperty("requirements") List<String> requirements,
             @JsonProperty("photoPath") String photoPath) {
-        this.id = id; this.name = name; this.phone = phone; this.email = email;
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
         this.linkedStudentId = linkedStudentId;
         this.requirements = requirements == null ? new ArrayList<>() : requirements;
         this.photoPath = photoPath;
     }
 
     JsonAdaptedParentContact(ParentContact source) {
-        id = source.getId(); name = source.getName().fullName; phone = source.getPhone().value;
+        id = source.getId();
+        name = source.getName().fullName;
+        phone = source.getPhone().value;
         email = source.getEmail() == null ? null : source.getEmail().value;
-        linkedStudentId = source.getLinkedStudentId(); requirements = source.getRequirements();
+        linkedStudentId = source.getLinkedStudentId();
+        requirements = source.getRequirements();
         photoPath = source.getPhotoPath().value;
     }
 
@@ -45,13 +51,22 @@ class JsonAdaptedParentContact {
         if (id == null || name == null || phone == null) {
             throw new IllegalValueException("Parent contact is missing a required field.");
         }
-        if (!Name.isValidName(name)) throw new IllegalValueException(Name.MESSAGE_CONSTRAINTS);
-        if (!Phone.isValidPhone(phone)) throw new IllegalValueException(Phone.MESSAGE_CONSTRAINTS);
+        if (!Name.isValidName(name)) {
+            throw new IllegalValueException(Name.MESSAGE_CONSTRAINTS);
+        }
+        if (!Phone.isValidPhone(phone)) {
+            throw new IllegalValueException(Phone.MESSAGE_CONSTRAINTS);
+        }
         if (email != null && !email.isEmpty() && !Email.isValidEmail(email)) {
             throw new IllegalValueException(Email.MESSAGE_CONSTRAINTS);
         }
-        return new ParentContact(id, new Name(name), new Phone(phone),
-                email == null || email.isEmpty() ? null : new Email(email), linkedStudentId, requirements,
+        return new ParentContact(
+                id,
+                new Name(name),
+                new Phone(phone),
+                email == null || email.isEmpty() ? null : new Email(email),
+                linkedStudentId,
+                requirements,
                 photoPath == null || photoPath.isEmpty() ? PhotoPath.NONE : new PhotoPath(photoPath));
     }
 }

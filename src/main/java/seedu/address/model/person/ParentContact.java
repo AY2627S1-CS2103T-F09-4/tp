@@ -17,11 +17,17 @@ public class ParentContact {
     private final List<String> requirements;
     private final PhotoPath photoPath;
 
+    /**
+     * Creates a new parent contact with a generated identifier.
+     */
     public ParentContact(Name name, Phone phone, Email email, String linkedStudentId,
             List<String> requirements) {
         this(UUID.randomUUID().toString(), name, phone, email, linkedStudentId, requirements);
     }
 
+    /**
+     * Creates a parent contact with the given identifier.
+     */
     public ParentContact(String id, Name name, Phone phone, Email email, String linkedStudentId,
             List<String> requirements) {
         this.id = requireNonNull(id);
@@ -33,36 +39,65 @@ public class ParentContact {
         this.photoPath = PhotoPath.NONE;
     }
 
+    /**
+     * Creates a parent contact with the given identifier and photo path.
+     */
     public ParentContact(String id, Name name, Phone phone, Email email, String linkedStudentId,
             List<String> requirements, PhotoPath photoPath) {
-        this.id = requireNonNull(id); this.name = requireNonNull(name); this.phone = requireNonNull(phone);
-        this.email = email; this.linkedStudentId = linkedStudentId;
+        this.id = requireNonNull(id);
+        this.name = requireNonNull(name);
+        this.phone = requireNonNull(phone);
+        this.email = email;
+        this.linkedStudentId = linkedStudentId;
         this.requirements = List.copyOf(requireNonNull(requirements));
         this.photoPath = requireNonNull(photoPath);
     }
 
-    public String getId() { return id; }
-    public Name getName() { return name; }
-    public Phone getPhone() { return phone; }
-    public Email getEmail() { return email; }
-    public String getLinkedStudentId() { return linkedStudentId; }
-    public List<String> getRequirements() { return Collections.unmodifiableList(requirements); }
-    public PhotoPath getPhotoPath() { return photoPath; }
+    public String getId() {
+        return id;
+    }
+    public Name getName() {
+        return name;
+    }
+    public Phone getPhone() {
+        return phone;
+    }
+    public Email getEmail() {
+        return email;
+    }
+    public String getLinkedStudentId() {
+        return linkedStudentId;
+    }
+    public List<String> getRequirements() {
+        return Collections.unmodifiableList(requirements);
+    }
+    public PhotoPath getPhotoPath() {
+        return photoPath;
+    }
 
+    /** Returns true if both parent contacts refer to the same person identity. */
     public boolean isSameContact(ParentContact other) {
-        return other != null && name.fullName.equalsIgnoreCase(other.name.fullName)
+        return other != null
+                && name.fullName.equalsIgnoreCase(other.name.fullName)
                 && phone.equals(other.phone);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof ParentContact contact)) return false;
-        return id.equals(contact.id) && name.equals(contact.name) && phone.equals(contact.phone)
+        if (!(other instanceof ParentContact contact)) {
+            return false;
+        }
+        return id.equals(contact.id)
+                && name.equals(contact.name)
+                && phone.equals(contact.phone)
                 && Objects.equals(email, contact.email)
                 && Objects.equals(linkedStudentId, contact.linkedStudentId)
-                && requirements.equals(contact.requirements) && photoPath.equals(contact.photoPath);
+                && requirements.equals(contact.requirements)
+                && photoPath.equals(contact.photoPath);
     }
 
     @Override
-    public int hashCode() { return Objects.hash(id, name, phone, email, linkedStudentId, requirements, photoPath); }
+    public int hashCode() {
+        return Objects.hash(id, name, phone, email, linkedStudentId, requirements, photoPath);
+    }
 }

@@ -5,12 +5,12 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
-import seedu.address.model.person.ParentContact;
-import javafx.collections.FXCollections;
 
 /**
  * Wraps all data at the address-book level.
@@ -88,6 +88,9 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
+    /**
+     * Adds a parent contact to the address book.
+     */
     public void addParentContact(ParentContact contact) {
         requireNonNull(contact);
         if (parentContacts.stream().anyMatch(contact::isSameContact)) {
@@ -102,7 +105,9 @@ public class AddressBook implements ReadOnlyAddressBook {
 
     public void setParentContact(ParentContact target, ParentContact replacement) {
         int index = parentContacts.indexOf(target);
-        if (index < 0) throw new seedu.address.model.person.exceptions.PersonNotFoundException();
+        if (index < 0) {
+            throw new seedu.address.model.person.exceptions.PersonNotFoundException();
+        }
         if (!target.isSameContact(replacement) && hasParentContact(replacement)) {
             throw new seedu.address.model.person.exceptions.DuplicatePersonException();
         }

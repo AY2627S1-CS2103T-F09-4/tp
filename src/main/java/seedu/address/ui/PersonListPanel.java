@@ -20,6 +20,16 @@ public class PersonListPanel extends UiPart<Region> {
     @FXML
     private ListView<Person> personListView;
 
+    /**
+     * Creates a {@code PersonListPanel} with the given {@code ObservableList}.
+     */
+    public PersonListPanel(ObservableList<Person> personList) {
+        super(FXML);
+        personListView.setItems(personList);
+        personListView.setCellFactory(listView -> new PersonListViewCell());
+    }
+
+    /** Selects the student row corresponding to the linked student id. */
     public void selectStudent(String studentId) {
         for (int i = 0; i < personListView.getItems().size(); i++) {
             Person person = personListView.getItems().get(i);
@@ -30,15 +40,6 @@ public class PersonListPanel extends UiPart<Region> {
                 return;
             }
         }
-    }
-
-    /**
-     * Creates a {@code PersonListPanel} with the given {@code ObservableList}.
-     */
-    public PersonListPanel(ObservableList<Person> personList) {
-        super(FXML);
-        personListView.setItems(personList);
-        personListView.setCellFactory(listView -> new PersonListViewCell());
     }
 
     /**
