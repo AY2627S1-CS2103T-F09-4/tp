@@ -25,6 +25,7 @@ public class Person {
     private final Address address;
     private final Subject subject;
     private final GradeLevel gradeLevel;
+    private final PhotoPath photoPath;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
@@ -40,13 +41,23 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
             Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, subject, gradeLevel, tags);
+        this(name, phone, email, address, subject, gradeLevel, PhotoPath.NONE, tags);
+    }
+
+    /**
+     * Every field must be present and not null. Use {@link GradeLevel#NONE} if there is no grade level.
+     * Use {@link PhotoPath#NONE} if there is no photo path.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
+            PhotoPath photoPath, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, subject, gradeLevel, photoPath, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.subject = subject;
         this.gradeLevel = gradeLevel;
+        this.photoPath = photoPath;
         this.tags.addAll(tags);
     }
 
@@ -72,6 +83,10 @@ public class Person {
 
     public GradeLevel getGradeLevel() {
         return gradeLevel;
+    }
+
+    public PhotoPath getPhotoPath() {
+        return photoPath;
     }
 
     /**
@@ -117,13 +132,14 @@ public class Person {
                 && address.equals(otherPerson.address)
                 && subject.equals(otherPerson.subject)
                 && gradeLevel.equals(otherPerson.gradeLevel)
+                && photoPath.equals(otherPerson.photoPath)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, subject, gradeLevel, tags);
+        return Objects.hash(name, phone, email, address, subject, gradeLevel, photoPath, tags);
     }
 
     @Override
@@ -135,6 +151,7 @@ public class Person {
                 .add("address", address)
                 .add("subject", subject)
                 .add("gradeLevel", gradeLevel)
+                .add("photoPath", photoPath)
                 .add("tags", tags)
                 .toString();
     }

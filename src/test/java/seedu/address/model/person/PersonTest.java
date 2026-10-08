@@ -100,6 +100,10 @@ public class PersonTest {
         editedAlice = new PersonBuilder(ALICE).withGradeLevel(VALID_GRADE_LEVEL_BOB).build();
         assertFalse(ALICE.equals(editedAlice));
 
+        // different photo path -> returns false
+        editedAlice = new PersonBuilder(ALICE).withPhotoPath("photos/alice.png").build();
+        assertFalse(ALICE.equals(editedAlice));
+
         // different tags -> returns false
         editedAlice = new PersonBuilder(ALICE).withTags(VALID_TAG_HUSBAND).build();
         assertFalse(ALICE.equals(editedAlice));
@@ -110,7 +114,7 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
                 + ", subject=" + ALICE.getSubject() + ", gradeLevel=" + ALICE.getGradeLevel()
-                + ", tags=" + ALICE.getTags() + "}";
+                + ", photoPath=" + ALICE.getPhotoPath() + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
     }
 }

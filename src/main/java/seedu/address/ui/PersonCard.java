@@ -1,9 +1,13 @@
 package seedu.address.ui;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.Comparator;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -43,6 +47,10 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label gradeLevel;
     @FXML
+    private ImageView photo;
+    @FXML
+    private Label photoPlaceholder;
+    @FXML
     private FlowPane tags;
 
     /**
@@ -60,8 +68,42 @@ public class PersonCard extends UiPart<Region> {
         gradeLevel.setText("Grade: " + person.getGradeLevel().value);
         gradeLevel.setVisible(person.getGradeLevel().isPresent());
         gradeLevel.setManaged(person.getGradeLevel().isPresent());
+        setPhoto(person);
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    private void setPhoto(Person person) {
+        if (!person.getPhotoPath().isPresent()) {
+            showPhotoPlaceholder();
+            return;
+        }
+
+        Image image;
+        try {
+            image = new Image(Path.of(person.getPhotoPath().value).toUri().toString(), 72, 72, true, true, true);
+        } catch (InvalidPathException ipe) {
+            showPhotoPlaceholder();
+            return;
+        }
+        if (image.isError()) {
+            showPhotoPlaceholder();
+            return;
+        }
+
+        photo.setImage(image);
+        photo.setVisible(true);
+        photo.setManaged(true);
+        photoPlaceholder.setVisible(false);
+        photoPlaceholder.setManaged(false);
+    }
+
+    private void showPhotoPlaceholder() {
+        photo.setImage(null);
+        photo.setVisible(false);
+        photo.setManaged(false);
+        photoPlaceholder.setVisible(true);
+        photoPlaceholder.setManaged(true);
     }
 }

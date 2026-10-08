@@ -16,6 +16,7 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 
@@ -32,6 +33,7 @@ class JsonAdaptedPerson {
     private final String address;
     private final String subject;
     private final String gradeLevel;
+    private final String photoPath;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
 
     /**
@@ -41,6 +43,7 @@ class JsonAdaptedPerson {
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("address") String address,
             @JsonProperty("subject") String subject, @JsonProperty("gradeLevel") String gradeLevel,
+            @JsonProperty("photoPath") String photoPath,
             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
         this.phone = phone;
@@ -48,9 +51,18 @@ class JsonAdaptedPerson {
         this.address = address;
         this.subject = subject;
         this.gradeLevel = gradeLevel;
+        this.photoPath = photoPath;
         if (tags != null) {
             this.tags.addAll(tags);
         }
+    }
+
+    /**
+     * Constructs a {@code JsonAdaptedPerson} without a photo path.
+     */
+    public JsonAdaptedPerson(String name, String phone, String email, String address, String subject,
+            String gradeLevel, List<JsonAdaptedTag> tags) {
+        this(name, phone, email, address, subject, gradeLevel, null, tags);
     }
 
     /**
@@ -63,6 +75,7 @@ class JsonAdaptedPerson {
         address = source.getAddress().value;
         subject = source.getSubject().value;
         gradeLevel = source.getGradeLevel().value;
+        photoPath = source.getPhotoPath().value;
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
@@ -129,9 +142,13 @@ class JsonAdaptedPerson {
             modelGradeLevel = new GradeLevel(gradeLevel);
         }
 
+        final PhotoPath modelPhotoPath = photoPath == null || photoPath.isEmpty()
+                ? PhotoPath.NONE
+                : new PhotoPath(photoPath);
+
         final Set<Tag> modelTags = new HashSet<>(personTags);
         return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSubject, modelGradeLevel,
-                modelTags);
+                modelPhotoPath, modelTags);
     }
 
 }

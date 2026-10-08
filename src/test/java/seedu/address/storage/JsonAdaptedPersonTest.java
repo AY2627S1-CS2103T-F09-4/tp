@@ -18,6 +18,7 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
 import seedu.address.testutil.PersonBuilder;
 
@@ -36,6 +37,7 @@ public class JsonAdaptedPersonTest {
     private static final String VALID_ADDRESS = BENSON.getAddress().toString();
     private static final String VALID_SUBJECT = BENSON.getSubject().toString();
     private static final String VALID_GRADE_LEVEL = "Sec 3";
+    private static final String VALID_PHOTO_PATH = "photos/benson.png";
     private static final List<JsonAdaptedTag> VALID_TAGS = BENSON.getTags().stream()
             .map(JsonAdaptedTag::new)
             .collect(Collectors.toList());
@@ -51,6 +53,13 @@ public class JsonAdaptedPersonTest {
         Person withGradeLevel = new PersonBuilder(BENSON).withGradeLevel(VALID_GRADE_LEVEL).build();
         JsonAdaptedPerson person = new JsonAdaptedPerson(withGradeLevel);
         assertEquals(withGradeLevel, person.toModelType());
+    }
+
+    @Test
+    public void toModelType_validPersonDetailsWithPhotoPath_returnsPerson() throws Exception {
+        Person withPhotoPath = new PersonBuilder(BENSON).withPhotoPath(VALID_PHOTO_PATH).build();
+        JsonAdaptedPerson person = new JsonAdaptedPerson(withPhotoPath);
+        assertEquals(withPhotoPath, person.toModelType());
     }
 
     @Test
@@ -150,6 +159,16 @@ public class JsonAdaptedPersonTest {
                 VALID_ADDRESS, VALID_SUBJECT, "", VALID_TAGS);
         assertEquals(BENSON, nullGradeLevel.toModelType());
         assertEquals(BENSON, emptyGradeLevel.toModelType());
+    }
+
+    @Test
+    public void toModelType_nullOrEmptyPhotoPath_returnsPersonWithoutPhotoPath() throws Exception {
+        JsonAdaptedPerson nullPhotoPath = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL,
+                VALID_ADDRESS, VALID_SUBJECT, null, null, VALID_TAGS);
+        JsonAdaptedPerson emptyPhotoPath = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL,
+                VALID_ADDRESS, VALID_SUBJECT, null, "", VALID_TAGS);
+        assertEquals(PhotoPath.NONE, nullPhotoPath.toModelType().getPhotoPath());
+        assertEquals(PhotoPath.NONE, emptyPhotoPath.toModelType().getPhotoPath());
     }
 
     @Test
