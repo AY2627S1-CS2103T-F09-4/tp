@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -10,6 +11,13 @@
 <?import javafx.scene.layout.VBox?>
 
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <VBox alignment="CENTER" minHeight="105" prefWidth="90">
+    <padding>
+      <Insets top="5" right="5" bottom="5" left="10" />
+    </padding>
+    <ImageView fx:id="photo" fitHeight="72" fitWidth="72" preserveRatio="true" />
+    <Label fx:id="photoPlaceholder" text="No photo" styleClass="cell_small_label" />
+  </VBox>
   <GridPane HBox.hgrow="ALWAYS">
     <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="150" />

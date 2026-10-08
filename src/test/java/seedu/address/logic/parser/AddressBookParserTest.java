@@ -7,14 +7,17 @@ import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddPhotoCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeletePhotoCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
 import seedu.address.logic.commands.ExitCommand;
@@ -47,6 +50,13 @@ public class AddressBookParserTest {
     }
 
     @Test
+    public void parseCommand_addPhoto() throws Exception {
+        AddPhotoCommand command = (AddPhotoCommand) parser.parseCommand(
+                AddPhotoCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " f/photos/amy.png");
+        assertEquals(new AddPhotoCommand(INDEX_FIRST_PERSON, Path.of("photos/amy.png")), command);
+    }
+
+    @Test
     public void parseCommand_replacedCommandWords_throwsParseException() {
         // "add" and "delete" were replaced by "add-student" and "delete-student"
         assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("add n/Amy"));
@@ -64,6 +74,13 @@ public class AddressBookParserTest {
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
                 DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
         assertEquals(new DeleteCommand(INDEX_FIRST_PERSON), command);
+    }
+
+    @Test
+    public void parseCommand_deletePhoto() throws Exception {
+        DeletePhotoCommand command = (DeletePhotoCommand) parser.parseCommand(
+                DeletePhotoCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+        assertEquals(new DeletePhotoCommand(INDEX_FIRST_PERSON), command);
     }
 
     @Test

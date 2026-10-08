@@ -49,6 +49,10 @@ public class Messages {
             builder.append("; Grade Level: ")
                     .append(person.getGradeLevel());
         }
+        if (person.getPhotoPath().isPresent()) {
+            builder.append("; Photo: ")
+                    .append(person.getPhotoPath());
+        }
         builder.append("; Tags: ");
         person.getTags().forEach(builder::append);
         return builder.toString();

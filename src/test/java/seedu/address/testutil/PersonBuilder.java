@@ -9,6 +9,7 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
@@ -30,6 +31,7 @@ public class PersonBuilder {
     private Address address;
     private Subject subject;
     private GradeLevel gradeLevel;
+    private PhotoPath photoPath;
     private Set<Tag> tags;
 
     /**
@@ -42,6 +44,7 @@ public class PersonBuilder {
         address = new Address(DEFAULT_ADDRESS);
         subject = new Subject(DEFAULT_SUBJECT);
         gradeLevel = GradeLevel.NONE;
+        photoPath = PhotoPath.NONE;
         tags = new HashSet<>();
     }
 
@@ -55,6 +58,7 @@ public class PersonBuilder {
         address = personToCopy.getAddress();
         subject = personToCopy.getSubject();
         gradeLevel = personToCopy.getGradeLevel();
+        photoPath = personToCopy.getPhotoPath();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -114,8 +118,16 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the {@code PhotoPath} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withPhotoPath(String photoPath) {
+        this.photoPath = new PhotoPath(photoPath);
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, phone, email, address, subject, gradeLevel, tags);
+        return new Person(name, phone, email, address, subject, gradeLevel, photoPath, tags);
     }
 
 }
