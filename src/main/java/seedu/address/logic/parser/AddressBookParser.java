@@ -9,16 +9,22 @@ import java.util.regex.Pattern;
 
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddContactCommand;
+import seedu.address.logic.commands.AddParentPhotoCommand;
 import seedu.address.logic.commands.AddPhotoCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeleteParentCommand;
+import seedu.address.logic.commands.DeleteParentPhotoCommand;
 import seedu.address.logic.commands.DeletePhotoCommand;
 import seedu.address.logic.commands.EditCommand;
+import seedu.address.logic.commands.EditParentCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ListParentsCommand;
 import seedu.address.logic.commands.SearchCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
@@ -55,6 +61,12 @@ public class AddressBookParser {
         logger.fine("Command word: " + commandWord + "; Arguments: " + arguments);
 
         return switch (commandWord) {
+            case AddContactCommand.COMMAND_WORD -> new AddContactCommandParser().parse(arguments);
+            case DeleteParentCommand.COMMAND_WORD -> new DeleteParentCommandParser().parse(arguments);
+            case ListParentsCommand.COMMAND_WORD -> new ListParentsCommand();
+            case EditParentCommand.COMMAND_WORD -> new EditParentCommandParser().parse(arguments);
+            case AddParentPhotoCommand.COMMAND_WORD -> new AddParentPhotoCommandParser().parse(arguments);
+            case DeleteParentPhotoCommand.COMMAND_WORD -> new DeleteParentPhotoCommandParser().parse(arguments);
             case AddCommand.COMMAND_WORD -> new AddCommandParser().parse(arguments);
             case AddPhotoCommand.COMMAND_WORD -> new AddPhotoCommandParser().parse(arguments);
             case EditCommand.COMMAND_WORD -> new EditCommandParser().parse(arguments);

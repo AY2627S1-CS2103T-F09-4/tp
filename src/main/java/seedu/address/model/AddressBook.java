@@ -3,9 +3,12 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Objects;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
 
@@ -16,6 +19,7 @@ import seedu.address.model.person.UniquePersonList;
 public class AddressBook implements ReadOnlyAddressBook {
 
     private final UniquePersonList persons = new UniquePersonList();
+    private final javafx.collections.ObservableList<ParentContact> parentContacts = FXCollections.observableArrayList();
 
     public AddressBook() {}
 
@@ -44,6 +48,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         requireNonNull(newData);
 
         setPersons(newData.getPersonList());
+        parentContacts.setAll(newData.getParentContactList());
     }
 
     //// person-level operations
@@ -83,6 +88,34 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
+    /**
+     * Adds a parent contact to the address book.
+     */
+    public void addParentContact(ParentContact contact) {
+        requireNonNull(contact);
+        if (parentContacts.stream().anyMatch(contact::isSameContact)) {
+            throw new seedu.address.model.person.exceptions.DuplicatePersonException();
+        }
+        parentContacts.add(contact);
+    }
+
+    public boolean hasParentContact(ParentContact contact) {
+        return parentContacts.stream().anyMatch(contact::isSameContact);
+    }
+
+    public void setParentContact(ParentContact target, ParentContact replacement) {
+        int index = parentContacts.indexOf(target);
+        if (index < 0) {
+            throw new seedu.address.model.person.exceptions.PersonNotFoundException();
+        }
+        if (!target.isSameContact(replacement) && hasParentContact(replacement)) {
+            throw new seedu.address.model.person.exceptions.DuplicatePersonException();
+        }
+        parentContacts.set(index, replacement);
+    }
+
+    public void removeParentContact(ParentContact contact) { parentContacts.remove(contact); }
+
     //// util methods
 
     @Override
@@ -98,6 +131,11 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public ObservableList<ParentContact> getParentContactList() {
+        return FXCollections.unmodifiableObservableList(parentContacts);
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -108,11 +146,12 @@ public class AddressBook implements ReadOnlyAddressBook {
             return false;
         }
 
-        return persons.equals(otherAddressBook.persons);
+        return persons.equals(otherAddressBook.persons)
+                && parentContacts.equals(otherAddressBook.parentContacts);
     }
 
     @Override
     public int hashCode() {
-        return persons.hashCode();
+        return Objects.hash(persons, parentContacts);
     }
 }

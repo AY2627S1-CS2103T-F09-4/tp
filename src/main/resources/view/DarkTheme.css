@@ -132,6 +132,14 @@
     -fx-text-fill: #010504;
 }
 
+.student-chip {
+    -fx-padding: 2 8 2 8;
+    -fx-border-width: 1;
+    -fx-border-color: #3e7b91;
+    -fx-background-color: #3e7b91;
+    -fx-font-size: 11px;
+}
+
 .stack-pane {
      -fx-background-color: derive(#1d1d1d, 20%);
 }

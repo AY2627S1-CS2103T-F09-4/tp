@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
+import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 
 /**
@@ -68,4 +69,20 @@ public interface Model {
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateFilteredPersonList(Predicate<Person> predicate);
+
+    default void addParentContact(ParentContact contact) {
+        getAddressBook();
+    }
+    default boolean hasParentContact(ParentContact contact) {
+        return getAddressBook().getParentContactList().contains(contact);
+    }
+    default void setParentContact(ParentContact target, ParentContact replacement) {
+        getAddressBook();
+    }
+    default void deleteParentContact(ParentContact target) {
+        getAddressBook();
+    }
+    default javafx.collections.ObservableList<ParentContact> getParentContactList() {
+        return getAddressBook().getParentContactList();
+    }
 }

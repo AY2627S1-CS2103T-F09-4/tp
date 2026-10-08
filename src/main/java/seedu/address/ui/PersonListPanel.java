@@ -29,6 +29,19 @@ public class PersonListPanel extends UiPart<Region> {
         personListView.setCellFactory(listView -> new PersonListViewCell());
     }
 
+    /** Selects the student row corresponding to the linked student id. */
+    public void selectStudent(String studentId) {
+        for (int i = 0; i < personListView.getItems().size(); i++) {
+            Person person = personListView.getItems().get(i);
+            String id = person.getName().fullName + "|" + person.getPhone().value;
+            if (id.equals(studentId)) {
+                personListView.getSelectionModel().select(i);
+                personListView.scrollTo(i);
+                return;
+            }
+        }
+    }
+
     /**
      * Custom {@code ListCell} that displays the graphics of a {@code Person} using a {@code PersonCard}.
      */
