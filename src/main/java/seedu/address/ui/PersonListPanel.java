@@ -20,6 +20,18 @@ public class PersonListPanel extends UiPart<Region> {
     @FXML
     private ListView<Person> personListView;
 
+    public void selectStudent(String studentId) {
+        for (int i = 0; i < personListView.getItems().size(); i++) {
+            Person person = personListView.getItems().get(i);
+            String id = person.getName().fullName + "|" + person.getPhone().value;
+            if (id.equals(studentId)) {
+                personListView.getSelectionModel().select(i);
+                personListView.scrollTo(i);
+                return;
+            }
+        }
+    }
+
     /**
      * Creates a {@code PersonListPanel} with the given {@code ObservableList}.
      */

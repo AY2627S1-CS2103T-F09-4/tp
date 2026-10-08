@@ -11,6 +11,7 @@ import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.ParentContact;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -109,6 +110,14 @@ public class ModelManager implements Model {
         requireNonNull(predicate);
         filteredPersons.setPredicate(predicate);
     }
+
+    @Override public void addParentContact(ParentContact contact) { addressBook.addParentContact(contact); }
+    @Override public boolean hasParentContact(ParentContact contact) { return addressBook.hasParentContact(contact); }
+    @Override public void setParentContact(ParentContact target, ParentContact replacement) {
+        addressBook.setParentContact(target, replacement);
+    }
+    @Override public void deleteParentContact(ParentContact target) { addressBook.removeParentContact(target); }
+    @Override public ObservableList<ParentContact> getParentContactList() { return addressBook.getParentContactList(); }
 
     @Override
     public boolean equals(Object other) {

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -34,6 +35,7 @@ public class MainWindow extends UiPart<Stage> {
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
+    private ParentListPanel parentListPanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
 
@@ -45,6 +47,12 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private StackPane personListPanelPlaceholder;
+
+    @FXML
+    private StackPane parentListPanelPlaceholder;
+
+    @FXML
+    private TabPane recordTabs;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -116,6 +124,8 @@ public class MainWindow extends UiPart<Stage> {
     void fillInnerParts() {
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+        parentListPanel = new ParentListPanel(logic.getParentContactList(), logic, this::selectStudent);
+        parentListPanelPlaceholder.getChildren().add(parentListPanel.getRoot());
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
@@ -171,6 +181,11 @@ public class MainWindow extends UiPart<Stage> {
         return personListPanel;
     }
 
+    private void selectStudent(String studentId) {
+        recordTabs.getSelectionModel().select(0);
+        personListPanel.selectStudent(studentId);
+    }
+
     /**
      * Executes the command and returns the result.
      *
@@ -179,6 +194,12 @@ public class MainWindow extends UiPart<Stage> {
     private CommandResult executeCommand(String commandText) throws CommandException, ParseException {
         try {
             CommandResult commandResult = logic.execute(commandText);
+            if (commandText.trim().startsWith("add-parent") || commandText.trim().startsWith("list-parents")
+                    || commandText.trim().startsWith("edit-parent") || commandText.trim().startsWith("delete-parent")) {
+                recordTabs.getSelectionModel().select(1);
+            } else if (commandText.trim().startsWith("list")) {
+                recordTabs.getSelectionModel().select(0);
+            }
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
