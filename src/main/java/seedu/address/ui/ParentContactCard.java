@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import seedu.address.logic.Logic;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
@@ -73,7 +74,8 @@ public class ParentContactCard extends UiPart<Region> {
 
         if (contact.getLinkedStudentId() != null) {
             linkedStudent.setOnMouseClicked(event -> selectStudent.run());
-            linkedStudent.setStyle("-fx-cursor: hand;");
+            linkedStudent.setStyle("-fx-cursor: hand; -fx-text-fill: #1a73e8; -fx-underline: true;");
+            linkedStudent.setTextFill(Color.web("#1a73e8"));
         }
     }
 
