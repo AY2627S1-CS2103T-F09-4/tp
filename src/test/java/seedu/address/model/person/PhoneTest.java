@@ -31,11 +31,17 @@ public class PhoneTest {
         assertFalse(Phone.isValidPhone("phone")); // non-numeric
         assertFalse(Phone.isValidPhone("9011p041")); // alphabets within digits
         assertFalse(Phone.isValidPhone("9312 1534")); // spaces within digits
+        assertFalse(Phone.isValidPhone("1234567890123456")); // more than 15 digits
+        assertFalse(Phone.isValidPhone("+12")); // plus sign but fewer than 3 digits
+        assertFalse(Phone.isValidPhone("++6591234567")); // more than one plus sign
+        assertFalse(Phone.isValidPhone("6591234567+")); // plus sign not at the start
 
         // valid phone numbers
         assertTrue(Phone.isValidPhone("911")); // exactly 3 numbers
         assertTrue(Phone.isValidPhone("93121534"));
-        assertTrue(Phone.isValidPhone("124293842033123")); // long phone numbers
+        assertTrue(Phone.isValidPhone("124293842033123")); // exactly 15 digits
+        assertTrue(Phone.isValidPhone("+6591234567")); // leading plus sign
+        assertTrue(Phone.isValidPhone("+911")); // leading plus sign, exactly 3 digits
     }
 
     @Test

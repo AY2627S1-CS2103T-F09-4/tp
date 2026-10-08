@@ -1,14 +1,55 @@
-[![CI Status](https://github.com/se-edu/addressbook-level3/workflows/Java%20CI/badge.svg)](https://github.com/se-edu/addressbook-level3/actions)
+![Tutoria](docs/images/Tutoria.png)
+
+[![CI Status](https://github.com/AY2627S1-CS2103T-F09-4/tp/workflows/Java%20CI/badge.svg)](https://github.com/AY2627S1-CS2103T-F09-4/tp/actions)
 
 ![Ui](docs/images/Ui.png)
 
-* This is **a sample project for Software Engineering (SE) students**.<br>
-  Example usages:
-  * as a starting point of a course project (as opposed to writing everything from scratch)
-  * as a case study
-* The project simulates an ongoing software project for a desktop application (called _AddressBook_) used for managing contact details.
-  * It is **written in an object-oriented programming (OOP) style** and provides a **reasonably well-written** codebase of about 6 KLoC. It is **larger** than what students typically write in beginner-level software-engineering modules, without being overwhelming.
-  * It comes with a **reasonable level of user and developer documentation**.
-* It is named `AddressBook Level 3` (`AB3` for short) because it was initially created as a part of a series of `AddressBook` projects (`Level 1`, `Level 2`, `Level 3` ...).
-* For the detailed documentation of this project, see the **[Address Book Product Website](https://se-education.org/addressbook-level3)**.
-* This project is a **part of the se-education.org** initiative. If you would like to contribute code to this project, see [se-education.org](https://se-education.org/#contributing-to-se-edu) for more info.
+## Table of Contents
+
+* [About](#-about)
+* [Quickstart](#-quickstart)
+* [Features](#-features)
+* [Documentation](#-documentation)
+* [Team](#-team)
+* [Acknowledgements and License](#-acknowledgements-and-license)
+
+## 🚀 About
+
+**Tutoria is a tutoring companion Graphical User Interface (GUI) for tutors to organise their work**.<br>
+Example usages:
+* Tutors can keep track of their students' details
+* Tutors can view students' performances
+* It is **written in an object-oriented programming (OOP) style**
+
+For the detailed documentation of this project, see the [Documentation](#-documentation)
+
+
+## ⚡ Quickstart
+
+1. Ensure you have **Java 25** installed (check with `java -version`).
+2. Download the latest `Tutoria.jar` from the [Releases page](https://github.com/AY2627S1-CS2103T-F09-4/tp/releases).
+3. Copy the file to the folder you want to use as the home folder for Tutoria.
+4. Open a terminal, `cd` into that folder, and run:
+   ```
+   java -jar Tutoria.jar
+   ```
+5. A GUI similar to the screenshot above should appear within a few seconds.
+
+**Running from source:** clone the repo and run `./gradlew run` (`gradlew run` on Windows).
+
+## ✨ Features
+
+* Add, edit, delete and find students' contact details
+
+## 📚 Documentation
+
+* [User Guide](docs/UserGuide.md)
+* [Developer Guide](docs/DeveloperGuide.md)
+
+## 👥 Team
+
+Meet the team on the [About Us](docs/AboutUs.md) page.
+
+## 📃 Acknowledgements and License
+
+This project is based on [AddressBook Level 3](https://se-education.org/addressbook-level3) by the [se-education.org](https://se-education.org) team. It is released under the [MIT License](LICENSE).

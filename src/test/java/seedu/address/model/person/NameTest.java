@@ -30,6 +30,10 @@ public class NameTest {
         assertFalse(Name.isValidName("^")); // only non-alphanumeric characters
         assertFalse(Name.isValidName("peter*")); // contains non-alphanumeric characters
 
+        // name length limit
+        assertFalse(Name.isValidName("a".repeat(101))); // 101 characters
+        assertTrue(Name.isValidName("a".repeat(100))); // exactly 100 characters
+
         // valid name
         assertTrue(Name.isValidName("peter jack")); // alphabets only
         assertTrue(Name.isValidName("12345")); // numbers only
