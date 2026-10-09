@@ -68,7 +68,8 @@ public class AddPhotoCommand extends Command {
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
         Person updatedPerson = new Person(personToUpdate.getName(), personToUpdate.getPhone(),
                 personToUpdate.getEmail(), personToUpdate.getAddress(), personToUpdate.getSubject(),
-                personToUpdate.getGradeLevel(), new PhotoPath(photoFilePath.toString()), personToUpdate.getTags());
+            personToUpdate.getGradeLevel(), new PhotoPath(photoFilePath.toString()),
+            personToUpdate.getTaskList(), personToUpdate.getTags());
 
         model.setPerson(personToUpdate, updatedPerson);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);

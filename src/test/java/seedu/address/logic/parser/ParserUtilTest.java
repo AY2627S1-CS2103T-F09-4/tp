@@ -17,6 +17,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.task.Task;
 
 public class ParserUtilTest {
     private static final String INVALID_NAME = "R@chel";
@@ -190,5 +191,20 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = Set.of(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseTask_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseTask(null));
+    }
+
+    @Test
+    public void parseTask_blankValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseTask(WHITESPACE));
+    }
+
+    @Test
+    public void parseTask_validValueWithWhitespace_returnsTrimmedTask() throws Exception {
+        assertEquals(new Task("do homework"), ParserUtil.parseTask("  do homework  "));
     }
 }

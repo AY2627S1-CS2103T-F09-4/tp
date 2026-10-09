@@ -12,6 +12,7 @@ import seedu.address.model.person.Phone;
 import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.task.TaskList;
 import seedu.address.model.util.SampleDataUtil;
 
 /**
@@ -32,6 +33,7 @@ public class PersonBuilder {
     private Subject subject;
     private GradeLevel gradeLevel;
     private PhotoPath photoPath;
+    private TaskList taskList;
     private Set<Tag> tags;
 
     /**
@@ -45,6 +47,7 @@ public class PersonBuilder {
         subject = new Subject(DEFAULT_SUBJECT);
         gradeLevel = GradeLevel.NONE;
         photoPath = PhotoPath.NONE;
+        taskList = new TaskList();
         tags = new HashSet<>();
     }
 
@@ -59,6 +62,7 @@ public class PersonBuilder {
         subject = personToCopy.getSubject();
         gradeLevel = personToCopy.getGradeLevel();
         photoPath = personToCopy.getPhotoPath();
+        taskList = personToCopy.getTaskList();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -126,8 +130,16 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Parses the descriptions into a {@code TaskList} and sets it on the person being built.
+     */
+    public PersonBuilder withTasks(String... taskDescriptions) {
+        taskList = SampleDataUtil.getTaskList(taskDescriptions);
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, phone, email, address, subject, gradeLevel, photoPath, tags);
+        return new Person(name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
     }
 
 }

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
@@ -43,4 +44,16 @@
       <Label fx:id="gradeLevel" styleClass="cell_small_label" text="\$gradeLevel" />
     </VBox>
   </GridPane>
+  <VBox minWidth="160" prefWidth="220" maxWidth="280" minHeight="105" spacing="6" styleClass="task-list">
+    <padding>
+      <Insets top="8" right="8" bottom="8" left="8" />
+    </padding>
+    <Label text="TASK LIST" styleClass="task-list-header" />
+    <ScrollPane fx:id="taskScrollPane" hbarPolicy="NEVER" fitToWidth="true" maxHeight="140"
+                styleClass="task-scroll-pane">
+      <content>
+        <VBox fx:id="tasks" spacing="4" />
+      </content>
+    </ScrollPane>
+  </VBox>
 </HBox>

@@ -20,6 +20,7 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
+import seedu.address.model.task.Task;
 import seedu.address.testutil.PersonBuilder;
 
 public class JsonAdaptedPersonTest {
@@ -178,6 +179,14 @@ public class JsonAdaptedPersonTest {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
                 VALID_SUBJECT, null, invalidTags);
         assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidTaskDescription_throwsIllegalValueException() {
+        List<JsonAdaptedTask> invalidTasks = List.of(new JsonAdaptedTask(" "));
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SUBJECT, null, null, VALID_TAGS, invalidTasks);
+        assertThrows(IllegalValueException.class, Task.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
 }

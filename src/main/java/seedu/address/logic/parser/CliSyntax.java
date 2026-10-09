@@ -14,6 +14,7 @@ public class CliSyntax {
     public static final Prefix PREFIX_GRADE_LEVEL = new Prefix("g/");
     public static final Prefix PREFIX_FILE_PATH = new Prefix("f/");
     public static final Prefix PREFIX_TAG = new Prefix("t/");
+    public static final Prefix PREFIX_TASK = new Prefix("task/");
     public static final Prefix PREFIX_LINK = new Prefix("link/");
     public static final Prefix PREFIX_REQUIREMENT = new Prefix("r/");
 

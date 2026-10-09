@@ -380,8 +380,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ### Glossary
 
+* **Contact**: A person record managed by the app; contacts may represent students, parents, or other people.
 * **Mainstream OS**: Windows, Linux, Unix, or macOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Parent**: A contact profile used to keep track of a student's parent's requirements.
+* **Private contact detail**: Personal information about a contact that is not meant to be shared with others.
+* **Schedule**: Activities or sessions associated with a specific date, potentially involving multiple students.
+* **Student**: A contact whose educational information, such as classes and deliverables, is tracked in the app.
+* **Tutor**: A user who manages student and parent information in the app.
 
 --------------------------------------------------------------------------------------------------------------------
 
