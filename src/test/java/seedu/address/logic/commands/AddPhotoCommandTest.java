@@ -21,12 +21,14 @@ import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PhotoPath;
+import seedu.address.testutil.PersonBuilder;
 
 public class AddPhotoCommandTest {
 
@@ -66,6 +68,19 @@ public class AddPhotoCommandTest {
         expectedModel.setPerson(personToUpdate, updatedPerson);
 
         assertCommandSuccess(addPhotoCommand, model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_personWithTasks_preservesTasks() throws IOException, CommandException {
+        Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework", "revise notes").build();
+        model.setPerson(originalPerson, personWithTasks);
+        AddPhotoCommand command = new AddPhotoCommand(INDEX_FIRST_PERSON, createImageFile("tasks.png", "png"));
+
+        command.execute(model);
+
+        assertEquals(personWithTasks.getTaskList(),
+                model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getTaskList());
     }
 
     @Test
@@ -154,6 +169,7 @@ public class AddPhotoCommandTest {
 
     private static Person createPersonWithPhoto(Person person, Path photoPath) {
         return new Person(person.getName(), person.getPhone(), person.getEmail(), person.getAddress(),
-                person.getSubject(), person.getGradeLevel(), new PhotoPath(photoPath.toString()), person.getTags());
+            person.getSubject(), person.getGradeLevel(), new PhotoPath(photoPath.toString()),
+            person.getTaskList(), person.getTags());
     }
 }

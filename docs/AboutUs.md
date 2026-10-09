@@ -30,12 +30,12 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 <img src="images/mr-yeo.png" width="200px">
 
-[[github](http://github.com/mr-yeo)] [[portfolio](team/johndoe.md)]
+[[github](http://github.com/mr-yeo)]
 
 * Role: Developer
 * Responsibilities: Data
 
-### Jean Doe
+### Aidan Chiang
 
 <img src="images/vanillajohn.png" width="200px">
 

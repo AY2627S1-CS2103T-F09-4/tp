@@ -14,12 +14,14 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PhotoPath;
+import seedu.address.testutil.PersonBuilder;
 
 public class DeletePhotoCommandTest {
 
@@ -38,6 +40,18 @@ public class DeletePhotoCommandTest {
         expectedModel.setPerson(personWithPhoto, updatedPerson);
 
         assertCommandSuccess(deletePhotoCommand, model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_personWithTasks_preservesTasks() throws CommandException {
+        Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework", "revise notes").build();
+        model.setPerson(originalPerson, personWithTasks);
+
+        new DeletePhotoCommand(INDEX_FIRST_PERSON).execute(model);
+
+        assertEquals(personWithTasks.getTaskList(),
+                model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getTaskList());
     }
 
     @Test
@@ -101,13 +115,13 @@ public class DeletePhotoCommandTest {
         Person person = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person personWithPhoto = new Person(person.getName(), person.getPhone(), person.getEmail(),
                 person.getAddress(), person.getSubject(), person.getGradeLevel(), new PhotoPath("photos/amy.png"),
-                person.getTags());
+            person.getTaskList(), person.getTags());
         model.setPerson(person, personWithPhoto);
         return personWithPhoto;
     }
 
     private static Person createPersonWithoutPhoto(Person person) {
         return new Person(person.getName(), person.getPhone(), person.getEmail(), person.getAddress(),
-                person.getSubject(), person.getGradeLevel(), PhotoPath.NONE, person.getTags());
+            person.getSubject(), person.getGradeLevel(), PhotoPath.NONE, person.getTaskList(), person.getTags());
     }
 }

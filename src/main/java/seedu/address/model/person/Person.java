@@ -9,6 +9,7 @@ import java.util.Set;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.task.TaskList;
 
 /**
  * Represents a Person in the address book.
@@ -26,6 +27,7 @@ public class Person {
     private final Subject subject;
     private final GradeLevel gradeLevel;
     private final PhotoPath photoPath;
+    private final TaskList taskList;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
@@ -33,7 +35,7 @@ public class Person {
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Subject subject, Set<Tag> tags) {
-        this(name, phone, email, address, subject, GradeLevel.NONE, tags);
+        this(name, phone, email, address, subject, GradeLevel.NONE, PhotoPath.NONE, new TaskList(), tags);
     }
 
     /**
@@ -41,7 +43,7 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
             Set<Tag> tags) {
-        this(name, phone, email, address, subject, gradeLevel, PhotoPath.NONE, tags);
+        this(name, phone, email, address, subject, gradeLevel, PhotoPath.NONE, new TaskList(), tags);
     }
 
     /**
@@ -50,7 +52,16 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
             PhotoPath photoPath, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, subject, gradeLevel, photoPath, tags);
+        this(name, phone, email, address, subject, gradeLevel, photoPath, new TaskList(), tags);
+    }
+
+    /**
+     * Every field must be present and not null. Use {@link GradeLevel#NONE} and {@link PhotoPath#NONE}
+     * when those values are not specified.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
+            PhotoPath photoPath, TaskList taskList, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -58,6 +69,7 @@ public class Person {
         this.subject = subject;
         this.gradeLevel = gradeLevel;
         this.photoPath = photoPath;
+        this.taskList = taskList;
         this.tags.addAll(tags);
     }
 
@@ -87,6 +99,10 @@ public class Person {
 
     public PhotoPath getPhotoPath() {
         return photoPath;
+    }
+
+    public TaskList getTaskList() {
+        return taskList;
     }
 
     /**
@@ -133,13 +149,14 @@ public class Person {
                 && subject.equals(otherPerson.subject)
                 && gradeLevel.equals(otherPerson.gradeLevel)
                 && photoPath.equals(otherPerson.photoPath)
+                && taskList.equals(otherPerson.taskList)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, subject, gradeLevel, photoPath, tags);
+        return Objects.hash(name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
     }
 
     @Override
@@ -152,6 +169,7 @@ public class Person {
                 .add("subject", subject)
                 .add("gradeLevel", gradeLevel)
                 .add("photoPath", photoPath)
+                .add("taskList", taskList)
                 .add("tags", tags)
                 .toString();
     }

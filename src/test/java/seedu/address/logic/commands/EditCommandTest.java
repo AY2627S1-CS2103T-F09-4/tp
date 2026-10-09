@@ -71,6 +71,24 @@ public class EditCommandTest {
     }
 
     @Test
+    public void execute_personWithTasks_preservesTasks() {
+        Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework", "revise notes").build();
+        model.setPerson(originalPerson, personWithTasks);
+
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName("Task Holder").build();
+        Person editedPerson = new PersonBuilder(personWithTasks).withName("Task Holder").build();
+        EditCommand command = new EditCommand(INDEX_FIRST_PERSON, descriptor);
+        Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
+        expectedModel.setPerson(personWithTasks, editedPerson);
+        String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_PERSON_SUCCESS, Messages.format(editedPerson));
+
+        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+        assertEquals(personWithTasks.getTaskList(),
+                model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getTaskList());
+    }
+
+    @Test
     public void execute_noFieldSpecifiedUnfilteredList_success() {
         EditCommand editCommand = new EditCommand(INDEX_FIRST_PERSON, new EditPersonDescriptor());
         Person editedPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());

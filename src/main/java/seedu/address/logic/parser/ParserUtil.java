@@ -16,6 +16,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.task.Task;
 
 /**
  * Contains utility methods used for parsing strings in the various *Parser classes.
@@ -140,6 +141,21 @@ public class ParserUtil {
             throw new ParseException(Tag.MESSAGE_CONSTRAINTS);
         }
         return new Tag(trimmedTag);
+    }
+
+    /**
+     * Parses a {@code String description} into a {@code Task}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given description is invalid.
+     */
+    public static Task parseTask(String description) throws ParseException {
+        requireNonNull(description);
+        String trimmedDescription = description.trim();
+        if (!Task.isValidDescription(trimmedDescription)) {
+            throw new ParseException(Task.MESSAGE_CONSTRAINTS);
+        }
+        return new Task(trimmedDescription);
     }
 
     /**

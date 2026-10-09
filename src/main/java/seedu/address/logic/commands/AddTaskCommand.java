@@ -11,30 +11,33 @@ import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Person;
-import seedu.address.model.person.PhotoPath;
+import seedu.address.model.task.Task;
 
 /**
- * Deletes the photo of a person identified using its displayed index from the address book.
+ * Adds a task to the task list of a person identified by displayed index.
  */
-public class DeletePhotoCommand extends Command {
+public class AddTaskCommand extends Command {
 
-    public static final String COMMAND_WORD = "delete-photo";
+    public static final String COMMAND_WORD = "add-task";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Deletes the photo of the student identified by the index number used in the displayed student list.\n"
-            + "Parameters: INDEX (must be a positive integer)\n"
-            + "Example: " + COMMAND_WORD + " 3";
+            + ": Adds a task to the student identified by the index number used in the displayed student list.\n"
+            + "Parameters: INDEX task/TASK_DESCRIPTION\n"
+            + "Example: " + COMMAND_WORD + " 1 task/do homework";
 
-    public static final String MESSAGE_DELETE_PHOTO_SUCCESS = "Deleted photo from student: %1$s";
+    public static final String MESSAGE_ADD_TASK_SUCCESS = "Added task to student: %1$s";
 
     private final Index targetIndex;
+    private final Task task;
 
     /**
-     * Creates a DeletePhotoCommand to delete a student's photo.
+     * Creates an AddTaskCommand for the specified person and task.
      */
-    public DeletePhotoCommand(Index targetIndex) {
+    public AddTaskCommand(Index targetIndex, Task task) {
         requireNonNull(targetIndex);
+        requireNonNull(task);
         this.targetIndex = targetIndex;
+        this.task = task;
     }
 
     @Override
@@ -49,11 +52,12 @@ public class DeletePhotoCommand extends Command {
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
         Person updatedPerson = new Person(personToUpdate.getName(), personToUpdate.getPhone(),
                 personToUpdate.getEmail(), personToUpdate.getAddress(), personToUpdate.getSubject(),
-            personToUpdate.getGradeLevel(), PhotoPath.NONE, personToUpdate.getTaskList(), personToUpdate.getTags());
+                personToUpdate.getGradeLevel(), personToUpdate.getPhotoPath(),
+                personToUpdate.getTaskList().withTask(task), personToUpdate.getTags());
 
         model.setPerson(personToUpdate, updatedPerson);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
-        return new CommandResult(String.format(MESSAGE_DELETE_PHOTO_SUCCESS, Messages.format(updatedPerson)));
+        return new CommandResult(String.format(MESSAGE_ADD_TASK_SUCCESS, Messages.format(updatedPerson)));
     }
 
     @Override
@@ -61,18 +65,17 @@ public class DeletePhotoCommand extends Command {
         if (other == this) {
             return true;
         }
-
-        if (!(other instanceof DeletePhotoCommand otherDeletePhotoCommand)) {
+        if (!(other instanceof AddTaskCommand otherAddTaskCommand)) {
             return false;
         }
-
-        return targetIndex.equals(otherDeletePhotoCommand.targetIndex);
+        return targetIndex.equals(otherAddTaskCommand.targetIndex) && task.equals(otherAddTaskCommand.task);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("targetIndex", targetIndex)
+                .add("task", task)
                 .toString();
     }
 }

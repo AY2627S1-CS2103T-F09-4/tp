@@ -107,6 +107,10 @@ public class PersonTest {
         // different tags -> returns false
         editedAlice = new PersonBuilder(ALICE).withTags(VALID_TAG_HUSBAND).build();
         assertFalse(ALICE.equals(editedAlice));
+
+        // different task list -> returns false
+        editedAlice = new PersonBuilder(ALICE).withTasks("do homework").build();
+        assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
@@ -114,7 +118,16 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
                 + ", subject=" + ALICE.getSubject() + ", gradeLevel=" + ALICE.getGradeLevel()
-                + ", photoPath=" + ALICE.getPhotoPath() + ", tags=" + ALICE.getTags() + "}";
+                + ", photoPath=" + ALICE.getPhotoPath() + ", taskList=" + ALICE.getTaskList()
+                + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
+    }
+
+    @Test
+    public void builderCopy_preservesTaskList() {
+        Person personWithTasks = new PersonBuilder(ALICE).withTasks("do homework", "revise notes").build();
+
+        assertEquals(personWithTasks, new PersonBuilder(personWithTasks).build());
+        assertEquals(personWithTasks.getTaskList(), new PersonBuilder(personWithTasks).build().getTaskList());
     }
 }

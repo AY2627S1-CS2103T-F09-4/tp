@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddPhotoCommand;
+import seedu.address.logic.commands.AddTaskCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.DeletePhotoCommand;
@@ -27,6 +28,7 @@ import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.task.Task;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.PersonUtil;
@@ -54,6 +56,13 @@ public class AddressBookParserTest {
         AddPhotoCommand command = (AddPhotoCommand) parser.parseCommand(
                 AddPhotoCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " f/photos/amy.png");
         assertEquals(new AddPhotoCommand(INDEX_FIRST_PERSON, Path.of("photos/amy.png")), command);
+    }
+
+    @Test
+    public void parseCommand_addTask() throws Exception {
+        AddTaskCommand command = (AddTaskCommand) parser.parseCommand(
+                AddTaskCommand.COMMAND_WORD + " 1 task/do homework");
+        assertEquals(new AddTaskCommand(INDEX_FIRST_PERSON, new Task("do homework")), command);
     }
 
     @Test

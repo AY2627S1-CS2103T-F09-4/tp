@@ -132,6 +132,36 @@
     -fx-text-fill: #010504;
 }
 
+.task-list {
+    -fx-border-color: #73797b;
+    -fx-border-width: 1px;
+    -fx-background-color: rgba(29, 29, 29, 0.22);
+}
+
+.task-list-header {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 12px;
+    -fx-text-fill: #cbd2d3;
+}
+
+.task-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.task-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.task-item {
+    -fx-padding: 5 7 5 7;
+    -fx-background-color: #3e7b91;
+    -fx-background-radius: 2px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
 .student-chip {
     -fx-padding: 2 8 2 8;
     -fx-border-width: 1;
