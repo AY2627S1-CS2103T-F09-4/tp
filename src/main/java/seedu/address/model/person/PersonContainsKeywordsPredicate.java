@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.task.Task;
 
 /**
- * Tests that a {@code Person}'s {@code Name} matches any of the keywords given.
+ * Tests that a {@code Person}'s {@code attributes} matches any of the keywords given.
  */
 public class PersonContainsKeywordsPredicate implements Predicate<Person> {
     private final List<String> keywords;
@@ -26,8 +27,19 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
                 || containsIgnoreCase(person.getPhone().value, keyword)
                 || containsIgnoreCase(person.getEmail().value, keyword)
                 || containsIgnoreCase(person.getAddress().value, keyword)
+                || containsIgnoreCase(person.getGradeLevel().value, keyword)
+                || containsIgnoreCase(person.getSubject().value, keyword)
+                || helper(person.getTaskList().getTasks(), keyword)
                 || person.getTags().stream()
                 .anyMatch(tag -> containsIgnoreCase(tag.tagName, keyword));
+    }
+
+    private boolean helper(List<Task> tasks, String keyword) {
+        boolean result = false;
+        for (Task task : tasks) {
+            result = result || containsIgnoreCase(task.toString(), keyword);
+        }
+        return result;
     }
 
     private boolean containsIgnoreCase(String field, String keyword) {

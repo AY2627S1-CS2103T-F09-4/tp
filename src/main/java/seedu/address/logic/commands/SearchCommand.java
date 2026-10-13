@@ -2,28 +2,33 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Objects;
+
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.person.PersonContainsKeywordsPredicate;
 
 /**
- * Finds and lists all persons in the address book whose name contains any of the argument keywords.
- * Keyword matching is case insensitive.
+ * Searches for and lists all students and parents whose attributes contains any of the argument keywords.
+ * Keyword matching is case insensitive and searches for exact phrases.
  */
 public class SearchCommand extends Command {
 
     public static final String COMMAND_WORD = "search";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Finds all persons whose names contain any of "
-            + "the specified keywords (case-insensitive) and displays them as a list with index numbers.\n"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Searches for all persons whose attributes contain any of "
+            + "the specified keywords (case-insensitive) and displays them as a list with index numbers"
+            + "and highlights the keywords.\n"
             + "Parameters: KEYWORD [MORE_KEYWORDS]...\n"
             + "Example: " + COMMAND_WORD + " alice bob charlie";
 
     private final PersonContainsKeywordsPredicate predicate;
+    private final String keyword;
 
-    public SearchCommand(PersonContainsKeywordsPredicate predicate) {
+    public SearchCommand(PersonContainsKeywordsPredicate predicate, String keyword) {
         this.predicate = predicate;
+        this.keyword = keyword;
     }
 
     @Override
@@ -31,7 +36,8 @@ public class SearchCommand extends Command {
         requireNonNull(model);
         model.updateFilteredPersonList(predicate);
         return new CommandResult(
-                String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size()));
+                String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size()),
+                keyword);
     }
 
     @Override

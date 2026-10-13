@@ -126,6 +126,18 @@ Examples:
 * `find alex david` returns `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
+### Searching for anything: `search`
+
+Searches for anything with the matching keyword, and highlights the keyword.
+
+Format: `search KEYWORD`
+
+* Everything after `search` is the keyword; for example, `Hans Bo` searches for `Hans Bo` together, and not `Hans` and `Bo` separately.
+* The search is case-insensitive; for example, `hans` matches `Hans`.
+* Keyword order matters; for example, `Hans Bo` does not match `Bo Hans`.
+* The search considers anything that can be entered as a field in the `add` commands
+* Full words don't have to match; for example, `Han` matches `Hans`.
+
 ### Deleting a person: `delete`
 
 Deletes the specified person from the address book.
@@ -164,10 +176,6 @@ AddressBook data is saved automatically as a JSON file `[JAR file location]/data
 If your changes make the data file invalid, AddressBook starts with an empty address book at the next run. The invalid file remains on disk until you run a command (AddressBook saves after every command). Still, we recommend backing up the file before editing it.<br>
 Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
 </div>
-
-### Archiving data files `[coming in v2.0]`
-
-_Details coming soon ..._
 
 --------------------------------------------------------------------------------------------------------------------
 

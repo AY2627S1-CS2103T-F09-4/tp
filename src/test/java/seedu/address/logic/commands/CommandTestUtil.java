@@ -108,6 +108,12 @@ public class CommandTestUtil {
         assertCommandSuccess(command, actualModel, expectedCommandResult, expectedModel);
     }
 
+    public static void assertCommandKeywordSuccess(Command command, Model actualModel, String expectedMessage,
+            Model expectedModel, String keyword) {
+        CommandResult expectedCommandResult = new CommandResult(expectedMessage, keyword);
+        assertCommandSuccess(command, actualModel, expectedCommandResult, expectedModel);
+    }
+
     /**
      * Executes the given {@code command}, confirms that <br>
      * - a {@code CommandException} is thrown <br>
