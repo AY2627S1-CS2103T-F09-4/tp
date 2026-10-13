@@ -19,7 +19,7 @@ public class PersonAttributesTextIndexFinder {
      * @param person a {@Person}.
      * @param keyword a keyword to search within a {@Person}'s attributes
      */
-    public PersonAttributesTextIndexFinder (Person person, String keyword) {
+    public PersonAttributesTextIndexFinder(Person person, String keyword) {
         this.person = person;
         this.textIndexFinder = new TextIndexFinder();
         this.keyword = keyword;
