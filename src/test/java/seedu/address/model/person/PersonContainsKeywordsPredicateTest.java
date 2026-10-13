@@ -134,7 +134,7 @@ public class PersonContainsKeywordsPredicateTest {
     }
 
     @Test
-    public void test_containsKeywords_caseInsensitive_returnsTrue() {
+    public void test_containsCaseInsensitiveKeywords_returnsTrue() {
         PersonContainsKeywordsPredicate predicate =
                 new PersonContainsKeywordsPredicate(List.of("MATHEMATICS"));
 
