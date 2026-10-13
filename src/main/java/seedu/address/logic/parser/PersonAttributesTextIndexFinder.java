@@ -9,10 +9,16 @@ import seedu.address.model.tag.Tag;
  * Finds a given keyword within a {@code Person}'s attributes.
  */
 public class PersonAttributesTextIndexFinder {
-    Person person;
-    TextIndexFinder textIndexFinder;
-    String keyword;
+    private Person person;
+    private TextIndexFinder textIndexFinder;
+    private String keyword;
 
+    /**
+     * Creates a PersonAttributesTextIndexFinder.
+     *
+     * @param person a {@Person}.
+     * @param keyword a keyword to search within a {@Person}'s attributes
+     */
     public PersonAttributesTextIndexFinder (Person person, String keyword) {
         this.person = person;
         this.textIndexFinder = new TextIndexFinder();

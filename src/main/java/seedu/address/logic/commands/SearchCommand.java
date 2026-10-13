@@ -2,8 +2,6 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
-
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
@@ -17,8 +15,8 @@ public class SearchCommand extends Command {
 
     public static final String COMMAND_WORD = "search";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Searches for all persons whose attributes contain any of "
-            + "the specified keywords (case-insensitive) and displays them as a list with index numbers"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Searches for all persons whose attributes contain "
+            + "any of the specified keywords (case-insensitive) and displays them as a list with index numbers"
             + "and highlights the keywords.\n"
             + "Parameters: KEYWORD [MORE_KEYWORDS]...\n"
             + "Example: " + COMMAND_WORD + " alice bob charlie";
@@ -26,6 +24,12 @@ public class SearchCommand extends Command {
     private final PersonContainsKeywordsPredicate predicate;
     private final String keyword;
 
+    /**
+     * Creates a SearchCommand
+     *
+     * @param predicate the predicate used to filter the resulting list of Persons.
+     * @param keyword the keyword to search with.
+     */
     public SearchCommand(PersonContainsKeywordsPredicate predicate, String keyword) {
         this.predicate = predicate;
         this.keyword = keyword;

@@ -201,7 +201,8 @@ public class PersonCard extends UiPart<Region> {
         return textFlow;
     }
 
-    private int colorStartingAndMatchingText(String text, List<MatchRange> ranges, int currentIndex, TextFlow textFlow) {
+    private int colorStartingAndMatchingText(String text, List<MatchRange> ranges, int currentIndex,
+                                             TextFlow textFlow) {
         for (MatchRange range : ranges) {
             int start = range.getStart();
             int end = range.getEnd();
@@ -219,7 +220,7 @@ public class PersonCard extends UiPart<Region> {
                 textFlow.getChildren().add(normalText);
             }
 
-            if(!keyword.isEmpty()) {
+            if (!keyword.isEmpty()) {
                 // Matching text.
                 Text match = new Text(text.substring(start, end));
                 match.getStyleClass().add("search-match");

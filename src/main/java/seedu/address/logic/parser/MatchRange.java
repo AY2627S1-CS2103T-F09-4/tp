@@ -7,6 +7,12 @@ public class MatchRange {
     private final int start;
     private final int end;
 
+    /**
+     * Creates a MatchRange.
+     *
+     * @param start the starting index.
+     * @param end the ending index.
+     */
     public MatchRange(int start, int end) {
         this.start = start;
         this.end = end;
