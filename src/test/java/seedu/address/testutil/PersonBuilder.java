@@ -12,7 +12,9 @@ import seedu.address.model.person.Phone;
 import seedu.address.model.person.PhotoPath;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskList;
+import seedu.address.model.task.TaskStatus;
 import seedu.address.model.util.SampleDataUtil;
 
 /**
@@ -135,6 +137,14 @@ public class PersonBuilder {
      */
     public PersonBuilder withTasks(String... taskDescriptions) {
         taskList = SampleDataUtil.getTaskList(taskDescriptions);
+        return this;
+    }
+
+    /**
+     * Appends a task with the given description and status to the person being built.
+     */
+    public PersonBuilder withTask(String description, TaskStatus status) {
+        taskList = taskList.withTask(new Task(description, status));
         return this;
     }
 

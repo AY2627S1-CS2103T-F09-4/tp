@@ -21,10 +21,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import seedu.address.model.person.Person;
+import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.PersonBuilder;
 
 class PersonCardTest {
@@ -142,14 +144,39 @@ class PersonCardTest {
 
             assertEquals(2, tasks.getChildren().size());
 
-            Node firstTask = tasks.getChildren().get(0);
-            Node secondTask = tasks.getChildren().get(1);
+            HBox firstRow = (HBox) tasks.getChildren().get(0);
+            HBox secondRow = (HBox) tasks.getChildren().get(1);
+            Node firstTask = firstRow.getChildren().get(1);
+            Node secondTask = secondRow.getChildren().get(1);
 
             assertTrue(firstTask.getStyleClass().contains("task-item"));
             assertTrue(secondTask.getStyleClass().contains("task-item"));
 
+            assertEquals("1.", ((Label) firstRow.getChildren().get(0)).getText());
+            assertEquals("2.", ((Label) secondRow.getChildren().get(0)).getText());
             assertEquals("Call Alice", getDisplayedText(firstTask));
             assertEquals("Prepare notes", getDisplayedText(secondTask));
+
+            return null;
+        });
+    }
+
+    @Test void constructor_styleTasksByStatus() throws Exception {
+        runOnFxThread(() -> {
+            Person person = new PersonBuilder().withTasks()
+                    .withTask("Finished task", TaskStatus.DONE)
+                    .withTask("Open task", TaskStatus.NOT_DONE).build();
+
+            PersonCard card = new PersonCard(person, 1, "");
+            VBox tasks = getField(card, "tasks");
+
+            Node doneTask = ((HBox) tasks.getChildren().get(0)).getChildren().get(1);
+            Node notDoneTask = ((HBox) tasks.getChildren().get(1)).getChildren().get(1);
+
+            assertTrue(doneTask.getStyleClass().contains("task-done"));
+            assertFalse(doneTask.getStyleClass().contains("task-not-done"));
+            assertTrue(notDoneTask.getStyleClass().contains("task-not-done"));
+            assertFalse(notDoneTask.getStyleClass().contains("task-done"));
 
             return null;
         });

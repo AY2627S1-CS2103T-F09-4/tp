@@ -159,13 +159,27 @@
     -fx-background-color: transparent;
 }
 
+.task-number {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 12px;
+    -fx-text-fill: #cbd2d3;
+    -fx-padding: 5 0 5 0;
+}
+
 .task-item {
     -fx-padding: 5 7 5 7;
-    -fx-background-color: #3e7b91;
     -fx-background-radius: 2px;
     -fx-font-family: "Segoe UI";
     -fx-font-size: 12px;
     -fx-text-fill: white;
+}
+
+.task-not-done {
+    -fx-background-color: #a33a3a;
+}
+
+.task-done {
+    -fx-background-color: #3a8a4a;
 }
 
 .student-chip {

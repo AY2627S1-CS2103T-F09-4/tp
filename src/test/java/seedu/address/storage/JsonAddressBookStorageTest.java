@@ -22,6 +22,7 @@ import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.person.Person;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskList;
+import seedu.address.model.task.TaskStatus;
 
 public class JsonAddressBookStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonAddressBookStorageTest");
@@ -96,7 +97,8 @@ public class JsonAddressBookStorageTest {
         AddressBook original = getTypicalAddressBook();
         Person aliceWithTasks = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(), ALICE.getAddress(),
                 ALICE.getSubject(), ALICE.getGradeLevel(), ALICE.getPhotoPath(),
-                new TaskList(List.of(new Task("do homework"), new Task("revise notes"))), ALICE.getTags());
+                new TaskList(List.of(new Task("do homework"), new Task("revise notes", TaskStatus.DONE))),
+                ALICE.getTags());
         original.setPerson(ALICE, aliceWithTasks);
 
         JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
@@ -104,7 +106,7 @@ public class JsonAddressBookStorageTest {
         ReadOnlyAddressBook readBack = storage.readAddressBook(filePath).get();
 
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(List.of(new Task("do homework"), new Task("revise notes")),
+        assertEquals(List.of(new Task("do homework"), new Task("revise notes", TaskStatus.DONE)),
                 readBack.getPersonList().get(0).getTaskList().getTasks());
     }
 

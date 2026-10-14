@@ -16,6 +16,7 @@ import static seedu.address.testutil.TypicalPersons.BOB;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.PersonBuilder;
 
 public class PersonTest {
@@ -121,6 +122,14 @@ public class PersonTest {
                 + ", photoPath=" + ALICE.getPhotoPath() + ", taskList=" + ALICE.getTaskList()
                 + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
+    }
+
+    @Test
+    public void equals_differentTaskStatus_returnsFalse() {
+        Person notDone = new PersonBuilder(ALICE).withTasks("do homework").build();
+        Person done = new PersonBuilder(ALICE).withTasks().withTask("do homework", TaskStatus.DONE).build();
+
+        assertFalse(notDone.equals(done));
     }
 
     @Test

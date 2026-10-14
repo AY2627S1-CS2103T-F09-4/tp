@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import seedu.address.commons.core.index.Index;
+
 /**
  * An immutable, ordered list of tasks.
  */
@@ -39,6 +41,20 @@ public class TaskList {
         return Collections.unmodifiableList(tasks);
     }
 
+    public int size() {
+        return tasks.size();
+    }
+
+    /**
+     * Returns the task at the given index.
+     *
+     * @throws IndexOutOfBoundsException if the index is beyond the end of the list.
+     */
+    public Task getTask(Index index) {
+        requireNonNull(index);
+        return tasks.get(index.getZeroBased());
+    }
+
     /**
      * Returns a new task list with the given task appended.
      */
@@ -46,6 +62,18 @@ public class TaskList {
         requireNonNull(task);
         List<Task> updatedTasks = new ArrayList<>(tasks);
         updatedTasks.add(task);
+        return new TaskList(updatedTasks);
+    }
+
+    /**
+     * Returns a new task list with the status of the task at {@code index} replaced.
+     *
+     * @throws IndexOutOfBoundsException if the index is beyond the end of the list.
+     */
+    public TaskList withTaskStatus(Index index, TaskStatus status) {
+        requireNonNull(status);
+        List<Task> updatedTasks = new ArrayList<>(tasks);
+        updatedTasks.set(index.getZeroBased(), getTask(index).withStatus(status));
         return new TaskList(updatedTasks);
     }
 

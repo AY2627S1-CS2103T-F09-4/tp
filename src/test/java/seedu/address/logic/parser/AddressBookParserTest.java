@@ -25,10 +25,12 @@ import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.MarkTaskCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
 import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.PersonUtil;
@@ -63,6 +65,13 @@ public class AddressBookParserTest {
         AddTaskCommand command = (AddTaskCommand) parser.parseCommand(
                 AddTaskCommand.COMMAND_WORD + " 1 task/do homework");
         assertEquals(new AddTaskCommand(INDEX_FIRST_PERSON, new Task("do homework")), command);
+    }
+
+    @Test
+    public void parseCommand_markTask() throws Exception {
+        MarkTaskCommand command = (MarkTaskCommand) parser.parseCommand(
+                MarkTaskCommand.COMMAND_WORD + " 1 tid/1 status/not done");
+        assertEquals(new MarkTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PERSON, TaskStatus.NOT_DONE), command);
     }
 
     @Test

@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.commons.core.index.Index;
+
 public class TaskListTest {
 
     @Test
@@ -53,6 +55,56 @@ public class TaskListTest {
         TaskList taskList = new TaskList().withTask(repeated).withTask(new Task("revise notes")).withTask(repeated);
 
         assertEquals(List.of(repeated, new Task("revise notes"), repeated), taskList.getTasks());
+    }
+
+    @Test
+    public void size_returnsNumberOfTasks() {
+        assertEquals(0, new TaskList().size());
+        assertEquals(2, new TaskList(List.of(new Task("do homework"), new Task("revise notes"))).size());
+    }
+
+    @Test
+    public void getTask_returnsTaskAtIndexAndRejectsOutOfRange() {
+        TaskList taskList = new TaskList(List.of(new Task("do homework"), new Task("revise notes")));
+
+        assertEquals(new Task("do homework"), taskList.getTask(Index.fromOneBased(1)));
+        assertEquals(new Task("revise notes"), taskList.getTask(Index.fromOneBased(2)));
+        assertThrows(IndexOutOfBoundsException.class, () -> taskList.getTask(Index.fromOneBased(3)));
+    }
+
+    @Test
+    public void withTaskStatus_replacesOnlyTargetTaskAndPreservesOriginal() {
+        TaskList original = new TaskList(List.of(new Task("do homework"), new Task("revise notes")));
+        TaskList updated = original.withTaskStatus(Index.fromOneBased(2), TaskStatus.DONE);
+
+        assertEquals(List.of(new Task("do homework"), new Task("revise notes")), original.getTasks());
+        assertEquals(List.of(new Task("do homework"), new Task("revise notes", TaskStatus.DONE)),
+                updated.getTasks());
+    }
+
+    @Test
+    public void withTaskStatus_sameStatus_returnsEqualList() {
+        TaskList original = new TaskList(List.of(new Task("do homework", TaskStatus.DONE)));
+
+        assertEquals(original, original.withTaskStatus(Index.fromOneBased(1), TaskStatus.DONE));
+    }
+
+    @Test
+    public void withTaskStatus_invalidArguments_throwsException() {
+        TaskList taskList = new TaskList(List.of(new Task("do homework")));
+        Index first = Index.fromOneBased(1);
+        Index second = Index.fromOneBased(2);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> taskList.withTaskStatus(second, TaskStatus.DONE));
+        assertThrows(NullPointerException.class, () -> taskList.withTaskStatus(first, null));
+    }
+
+    @Test
+    public void equals_statusMatters() {
+        TaskList notDone = new TaskList(List.of(new Task("do homework")));
+        TaskList done = new TaskList(List.of(new Task("do homework", TaskStatus.DONE)));
+
+        assertFalse(notDone.equals(done));
     }
 
     @Test

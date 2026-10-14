@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -20,6 +21,7 @@ import seedu.address.logic.parser.MatchRange;
 import seedu.address.logic.parser.PersonAttributesTextIndexFinder;
 import seedu.address.model.person.Person;
 import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskStatus;
 
 /**
  * A UI component that displays information of a {@code Person}.
@@ -125,7 +127,7 @@ public class PersonCard extends UiPart<Region> {
             Task task = person.getTaskList().getTasks().get(i);
 
             tasks.getChildren().add(
-                    createTaskLabel(task, finder.getTaskIndex(i)));
+                    createTaskRow(i + 1, task, finder.getTaskIndex(i)));
         }
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
@@ -137,13 +139,21 @@ public class PersonCard extends UiPart<Region> {
                 });
     }
 
-    private TextFlow createTaskLabel(
-            Task task, List<MatchRange> ranges) {
-        TextFlow taskText = createHighlightedText(
-                task.description, ranges);
+    private HBox createTaskRow(int taskId, Task task, List<MatchRange> ranges) {
+        // The number sits outside the text so highlight ranges stay aligned with the description.
+        Label number = new Label(taskId + ".");
+        number.getStyleClass().add("task-number");
+        number.setMinWidth(Region.USE_PREF_SIZE);
+
+        TextFlow taskText = createHighlightedText(task.description, ranges);
         taskText.getStyleClass().add("task-item");
+        taskText.getStyleClass().add(task.status == TaskStatus.DONE ? "task-done" : "task-not-done");
         taskText.setMaxWidth(Double.MAX_VALUE);
-        return taskText;
+        HBox.setHgrow(taskText, Priority.ALWAYS);
+
+        HBox row = new HBox(4, number, taskText);
+        row.getStyleClass().add("task-row");
+        return row;
     }
 
     private void setPhoto(Person person) {

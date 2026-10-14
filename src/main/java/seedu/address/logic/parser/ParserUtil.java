@@ -17,6 +17,7 @@ import seedu.address.model.person.Phone;
 import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskStatus;
 
 /**
  * Contains utility methods used for parsing strings in the various *Parser classes.
@@ -156,6 +157,19 @@ public class ParserUtil {
             throw new ParseException(Task.MESSAGE_CONSTRAINTS);
         }
         return new Task(trimmedDescription);
+    }
+
+    /**
+     * Parses a {@code String status} into a {@code TaskStatus}, ignoring case and surrounding whitespace.
+     *
+     * @throws ParseException if the given status is neither "done" nor "not done".
+     */
+    public static TaskStatus parseTaskStatus(String status) throws ParseException {
+        requireNonNull(status);
+        if (!TaskStatus.isValidStatus(status)) {
+            throw new ParseException(TaskStatus.MESSAGE_CONSTRAINTS);
+        }
+        return TaskStatus.fromString(status);
     }
 
     /**
