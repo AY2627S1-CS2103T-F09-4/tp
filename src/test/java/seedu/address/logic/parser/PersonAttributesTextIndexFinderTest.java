@@ -45,6 +45,14 @@ public class PersonAttributesTextIndexFinderTest {
         assertRanges(finder.getAddressIndex(), new int[][] {{5, 11}});
     }
 
+    @Test
+    public void getGradeIndex_keywordAbsent_returnsCorrectRange() {
+        PersonAttributesTextIndexFinder finder =
+                new PersonAttributesTextIndexFinder(CARL, "2");
+
+        assertTrue(finder.getGradeLevelIndex().isEmpty());
+    }
+
     /**
      * while every Person by default has a Subject from PersonBuilder, for all intents and purposes
      * this test is functionally the same as if a Person had no class at all.
@@ -54,6 +62,14 @@ public class PersonAttributesTextIndexFinderTest {
         PersonAttributesTextIndexFinder finder =
                 new PersonAttributesTextIndexFinder(CARL, "Science");
         assertTrue(finder.getSubjectIndex().isEmpty());
+    }
+
+    @Test
+    public void getTaskIndex_keywordPresent_returnsCorrectRange() {
+        PersonAttributesTextIndexFinder finder =
+                new PersonAttributesTextIndexFinder(CARL, "homework");
+
+        assertRanges(finder.getTaskIndex(0), new int[][] {{0, 8}});
     }
 
     @Test

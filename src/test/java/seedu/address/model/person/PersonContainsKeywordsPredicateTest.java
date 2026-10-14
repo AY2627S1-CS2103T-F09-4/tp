@@ -118,7 +118,7 @@ public class PersonContainsKeywordsPredicateTest {
 
         assertTrue(predicate.test(new PersonBuilder()
                 .withName("Alice")
-                .withTasks("Complete homework")
+                .withTasks("Complete homework", "do assignment", "revise practical")
                 .build()));
     }
 
