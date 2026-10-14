@@ -29,12 +29,12 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
                 || containsIgnoreCase(person.getAddress().value, keyword)
                 || containsIgnoreCase(person.getGradeLevel().value, keyword)
                 || containsIgnoreCase(person.getSubject().value, keyword)
-                || CheckIfTasksContainKeyword(person.getTaskList().getTasks(), keyword)
+                || checkIfTasksContainKeyword(person.getTaskList().getTasks(), keyword)
                 || person.getTags().stream()
                 .anyMatch(tag -> containsIgnoreCase(tag.tagName, keyword));
     }
 
-    private boolean CheckIfTasksContainKeyword(List<Task> tasks, String keyword) {
+    private boolean checkIfTasksContainKeyword(List<Task> tasks, String keyword) {
         boolean result = false;
         for (Task task : tasks) {
             result = result || containsIgnoreCase(task.toString(), keyword);

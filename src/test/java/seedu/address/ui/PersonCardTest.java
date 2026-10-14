@@ -12,6 +12,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -21,10 +24,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -37,7 +36,8 @@ class PersonCardTest {
         } catch (IllegalStateException e) {
             // The JavaFX toolkit has already been initialized.
         }
-        CountDownLatch latch = new CountDownLatch(1); Platform.runLater(latch::countDown);
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(latch::countDown);
         assertTrue(latch.await(10, TimeUnit.SECONDS), "JavaFX toolkit did not initialise in time");
     }
 
@@ -49,25 +49,26 @@ class PersonCardTest {
 
     private static <T> T getField(PersonCard card, String fieldName) throws ReflectiveOperationException {
         Field field = PersonCard.class.getDeclaredField(fieldName);
-        field.setAccessible(true); return (T) field.get(card);
+        field.setAccessible(true);
+        return (T) field.get(card);
     }
 
     private static String getDisplayedText(Node node) {
         if (node instanceof Text) {
             return ((Text) node).getText();
         }
-            if (node instanceof TextFlow) {
-                TextFlow textflow = (TextFlow) node;
-                StringBuilder result = new StringBuilder();
+        if (node instanceof TextFlow) {
+            TextFlow textflow = (TextFlow) node;
+            StringBuilder result = new StringBuilder();
 
-                for (Node child : textflow.getChildren()) {
-                    result.append(getDisplayedText(child));
-                }
-
-                return result.toString();
+            for (Node child : textflow.getChildren()) {
+                result.append(getDisplayedText(child));
             }
 
-            return "";
+            return result.toString();
+        }
+
+        return "";
     }
 
     @Test void constructor_displaysPersonAttributes() throws Exception {
@@ -77,7 +78,8 @@ class PersonCardTest {
 
             PersonCard card = new PersonCard(person, 1, null);
             assertEquals(person, card.person);
-            Label id = getField(card, "id"); assertEquals("1. ", id.getText());
+            Label id = getField(card, "id");
+            assertEquals("1. ", id.getText());
 
             assertEquals("Alice Tan", getDisplayedText(getField(card, "name")));
             assertEquals("91234567", getDisplayedText(getField(card, "phone")));
@@ -93,20 +95,22 @@ class PersonCardTest {
             Person person = new PersonBuilder().build();
             PersonCard card = new PersonCard(person, 1, "");
             TextFlow gradeLevel = getField(card, "gradeLevel");
-            assertFalse(gradeLevel.isVisible()); assertFalse(gradeLevel.isManaged());
+            assertFalse(gradeLevel.isVisible());
+            assertFalse(gradeLevel.isManaged());
             return null;
         });
     }
 
     @Test void constructorWithGradeLevelDisplaysGradeLevel() throws Exception {
         runOnFxThread(() -> {
-            Person person = new PersonBuilder() .withGradeLevel("10") .build();
+            Person person = new PersonBuilder().withGradeLevel("10").build();
 
             PersonCard card = new PersonCard(person, 1, "");
 
             TextFlow gradeLevel = getField(card, "gradeLevel");
 
-            assertTrue(gradeLevel.isVisible()); assertTrue(gradeLevel.isManaged());
+            assertTrue(gradeLevel.isVisible());
+            assertTrue(gradeLevel.isManaged());
             assertEquals("10", getDisplayedText(gradeLevel));
 
             return null;
@@ -156,10 +160,13 @@ class PersonCardTest {
             Person person = new PersonBuilder().build();
             PersonCard card = new PersonCard(person, 1, "");
 
-            ImageView photo = getField(card, "photo"); Label placeholder = getField(card, "photoPlaceholder");
+            ImageView photo = getField(card, "photo");
+            Label placeholder = getField(card, "photoPlaceholder");
 
-            assertNotNull(placeholder); assertFalse(photo.isVisible());
-            assertFalse(photo.isManaged()); assertTrue(placeholder.isVisible());
+            assertNotNull(placeholder);
+            assertFalse(photo.isVisible());
+            assertFalse(photo.isManaged());
+            assertTrue(placeholder.isVisible());
             assertTrue(placeholder.isManaged());
 
             return null;
