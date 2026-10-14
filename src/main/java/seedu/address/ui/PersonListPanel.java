@@ -16,6 +16,7 @@ import seedu.address.model.person.Person;
 public class PersonListPanel extends UiPart<Region> {
     private static final String FXML = "PersonListPanel.fxml";
     private final Logger logger = LogsCenter.getLogger(PersonListPanel.class);
+    private String keyword;
 
     @FXML
     private ListView<Person> personListView;
@@ -27,6 +28,14 @@ public class PersonListPanel extends UiPart<Region> {
         super(FXML);
         personListView.setItems(personList);
         personListView.setCellFactory(listView -> new PersonListViewCell());
+    }
+
+    /**
+     * Sets the keyword a {@code PersonCard} would have and refreshes the {@code personListView}.
+     */
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+        personListView.refresh();
     }
 
     /** Selects the student row corresponding to the linked student id. */
@@ -54,7 +63,7 @@ public class PersonListPanel extends UiPart<Region> {
                 setGraphic(null);
                 setText(null);
             } else {
-                setGraphic(new PersonCard(person, getIndex() + 1).getRoot());
+                setGraphic(new PersonCard(person, getIndex() + 1, keyword).getRoot());
             }
         }
     }

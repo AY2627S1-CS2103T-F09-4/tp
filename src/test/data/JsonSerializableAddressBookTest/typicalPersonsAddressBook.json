@@ -20,6 +20,7 @@
     "email" : "heinz@example.com",
     "address" : "wall street",
     "subject" : "Mathematics",
+    "tasks" : ["homework", "assignment"],
     "tags" : [ ]
   }, {
     "name" : "Daniel Meier",

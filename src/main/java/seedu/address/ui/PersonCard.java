@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -13,6 +14,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import seedu.address.logic.parser.MatchRange;
+import seedu.address.logic.parser.PersonAttributesTextIndexFinder;
 import seedu.address.model.person.Person;
 import seedu.address.model.task.Task;
 
@@ -32,23 +37,24 @@ public class PersonCard extends UiPart<Region> {
      */
 
     public final Person person;
+    private final String keyword;
 
     @FXML
     private HBox cardPane;
     @FXML
-    private Label name;
+    private TextFlow name;
     @FXML
     private Label id;
     @FXML
-    private Label phone;
+    private TextFlow phone;
     @FXML
-    private Label address;
+    private TextFlow address;
     @FXML
-    private Label email;
+    private TextFlow email;
     @FXML
-    private Label subject;
+    private TextFlow subject;
     @FXML
-    private Label gradeLevel;
+    private TextFlow gradeLevel;
     @FXML
     private ImageView photo;
     @FXML
@@ -63,32 +69,81 @@ public class PersonCard extends UiPart<Region> {
     /**
      * Creates a {@code PersonCard} with the given {@code Person} and index to display.
      */
-    public PersonCard(Person person, int displayedIndex) {
+    public PersonCard(Person person, int displayedIndex, String keyword) {
         super(FXML);
         this.person = person;
+        this.keyword = keyword == null ? "" : keyword;
+
+        PersonAttributesTextIndexFinder finder =
+                new PersonAttributesTextIndexFinder(person, this.keyword);
+
         id.setText(displayedIndex + ". ");
-        name.setText(person.getName().fullName);
-        phone.setText(person.getPhone().value);
-        address.setText(person.getAddress().value);
-        email.setText(person.getEmail().value);
-        subject.setText("Subject: " + person.getSubject().value);
-        gradeLevel.setText("Grade: " + person.getGradeLevel().value);
-        gradeLevel.setVisible(person.getGradeLevel().isPresent());
-        gradeLevel.setManaged(person.getGradeLevel().isPresent());
+
+        setAttributes(person, finder);
+
         setPhoto(person);
-        person.getTags().stream()
-                .sorted(Comparator.comparing(tag -> tag.tagName))
-                .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
-        person.getTaskList().getTasks().forEach(task -> tasks.getChildren().add(createTaskLabel(task)));
         taskScrollPane.setVvalue(1.0);
     }
 
-    private Label createTaskLabel(Task task) {
-        Label taskLabel = new Label(task.description);
-        taskLabel.getStyleClass().add("task-item");
-        taskLabel.setWrapText(true);
-        taskLabel.setMaxWidth(Double.MAX_VALUE);
-        return taskLabel;
+    private void setAttributes(Person person, PersonAttributesTextIndexFinder finder) {
+        name.getChildren().setAll(
+                createHighlightedText(
+                        person.getName().fullName,
+                        finder.getNameIndex()).getChildren());
+
+        phone.getChildren().setAll(
+                createHighlightedText(
+                        person.getPhone().value,
+                        finder.getPhoneIndex()).getChildren());
+
+        address.getChildren().setAll(
+                createHighlightedText(
+                        person.getAddress().value,
+                        finder.getAddressIndex()).getChildren());
+
+        email.getChildren().setAll(
+                createHighlightedText(
+                        person.getEmail().value,
+                        finder.getEmailIndex()).getChildren());
+
+        subject.getChildren().setAll(
+                createHighlightedText(
+                        person.getSubject().value,
+                        finder.getSubjectIndex()).getChildren());
+
+        gradeLevel.setVisible(person.getGradeLevel().isPresent());
+        gradeLevel.setManaged(person.getGradeLevel().isPresent());
+
+        if (person.getGradeLevel().isPresent()) {
+            gradeLevel.getChildren().setAll(
+                    createHighlightedText(
+                            person.getGradeLevel().value,
+                            finder.getGradeLevelIndex()).getChildren());
+        }
+
+        for (int i = 0; i < person.getTaskList().getTasks().size(); i++) {
+            Task task = person.getTaskList().getTasks().get(i);
+
+            tasks.getChildren().add(
+                    createTaskLabel(task, finder.getTaskIndex(i)));
+        }
+        person.getTags().stream()
+                .sorted(Comparator.comparing(tag -> tag.tagName))
+                .forEach(tag -> {
+                    TextFlow tagText = createHighlightedText(
+                            tag.tagName, finder.getTagIndex(tag));
+
+                    tags.getChildren().add(tagText);
+                });
+    }
+
+    private TextFlow createTaskLabel(
+            Task task, List<MatchRange> ranges) {
+        TextFlow taskText = createHighlightedText(
+                task.description, ranges);
+        taskText.getStyleClass().add("task-item");
+        taskText.setMaxWidth(Double.MAX_VALUE);
+        return taskText;
     }
 
     private void setPhoto(Person person) {
@@ -123,4 +178,58 @@ public class PersonCard extends UiPart<Region> {
         photoPlaceholder.setVisible(true);
         photoPlaceholder.setManaged(true);
     }
+
+    private TextFlow createHighlightedText(
+            String text, List<MatchRange> ranges) {
+
+        TextFlow textFlow = new TextFlow();
+        int currentIndex = 0;
+
+        if (text == null || text.isEmpty()) {
+            return textFlow;
+        }
+
+        currentIndex = colorStartingAndMatchingText(text, ranges, currentIndex, textFlow);
+
+        // Ordinary text after the final match.
+        if (currentIndex < text.length()) {
+            Text normalText = new Text(text.substring(currentIndex));
+            normalText.getStyleClass().add("normal-card-text");
+            textFlow.getChildren().add(normalText);
+        }
+
+        return textFlow;
+    }
+
+    private int colorStartingAndMatchingText(String text, List<MatchRange> ranges, int currentIndex,
+                                             TextFlow textFlow) {
+        for (MatchRange range : ranges) {
+            int start = range.getStart();
+            int end = range.getEnd();
+
+            if (start < currentIndex || start < 0
+                    || end <= start || end > text.length()) {
+                continue;
+            }
+
+            // Ordinary text before the match.
+            if (currentIndex < start) {
+                Text normalText =
+                        new Text(text.substring(currentIndex, start));
+                normalText.getStyleClass().add("normal-card-text");
+                textFlow.getChildren().add(normalText);
+            }
+
+            if (!keyword.isEmpty()) {
+                // Matching text.
+                Text match = new Text(text.substring(start, end));
+                match.getStyleClass().add("search-match");
+                textFlow.getChildren().add(match);
+
+                currentIndex = end;
+            }
+        }
+        return currentIndex;
+    }
+
 }

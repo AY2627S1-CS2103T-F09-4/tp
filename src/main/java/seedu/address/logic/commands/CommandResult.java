@@ -19,6 +19,8 @@ public class CommandResult {
     /** The application should exit. */
     private final boolean exit;
 
+    private final String keyword;
+
     /**
      * Constructs a {@code CommandResult} with the specified fields.
      */
@@ -26,6 +28,7 @@ public class CommandResult {
         this.feedbackToUser = requireNonNull(feedbackToUser);
         this.showHelp = showHelp;
         this.exit = exit;
+        this.keyword = null;
     }
 
     /**
@@ -34,6 +37,16 @@ public class CommandResult {
      */
     public CommandResult(String feedbackToUser) {
         this(feedbackToUser, false, false);
+    }
+
+    /**
+     * Constructs a {@code CommandResult} with the default fields and a keyword.
+     */
+    public CommandResult(String feedbackToUser, String keyword) {
+        this.feedbackToUser = requireNonNull(feedbackToUser);
+        this.showHelp = false;
+        this.exit = false;
+        this.keyword = keyword;
     }
 
     public String getFeedbackToUser() {
@@ -46,6 +59,10 @@ public class CommandResult {
 
     public boolean isExit() {
         return exit;
+    }
+
+    public String getKeyword() {
+        return keyword;
     }
 
     @Override
@@ -61,12 +78,13 @@ public class CommandResult {
 
         return feedbackToUser.equals(otherCommandResult.feedbackToUser)
                 && showHelp == otherCommandResult.showHelp
-                && exit == otherCommandResult.exit;
+                && exit == otherCommandResult.exit
+                && Objects.equals(keyword, otherCommandResult.keyword);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(feedbackToUser, showHelp, exit);
+        return Objects.hash(feedbackToUser, showHelp, exit, keyword);
     }
 
     @Override

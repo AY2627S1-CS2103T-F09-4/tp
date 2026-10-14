@@ -269,8 +269,7 @@ _{Explain here how the data archiving feature will be implemented}_
 * prefers typing to mouse interactions
 * is reasonably comfortable using CLI apps
 
-**Value proposition**: optimize creating and tracking student information, including classes, 
-deliverables, improvement, parents, locations, etc.
+**Value proposition**: optimize creating and tracking student information, including classes, deliverables, improvement, parents, locations, etc.
 
 
 ### User stories
