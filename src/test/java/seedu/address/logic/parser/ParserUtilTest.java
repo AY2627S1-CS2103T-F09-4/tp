@@ -18,6 +18,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskStatus;
 
 public class ParserUtilTest {
     private static final String INVALID_NAME = "R@chel";
@@ -206,5 +207,25 @@ public class ParserUtilTest {
     @Test
     public void parseTask_validValueWithWhitespace_returnsTrimmedTask() throws Exception {
         assertEquals(new Task("do homework"), ParserUtil.parseTask("  do homework  "));
+    }
+
+    @Test
+    public void parseTaskStatus_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseTaskStatus(null));
+    }
+
+    @Test
+    public void parseTaskStatus_invalidValue_throwsParseException() {
+        String message = TaskStatus.MESSAGE_CONSTRAINTS;
+
+        assertThrows(ParseException.class, message, () -> ParserUtil.parseTaskStatus("finished"));
+        assertThrows(ParseException.class, message, () -> ParserUtil.parseTaskStatus(""));
+    }
+
+    @Test
+    public void parseTaskStatus_validValue_returnsStatus() throws Exception {
+        assertEquals(TaskStatus.DONE, ParserUtil.parseTaskStatus("done"));
+        assertEquals(TaskStatus.NOT_DONE, ParserUtil.parseTaskStatus("not done"));
+        assertEquals(TaskStatus.DONE, ParserUtil.parseTaskStatus(WHITESPACE + "DONE" + WHITESPACE));
     }
 }

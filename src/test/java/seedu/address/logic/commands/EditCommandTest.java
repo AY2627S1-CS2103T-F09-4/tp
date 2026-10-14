@@ -25,6 +25,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
+import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 
@@ -73,7 +74,8 @@ public class EditCommandTest {
     @Test
     public void execute_personWithTasks_preservesTasks() {
         Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework", "revise notes").build();
+        Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework")
+                .withTask("revise notes", TaskStatus.DONE).build();
         model.setPerson(originalPerson, personWithTasks);
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName("Task Holder").build();
