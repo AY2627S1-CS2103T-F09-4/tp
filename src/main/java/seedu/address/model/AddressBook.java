@@ -114,7 +114,9 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.set(index, replacement);
     }
 
-    public void removeParentContact(ParentContact contact) { parentContacts.remove(contact); }
+    public void removeParentContact(ParentContact contact) {
+        parentContacts.remove(contact);
+    }
 
     //// util methods
 

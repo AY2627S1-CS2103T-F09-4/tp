@@ -3,7 +3,7 @@ layout: page
 title: User Guide
 ---
 
-AddressBook Level 3 (AB3) is a **desktop application for managing contacts, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI). If you type quickly, AB3 can help you manage contacts faster than traditional GUI applications.
+Tutoria is a **desktop application for managing students under a tutor, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI). If you type quickly, Tutoria can help you manage students faster than traditional GUI applications.
 
 * Table of Contents
 {:toc}
@@ -15,24 +15,24 @@ AddressBook Level 3 (AB3) is a **desktop application for managing contacts, opti
 1. Ensure that Java `25` or later is installed on your computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/se-edu/addressbook-level3/releases).
+2. Download the latest `.jar` file from [here](https://github.com/se-edu/addressbook-level3/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for your AddressBook.
+3. Copy the file to the folder you want to use as the _home folder_ for Tutoria.
 
-1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar addressbook.jar`.<br>
+4. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar Tutoria.jar`.<br>
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
    ![Ui](images/Ui.png)
 
-1. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
+5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
    Some example commands you can try:
 
-   * `list` : Lists all contacts.
+   * `list` : Lists all students.
 
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a contact named `John Doe` to the Address Book.
+   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to Tutoria.
 
-   * `delete 3` : Deletes the 3rd contact shown in the current list.
+   * `delete 3` : Deletes the 3rd student shown in the current list.
 
-   * `clear` : Deletes all contacts.
+   * `clear` : Deletes all student.
 
    * `exit` : Exits the app.
 
@@ -44,7 +44,7 @@ AddressBook Level 3 (AB3) is a **desktop application for managing contacts, opti
 
 <div markdown="block" class="alert alert-info">
 
-**:information_source: Notes about the command format:**<br>
+** :information_source: Notes about the command format:**<br>
 
 * Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
   For example, in `add n/NAME`, replace `NAME` with a value such as `John Doe`.
@@ -72,46 +72,159 @@ Shows a message explaining how to access the help page.
 
 Format: `help`
 
+### Adding a student: `add-student`
 
-### Adding a person: `add`
+Adds a student to Tutoria.
 
-Adds a person to the address book.
+Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...`
 
-Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​`
+* All fields cannot be blank unless they are optional.
+* `NAME` is the student's name. At most 100 characters long.
+* `PHONE` is the student's phone number. It must contain 3 to 15 digits and can start with an optional + (e.g. +6591234567).
+* `EMAIL` is the student's email address. It must be a valid email in the format local-part@domain.
+* `ADDRESS` is the student's address and can be at most 200 characters long.
+* `SUBJECT` is the subject the student is being tutored in.
+* `GRADE_LEVEL` (optional) is the student's grade level, e.g. Sec 3 or P6.
+* `TAG` (optional) must be alphanumeric and cannot contain spaces.
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-A person can have any number of tags, including zero.
+A student can have any number of tags, including zero.
 </div>
 
 Examples:
-* `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
+* `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 3 t/needsReminder`
 
-### Listing all persons: `list`
+### Adding a parent: `add-parent`
 
-Shows a list of all persons in the address book.
+Adds a parent to Tutoria.
+
+Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
+
+* `NAME` is the parent’s name.
+* `PHONE` is the parent’s phone number. It must contain 3 to 15 digits and may start with +.
+* `EMAIL` (optional). If provided, it must be a valid email address.
+* `STUDENT_INDEX` (optional) and identifies the student to link to the parent.
+* `REQUIREMENT` (optional) is a parent requirement or note. It can be repeated.
+
+Examples:
+* add-parent n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session
+
+### Listing all students: `list`
+
+Shows a list of all students in Tutoria.
 
 Format: `list`
 
-### Editing a person: `edit`
+### Listing all parents: `list-parents`
 
-Edits an existing person in the address book.
+Shows a list of all parents in Tutoria.
 
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`
+Format: `list-parents`
 
-* Edits the person at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, …​
+### Editing a student: `edit`
+
+Edits an existing student.
+
+Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/SUBJECT] [g/GRADE_LEVEL] [t/TAG]…​`
+
+* Edits the student at the specified `INDEX`. The index refers to the index number shown in the displayed list. The index **must be a positive integer** 1, 2, 3, …​
 * At least one of the optional fields must be provided.
 * Existing values will be updated to the input values.
-* When editing tags, all of the person's existing tags are removed; adding tags is not cumulative.
-* To remove all of a person's tags, enter `t/` without a tag after it.
+* When editing tags, all the student's existing tags are removed; adding tags is not cumulative.
+* To remove all of a student's tags, enter `t/` without a tag after it.
 
 Examples:
-*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st person to be `91234567` and `johndoe@example.com` respectively.
-*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
+*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st student to be `91234567` and `johndoe@example.com` respectively.
+*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd student to be `Betsy Crower` and clears all existing tags.
 
-### Locating persons by name: `find`
+### Editing a parent: `edit-parent`
 
-Finds persons whose names contain any of the given keywords.
+Edits an existing parent.
+
+Format: `edit-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]`
+
+* Edits the student at the specified `INDEX`. The index refers to the index number shown in the displayed list. The index **must be a positive integer** 1, 2, 3, …​
+* At least one of the optional fields must be provided.
+* Existing values will be updated to the input values.
+
+### Adding photos to a student: `add-photo`
+
+Adds a profile photo to an existing student.
+
+Format: `add-photo INDEX f/FILE_PATH`
+
+* `INDEX` must be a positive integer (1, 2, 3, …).
+* `INDEX` must not be larger than the number of students in the displayed list.
+* The index refers to the index number shown in the displayed list.
+* `FILE_PATH` is the path to the image on the user’s computer.
+* The file must exist and be readable.
+* The image must be in JPG, JPEG, or PNG format, and not larger than 5MB.
+* The file must contain a valid image; changing a non-image file’s extension is not sufficient.
+* Only one f/ prefix may be provided.
+* If the student already has a photo, it is replaced.
+* Tutoria stores the image’s file path, so the image may stop displaying if the original file is moved, renamed, or deleted.
+
+Examples:
+* `list` followed by`add-photo 2 f/C:\Users\prana\Pictures\student.png` adds the photo to the 2nd student in the list.
+
+### Adding photos to a parent: `add-parent-photo`
+
+Adds a profile photo to an existing parent.
+
+Format: `add-parent-photo INDEX f/FILE_PATH`
+
+* Details for the `add-photo` command apply here.
+
+### Deleting photos of a student: `delete-photo`
+
+Deletes the profile photo of an existing student.
+
+Format: `delete-photo INDEX`
+
+* `INDEX` must be a positive integer (1, 2, 3, …).
+* `INDEX` must not be larger than the number of students in the displayed list.
+* The index refers to the index number shown in the displayed list.
+
+### Deleting photos of a parent: `delete-parent-photo`
+
+Deletes the profile photo of an existing parent.
+
+* `INDEX` must be a positive integer (1, 2, 3, …).
+* `INDEX` must not be larger than the number of students in the displayed list.
+* The index refers to the index number shown in the displayed list.
+
+Format: `delete-parent-photo INDEX`
+
+### Adding tasks to a student: `add-task`
+
+Adds tasks to an existing student.
+
+* `INDEX` is the index of the student in the displayed student list.
+* `DESCRIPTION` is the text of the task. It can contain spaces, but it cannot be blank.
+
+Format: `add-task <INDEX> task/<DESCRIPTION>`
+
+Examples:
+* `add-task 1 task/do homework`
+* `add-task 2 task/revise chapter 3 notes`
+
+### Marking tasks as done or not: `mark-task`
+
+Marks a task as completed or incompleted.
+
+Format: `mark-task <INDEX> tid/<TASK_ID> status/<STATUS>`
+
+* `INDEX` is the index of the student in the displayed student list.
+* `TASK_ID` is the number shown beside the task in that student's task list (the first task is 1).
+* `STATUS` is either done or not done.
+
+Examples:
+* `mark-task 1 tid/1 status/done` will color the task as green.
+* `mark-task 1 tid/1 status/not done` will color the task as red.
+
+### Locating students by name: `find`
+
+Finds students whose names contain any of the given keywords.
 
 Format: `find KEYWORD [MORE_KEYWORDS]`
 
@@ -119,7 +232,7 @@ Format: `find KEYWORD [MORE_KEYWORDS]`
 * Keyword order does not matter; for example, `Hans Bo` matches `Bo Hans`.
 * The search considers only names.
 * Only full words match; for example, `Han` does not match `Hans`.
-* Persons matching at least one keyword are returned (an `OR` search); for example, `Hans Bo` returns `Hans Gruber` and `Bo Yang`.
+* Students matching at least one keyword are returned (an `OR` search); for example, `Hans Bo` returns `Hans Gruber` and `Bo Yang`.
 
 Examples:
 * `find John` returns `john` and `John Doe`
@@ -138,23 +251,37 @@ Format: `search KEYWORD`
 * The search considers anything that can be entered as a field in the `add` commands
 * Full words don't have to match; for example, `Han` matches `Hans`.
 
-### Deleting a person: `delete`
+### Deleting a student: `delete-student`
 
-Deletes the specified person from the address book.
+Deletes the specified student from Tutoria.
 
-Format: `delete INDEX`
+Format: `delete-student INDEX`
 
-* Deletes the person at the specified `INDEX`.
-* The index refers to the index number shown in the displayed person list.
+* Deletes the student at the specified `INDEX`.
+* The index refers to the index number shown in the displayed list.
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd person in the address book.
-* `find Betsy` followed by `delete 1` deletes the 1st person in the results of the `find` command.
+* `list` followed by `delete 2` deletes the 2nd student in the list.
+* `find Betsy` followed by `delete 1` deletes the 1st student in the results of the `find` command.
+
+### Deleting a parent: `delete-parent`
+
+Deletes the specified parent from Tutoria.
+
+Format: `delete-parent INDEX`
+
+* Deletes the parent at the specified `INDEX`.
+* The index refers to the index number shown in the displayed list.
+* The index **must be a positive integer** 1, 2, 3, …​
+
+Examples:
+* `list` followed by `delete 2` deletes the 2nd parent in the list.
+* `find Betsy` followed by `delete 1` deletes the 1st parent in the results of the `find` command.
 
 ### Clearing all entries: `clear`
 
-Clears all entries from the address book.
+Clears all entries from Tutoria.
 
 Format: `clear`
 
@@ -166,23 +293,23 @@ Format: `exit`
 
 ### Saving the data
 
-AddressBook automatically saves data after every command. You do not need to save manually.
+Tutoria automatically saves data after every command. You do not need to save manually.
 
 ### Editing the data file
 
-AddressBook data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+Tutoria data is saved automatically as a JSON file `[JAR file location]/data/Tutoria.json`. Advanced users are welcome to update data directly by editing that data file.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
-If your changes make the data file invalid, AddressBook starts with an empty address book at the next run. The invalid file remains on disk until you run a command (AddressBook saves after every command). Still, we recommend backing up the file before editing it.<br>
-Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
-</div>
+If your changes make the data file invalid, Tutoria starts empty at the next run. The invalid file remains on disk until you run a command (Tutoria saves after every command). Still, we recommend backing up the file before editing it.<br>
+Furthermore, certain edits can cause the  to behave in unexpected ways (e.g., if a value entered is outside the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+</div>Tutoria
 
 --------------------------------------------------------------------------------------------------------------------
 
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
-**A**: Install the app on the other computer and overwrite the data file it creates with the data file from your previous AddressBook home folder.
+**A**: Install the app on the other computer and overwrite the data file it creates with the data file from your previous Tutoria home folder.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -195,12 +322,12 @@ Furthermore, certain edits can cause the AddressBook to behave in unexpected way
 
 ## Command summary
 
-Action | Format, Examples
---------|------------------
-**Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
-**Clear** | `clear`
-**Delete** | `delete INDEX`<br> e.g., `delete 3`
-**Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
-**Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
-**List** | `list`
-**Help** | `help`
+ Action     | Format, Examples                                                                                                                                                      |
+------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ **Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague` |
+ **Clear**  | `clear`                                                                                                                                                               |
+ **Delete** | `delete INDEX`<br> e.g., `delete 3`                                                                                                                                   |
+ **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`                                          |
+ **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                            |
+ **List**   | `list`                                                                                                                                                                |
+ **Help**   | `help`                                                                                                                                                                |
