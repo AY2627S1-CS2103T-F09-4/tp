@@ -7,8 +7,8 @@ import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailur
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.logic.commands.AddContactCommand;
 import seedu.address.logic.Messages;
+import seedu.address.logic.commands.AddContactCommand;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
@@ -33,9 +33,9 @@ public class AddContactCommandParserTest {
     @Test
     public void parse_repeatedNonRequirementPrefix_failure() {
         String valid = " n/Mary Tan p/98765432";
-        assertParseFailure(parser, valid + " n/Peter Tan", 
+        assertParseFailure(parser, valid + " n/Peter Tan",
                 Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME));
-        assertParseFailure(parser, valid + " p/91234567", 
+        assertParseFailure(parser, valid + " p/91234567",
                 Messages.getErrorMessageForDuplicatePrefixes(PREFIX_PHONE));
     }
 

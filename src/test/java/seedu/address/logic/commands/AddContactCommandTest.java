@@ -43,15 +43,15 @@ public class AddContactCommandTest {
         ParentContact sameIdentity = new ParentContact(new Name("mary tan"), PARENT.getPhone(),
                 new Email("different@example.com"), null, List.of());
 
-        assertThrows(CommandException.class, AddContactCommand.MESSAGE_DUPLICATE,
-                () -> new AddContactCommand(sameIdentity, null).execute(model));
+        assertThrows(CommandException.class, AddContactCommand.MESSAGE_DUPLICATE, () ->
+                new AddContactCommand(sameIdentity, null).execute(model));
     }
 
     @Test
     public void execute_invalidLink_throwsCommandException() {
         ModelManager model = new ModelManager();
-        assertThrows(CommandException.class, AddContactCommand.MESSAGE_INVALID_LINK,
-                () -> new AddContactCommand(PARENT, Index.fromOneBased(1)).execute(model));
+        assertThrows(CommandException.class, AddContactCommand.MESSAGE_INVALID_LINK, () ->
+                new AddContactCommand(PARENT, Index.fromOneBased(1)).execute(model));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class AddContactCommandTest {
 
         ParentContact anotherParent = new ParentContact(new Name("Peter Tan"), new Phone("91234568"),
                 new Email("peter@example.com"), null, List.of());
-        assertThrows(CommandException.class, "Each student can have at most one parent contact.",
-                () -> new AddContactCommand(anotherParent, Index.fromOneBased(1)).execute(model));
+        assertThrows(CommandException.class, "Each student can have at most one parent contact.", () ->
+                new AddContactCommand(anotherParent, Index.fromOneBased(1)).execute(model));
     }
 }
