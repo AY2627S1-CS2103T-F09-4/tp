@@ -13,6 +13,7 @@ import seedu.address.model.person.Person;
 public interface Model {
     /** {@code Predicate} that always evaluates to true */
     Predicate<Person> PREDICATE_SHOW_ALL_PERSONS = unused -> true;
+    Predicate<ParentContact> PREDICATE_SHOW_ALL_PARENTS = unused -> true;
 
     /**
      * Returns the user prefs.
@@ -64,6 +65,9 @@ public interface Model {
     /** Returns an unmodifiable view of the filtered person list */
     ObservableList<Person> getFilteredPersonList();
 
+    /** Returns an unmodifiable view of the person list */
+    ObservableList<Person> getPersonList();
+
     /**
      * Updates the filter of the filtered person list to filter by the given {@code predicate}.
      * @throws NullPointerException if {@code predicate} is null.
@@ -85,4 +89,6 @@ public interface Model {
     default javafx.collections.ObservableList<ParentContact> getParentContactList() {
         return getAddressBook().getParentContactList();
     }
+
+    void updateParentList(Predicate<ParentContact> predicate);
 }

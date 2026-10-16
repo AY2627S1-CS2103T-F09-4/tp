@@ -23,6 +23,14 @@ public interface Logic {
 
     /** Returns an unmodifiable view of the filtered list of persons */
     ObservableList<Person> getFilteredPersonList();
+
+    /** Returns an unmodifiable view of the list of persons */
+    ObservableList<Person> getPersonList();
+
+    /** Sets the filtered list to the original list */
+    void resetPersonList();
+
+    /** Returns an unmodifiable view of the filtered list of parent contacts */
     ObservableList<ParentContact> getParentContactList();
 
     /**

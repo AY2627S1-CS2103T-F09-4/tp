@@ -6,6 +6,7 @@ import java.util.List;
 
 import seedu.address.logic.commands.SearchCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.ParentContainsKeywordsPredicate;
 import seedu.address.model.person.PersonContainsKeywordsPredicate;
 
 /**
@@ -25,7 +26,8 @@ public class SearchCommandParser implements Parser<SearchCommand> {
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, SearchCommand.MESSAGE_USAGE));
         }
 
-        return new SearchCommand(new PersonContainsKeywordsPredicate(List.of(trimmedArgs)), trimmedArgs);
+        return new SearchCommand(new PersonContainsKeywordsPredicate(List.of(trimmedArgs)),
+                new ParentContainsKeywordsPredicate(List.of(trimmedArgs)), trimmedArgs);
     }
 
 }
