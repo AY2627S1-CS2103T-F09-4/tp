@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
 
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
   <VBox alignment="CENTER" minHeight="105" prefWidth="90">
@@ -31,12 +32,12 @@
             <Region fx:constant="USE_PREF_SIZE" />
           </minWidth>
         </Label>
-        <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
+        <TextFlow fx:id="name" styleClass="cell_big_label" />
       </HBox>
-      <Label fx:id="phone" styleClass="cell_small_label" text="\$phone" />
-      <Label fx:id="email" styleClass="cell_small_label" text="\$email" />
-      <Label fx:id="linkedStudent" styleClass="cell_small_label" text="\$linkedStudent" />
-      <Label fx:id="requirements" styleClass="cell_small_label" text="\$requirements" />
+      <TextFlow fx:id="phone" styleClass="cell_small_label" />
+      <TextFlow fx:id="email" styleClass="cell_small_label" />
+      <TextFlow fx:id="linkedStudent" styleClass="cell_small_label" />
+      <TextFlow fx:id="requirements" styleClass="cell_small_label" />
     </VBox>
   </GridPane>
 </HBox>

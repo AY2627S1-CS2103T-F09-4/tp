@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.util.function.Consumer;
 
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Region;
@@ -12,8 +13,14 @@ import seedu.address.model.person.ParentContact;
 /** Displays parent contacts in the Contacts tab. */
 public class ParentListPanel extends UiPart<Region> {
     private static final String FXML = "PersonListPanel.fxml";
+
     private final Logic logic;
-    private final ListView<ParentContact> listView = new ListView<>();
+    private final Consumer<String> selectStudent;
+
+    private String keyword;
+
+    @FXML
+    private ListView<ParentContact> personListView;
 
     /**
      * Creates a panel displaying parent contacts.
@@ -24,25 +31,45 @@ public class ParentListPanel extends UiPart<Region> {
             Consumer<String> selectStudent) {
         super(FXML);
         this.logic = logic;
-        listView.setItems(contacts);
-        getRoot().getChildrenUnmodifiable();
-        javafx.scene.layout.VBox root = (javafx.scene.layout.VBox) getRoot();
-        root.getChildren().setAll(listView);
-        listView.setCellFactory(
-                view -> new ListCell<>() {
-                    @Override
-                    protected void updateItem(ParentContact contact, boolean empty) {
-                        super.updateItem(contact, empty);
-                        Runnable selectLinkedStudent = () -> selectStudent.accept(contact.getLinkedStudentId());
-                        setGraphic(empty || contact == null
-                                ? null
-                                : new ParentContactCard(
-                                        contact,
-                                        getIndex() + 1,
-                                        logic,
-                                        selectLinkedStudent).getRoot());
-                        setText(null);
-                    }
-                });
+        this.selectStudent = selectStudent;
+
+        personListView.setItems(contacts);
+        personListView.setCellFactory(view -> new ParentListViewCell());
+    }
+
+    /**
+     * Sets the keyword a {@code ParentContactCard} would have
+     * and refreshes the parent contact list.
+     */
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+        personListView.refresh();
+    }
+
+    /**
+     * Custom {@code ListCell} that displays a ParentContact using a ParentContactCard.
+     */
+    class ParentListViewCell extends ListCell<ParentContact> {
+        @Override
+        protected void updateItem(ParentContact contact, boolean empty) {
+            super.updateItem(contact, empty);
+
+            if (empty || contact == null) {
+                setGraphic(null);
+                setText(null);
+            } else {
+                Runnable selectLinkedStudent = () -> selectStudent.accept(contact.getLinkedStudentId());
+
+                setGraphic(new ParentContactCard(
+                        contact,
+                        getIndex() + 1,
+                        logic,
+                        selectLinkedStudent,
+                        keyword
+                ).getRoot());
+
+                setText(null);
+            }
+        }
     }
 }

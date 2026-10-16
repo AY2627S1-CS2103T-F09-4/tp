@@ -22,6 +22,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final FilteredList<ParentContact> parentList;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -33,7 +34,8 @@ public class ModelManager implements Model {
 
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
-        filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        this.filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        this.parentList = new FilteredList<>(this.addressBook.getParentContactList());
     }
 
     public ModelManager() {
@@ -111,6 +113,15 @@ public class ModelManager implements Model {
         filteredPersons.setPredicate(predicate);
     }
 
+    /**
+     * Returns an unmodifiable view of the unfiltered list of {@code Person} backed by the internal list of
+     * {@code addressBook}
+     */
+    @Override
+    public ObservableList<Person> getPersonList() {
+        return this.addressBook.getPersonList();
+    }
+
     @Override public void addParentContact(ParentContact contact) {
         addressBook.addParentContact(contact); }
     @Override public boolean hasParentContact(ParentContact contact) {
@@ -120,8 +131,15 @@ public class ModelManager implements Model {
     }
     @Override public void deleteParentContact(ParentContact target) {
         addressBook.removeParentContact(target); }
+
     @Override public ObservableList<ParentContact> getParentContactList() {
-        return addressBook.getParentContactList(); }
+        return parentList; }
+
+    @Override
+    public void updateParentList(Predicate<ParentContact> predicate) {
+        requireNonNull(predicate);
+        parentList.setPredicate(predicate);
+    }
 
     @Override
     public boolean equals(Object other) {

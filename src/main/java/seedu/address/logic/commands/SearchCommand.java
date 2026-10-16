@@ -5,11 +5,12 @@ import static java.util.Objects.requireNonNull;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
+import seedu.address.model.person.ParentContainsKeywordsPredicate;
 import seedu.address.model.person.PersonContainsKeywordsPredicate;
 
 /**
  * Searches for and lists all students and parents whose attributes contains any of the argument keywords.
- * Keyword matching is case insensitive and searches for exact phrases.
+ * Keyword matching is case-insensitive and searches for exact phrases.
  */
 public class SearchCommand extends Command {
 
@@ -21,27 +22,32 @@ public class SearchCommand extends Command {
             + "Parameters: KEYWORD [MORE_KEYWORDS]...\n"
             + "Example: " + COMMAND_WORD + " alice bob charlie";
 
-    private final PersonContainsKeywordsPredicate predicate;
+    private final PersonContainsKeywordsPredicate studentPredicate;
+    private final ParentContainsKeywordsPredicate parentPredicate;
     private final String keyword;
 
     /**
      * Creates a SearchCommand
      *
-     * @param predicate the predicate used to filter the resulting list of Persons.
+     * @param studentPredicate the predicate used to filter the resulting list of Persons.
+     * @param parentPredicate the predicate used to filter the resulting list of Parents.
      * @param keyword the keyword to search with.
      */
-    public SearchCommand(PersonContainsKeywordsPredicate predicate, String keyword) {
-        this.predicate = predicate;
+    public SearchCommand(PersonContainsKeywordsPredicate studentPredicate,
+                         ParentContainsKeywordsPredicate parentPredicate, String keyword) {
+        this.studentPredicate = studentPredicate;
+        this.parentPredicate = parentPredicate;
         this.keyword = keyword;
     }
 
     @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
-        model.updateFilteredPersonList(predicate);
-        return new CommandResult(
-                String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size()),
-                keyword);
+        model.updateFilteredPersonList(studentPredicate);
+        model.updateParentList(parentPredicate);
+        String message = String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size())
+                + " " + String.format(Messages.MESSAGE_PARENTS_LISTED_OVERVIEW, model.getParentContactList().size());
+        return new CommandResult(message, keyword);
     }
 
     @Override
@@ -55,13 +61,15 @@ public class SearchCommand extends Command {
             return false;
         }
 
-        return predicate.equals(otherSearchCommand.predicate);
+        return studentPredicate.equals(otherSearchCommand.studentPredicate)
+                && parentPredicate.equals(otherSearchCommand.parentPredicate);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("predicate", predicate)
+                .add("studentPredicate", studentPredicate)
+                .add("parentPredicate", parentPredicate)
                 .toString();
     }
 }

@@ -79,7 +79,6 @@ class PersonCardTest {
                     .withEmail("alice@example.com").withAddress("123 Example Street").withSubject("Science").build();
 
             PersonCard card = new PersonCard(person, 1, null);
-            assertEquals(person, card.person);
             Label id = getField(card, "id");
             assertEquals("1. ", id.getText());
 

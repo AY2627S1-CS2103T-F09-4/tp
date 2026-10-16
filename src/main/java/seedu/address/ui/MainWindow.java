@@ -184,6 +184,8 @@ public class MainWindow extends UiPart<Stage> {
     private void selectStudent(String studentId) {
         recordTabs.getSelectionModel().select(0);
         personListPanel.selectStudent(studentId);
+        personListPanel.setKeyword(null);
+        logic.resetPersonList();
     }
 
     /**
@@ -204,6 +206,7 @@ public class MainWindow extends UiPart<Stage> {
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
             personListPanel.setKeyword(commandResult.getKeyword());
+            parentListPanel.setKeyword(commandResult.getKeyword());
 
             if (commandResult.isShowHelp()) {
                 handleHelp();

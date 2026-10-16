@@ -38,7 +38,6 @@ public class PersonCard extends UiPart<Region> {
      * @see <a href="https://github.com/se-edu/addressbook-level4/issues/336">The issue on AddressBook level 4</a>
      */
 
-    public final Person person;
     private final String keyword;
 
     @FXML
@@ -73,7 +72,6 @@ public class PersonCard extends UiPart<Region> {
      */
     public PersonCard(Person person, int displayedIndex, String keyword) {
         super(FXML);
-        this.person = person;
         this.keyword = keyword == null ? "" : keyword;
 
         PersonAttributesTextIndexFinder finder =
