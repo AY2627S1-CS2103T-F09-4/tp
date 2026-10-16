@@ -1,5 +1,7 @@
 package seedu.address.logic.parser;
 
+import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+
 import seedu.address.logic.commands.DeleteParentCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
@@ -7,6 +9,11 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class DeleteParentCommandParser implements Parser<DeleteParentCommand> {
     @Override
     public DeleteParentCommand parse(String args) throws ParseException {
-        return new DeleteParentCommand(ParserUtil.parseIndex(args));
+        try {
+            return new DeleteParentCommand(ParserUtil.parseIndex(args));
+        } catch (ParseException pe) {
+            throw new ParseException(
+                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteParentCommand.MESSAGE_USAGE), pe);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package seedu.address.logic.parser;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
@@ -24,7 +25,7 @@ public class AddContactCommandParserTest {
 
     @Test
     public void parse_missingRequiredField_failure() {
-        String expected = AddContactCommand.MESSAGE_USAGE;
+        String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddContactCommand.MESSAGE_USAGE);
         assertParseFailure(parser, "p/98765432", expected);
         assertParseFailure(parser, "n/Mary Tan", expected);
         assertParseFailure(parser, "junk n/Mary Tan p/98765432", expected);
