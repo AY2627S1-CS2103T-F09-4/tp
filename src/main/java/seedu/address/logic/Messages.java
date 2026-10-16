@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.logic.parser.Prefix;
+import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 
 /**
@@ -15,6 +16,7 @@ public class Messages {
     public static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command.";
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_INVALID_PERSON_DISPLAYED_INDEX = "The student index provided is invalid.";
+    public static final String MESSAGE_INVALID_PARENT_DISPLAYED_INDEX = "The parent index provided is invalid.";
     public static final String MESSAGE_PERSONS_LISTED_OVERVIEW = "%1$d person(s) listed!";
     public static final String MESSAGE_DUPLICATE_FIELDS =
                 "Multiple values specified for the following single-valued field(s): ";
@@ -55,6 +57,27 @@ public class Messages {
         }
         builder.append("; Tags: ");
         person.getTags().forEach(builder::append);
+        return builder.toString();
+    }
+
+    /**
+     * Formats the {@code parent} for display to the user.
+     */
+    public static String format(ParentContact parent) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(parent.getName())
+                .append("; Phone: ")
+                .append(parent.getPhone());
+        if (parent.getEmail() != null) {
+            builder.append("; Email: ")
+                    .append(parent.getEmail());
+        }
+        if (parent.getPhotoPath().isPresent()) {
+            builder.append("; Photo: ")
+                    .append(parent.getPhotoPath());
+        }
+        builder.append("; Requirements: ")
+                .append(String.join(", ", parent.getRequirements()));
         return builder.toString();
     }
 

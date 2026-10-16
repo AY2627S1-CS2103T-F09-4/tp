@@ -10,6 +10,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.ParentContact;
@@ -36,7 +37,7 @@ public class AddParentPhotoCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         List<ParentContact> contacts = model.getParentContactList();
         if (index.getZeroBased() >= contacts.size()) {
-            throw new CommandException("The parent index provided is invalid.");
+            throw new CommandException(Messages.MESSAGE_INVALID_PARENT_DISPLAYED_INDEX);
         }
         validate(path);
         ParentContact old = contacts.get(index.getZeroBased());

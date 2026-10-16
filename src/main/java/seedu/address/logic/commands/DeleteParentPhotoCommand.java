@@ -1,6 +1,7 @@
 package seedu.address.logic.commands;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.ParentContact;
@@ -18,7 +19,7 @@ public class DeleteParentPhotoCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         if (index.getZeroBased() >= model.getParentContactList().size()) {
-            throw new CommandException("The parent index provided is invalid.");
+            throw new CommandException(Messages.MESSAGE_INVALID_PARENT_DISPLAYED_INDEX);
         }
         ParentContact old = model.getParentContactList().get(index.getZeroBased());
         ParentContact updated = new ParentContact(
