@@ -6,14 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -30,6 +34,9 @@ import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.PersonBuilder;
 
 class PersonCardTest {
+
+    @TempDir
+    Path testFolder;
 
     @BeforeAll static void initialiseJavaFx() throws Exception {
         try {
@@ -196,6 +203,62 @@ class PersonCardTest {
             assertTrue(placeholder.isVisible());
             assertTrue(placeholder.isManaged());
 
+            return null;
+        });
+    }
+
+    @Test void constructorWithValidPhotoDisplaysPhoto() throws Exception {
+        Path photoPath = testFolder.resolve("student.png");
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        ImageIO.write(image, "png", photoPath.toFile());
+
+        runOnFxThread(() -> {
+            Person person = new PersonBuilder().withPhotoPath(photoPath.toString()).build();
+            PersonCard card = new PersonCard(person, 1, "");
+
+            ImageView photo = getField(card, "photo");
+            Label placeholder = getField(card, "photoPlaceholder");
+
+            assertNotNull(photo.getImage());
+            assertFalse(photo.getImage().isError());
+            assertTrue(photo.isVisible());
+            assertTrue(photo.isManaged());
+            assertFalse(placeholder.isVisible());
+            assertFalse(placeholder.isManaged());
+            return null;
+        });
+    }
+
+    @Test void constructorWithMissingPhotoFileShowsPlaceholder() throws Exception {
+        Path missingPhotoPath = testFolder.resolve("missing.png");
+
+        runOnFxThread(() -> {
+            Person person = new PersonBuilder().withPhotoPath(missingPhotoPath.toString()).build();
+            PersonCard card = new PersonCard(person, 1, "");
+
+            ImageView photo = getField(card, "photo");
+            Label placeholder = getField(card, "photoPlaceholder");
+
+            assertFalse(photo.isVisible());
+            assertFalse(photo.isManaged());
+            assertTrue(placeholder.isVisible());
+            assertTrue(placeholder.isManaged());
+            return null;
+        });
+    }
+
+    @Test void constructorWithInvalidPhotoPathShowsPlaceholder() throws Exception {
+        runOnFxThread(() -> {
+            Person person = new PersonBuilder().withPhotoPath("invalid\u0000path.png").build();
+            PersonCard card = new PersonCard(person, 1, "");
+
+            ImageView photo = getField(card, "photo");
+            Label placeholder = getField(card, "photoPlaceholder");
+
+            assertFalse(photo.isVisible());
+            assertFalse(photo.isManaged());
+            assertTrue(placeholder.isVisible());
+            assertTrue(placeholder.isManaged());
             return null;
         });
     }

@@ -164,7 +164,7 @@ public class PersonCard extends UiPart<Region> {
 
         Image image;
         try {
-            image = new Image(Path.of(person.getPhotoPath().value).toUri().toString(), 72, 72, true, true, true);
+            image = new Image(Path.of(person.getPhotoPath().value).toUri().toString(), 72, 72, true, true, false);
         } catch (InvalidPathException ipe) {
             showPhotoPlaceholder();
             return;
