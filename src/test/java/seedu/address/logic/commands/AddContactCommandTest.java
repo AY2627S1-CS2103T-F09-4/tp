@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.ModelManager;
 import seedu.address.model.person.Email;
@@ -31,7 +32,7 @@ public class AddContactCommandTest {
         ModelManager model = new ModelManager();
         CommandResult result = new AddContactCommand(PARENT, null).execute(model);
 
-        assertEquals(String.format(AddContactCommand.MESSAGE_SUCCESS, PARENT.getName()),
+        assertEquals(String.format(AddContactCommand.MESSAGE_SUCCESS, Messages.format(PARENT)),
                 result.getFeedbackToUser());
         assertEquals(List.of(PARENT), model.getParentContactList());
     }
@@ -43,14 +44,14 @@ public class AddContactCommandTest {
         ParentContact sameIdentity = new ParentContact(new Name("mary tan"), PARENT.getPhone(),
                 new Email("different@example.com"), null, List.of());
 
-        assertThrows(CommandException.class, AddContactCommand.MESSAGE_DUPLICATE, () ->
+        assertThrows(CommandException.class, AddContactCommand.MESSAGE_DUPLICATE_PARENT, () ->
                 new AddContactCommand(sameIdentity, null).execute(model));
     }
 
     @Test
     public void execute_invalidLink_throwsCommandException() {
         ModelManager model = new ModelManager();
-        assertThrows(CommandException.class, AddContactCommand.MESSAGE_INVALID_LINK, () ->
+        assertThrows(CommandException.class, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () ->
                 new AddContactCommand(PARENT, Index.fromOneBased(1)).execute(model));
     }
 
@@ -72,7 +73,7 @@ public class AddContactCommandTest {
 
         ParentContact anotherParent = new ParentContact(new Name("Peter Tan"), new Phone("91234568"),
                 new Email("peter@example.com"), null, List.of());
-        assertThrows(CommandException.class, "Each student can have at most one parent contact.", () ->
+        assertThrows(CommandException.class, AddContactCommand.MESSAGE_STUDENT_ALREADY_LINKED, () ->
                 new AddContactCommand(anotherParent, Index.fromOneBased(1)).execute(model));
     }
 }

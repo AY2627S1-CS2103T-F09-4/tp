@@ -72,6 +72,25 @@ public class AddPhotoCommandTest {
     }
 
     @Test
+    public void execute_studentWithExistingPhoto_replacesPhoto() throws IOException {
+        Path oldPhotoPath = createImageFile("old.png", "png");
+        Path newPhotoPath = createImageFile("new.png", "png");
+        Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person personWithOldPhoto = createPersonWithPhoto(originalPerson, oldPhotoPath);
+        model.setPerson(originalPerson, personWithOldPhoto);
+
+        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, newPhotoPath);
+        Person updatedPerson = createPersonWithPhoto(personWithOldPhoto, newPhotoPath);
+        String expectedMessage = String.format(AddPhotoCommand.MESSAGE_ADD_PHOTO_SUCCESS,
+                Messages.format(updatedPerson));
+
+        Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
+        expectedModel.setPerson(personWithOldPhoto, updatedPerson);
+
+        assertCommandSuccess(addPhotoCommand, model, expectedMessage, expectedModel);
+    }
+
+    @Test
     public void execute_personWithTasks_preservesTasks() throws IOException, CommandException {
         Person originalPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework")
