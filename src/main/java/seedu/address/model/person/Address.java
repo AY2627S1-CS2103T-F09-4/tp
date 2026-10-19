@@ -37,6 +37,11 @@ public class Address {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this Address instance */
+    public Address copy() {
+        return new Address(this.value);
+    }
+
     @Override
     public String toString() {
         return value;

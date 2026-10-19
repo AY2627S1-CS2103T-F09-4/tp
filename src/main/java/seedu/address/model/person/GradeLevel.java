@@ -45,6 +45,11 @@ public class GradeLevel {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this GradeLevel instance */
+    public GradeLevel copy() {
+        return new GradeLevel(this.value);
+    }
+
     /**
      * Returns true if a grade level was specified.
      */

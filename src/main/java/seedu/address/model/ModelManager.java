@@ -12,6 +12,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.storage.SnapshotManager;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -23,6 +24,7 @@ public class ModelManager implements Model {
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
     private final FilteredList<ParentContact> parentList;
+    private final SnapshotManager snapshotManager;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -36,6 +38,8 @@ public class ModelManager implements Model {
         this.userPrefs = new UserPrefs(userPrefs);
         this.filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         this.parentList = new FilteredList<>(this.addressBook.getParentContactList());
+        this.snapshotManager = new SnapshotManager();
+        snapshotManager.saveSnapshot(this.addressBook);
     }
 
     public ModelManager() {
@@ -139,6 +143,29 @@ public class ModelManager implements Model {
     public void updateParentList(Predicate<ParentContact> predicate) {
         requireNonNull(predicate);
         parentList.setPredicate(predicate);
+    }
+
+    @Override
+    public void save() {
+        snapshotManager.saveSnapshot(addressBook);
+    }
+
+    @Override
+    public void undo() {
+        AddressBook newAddressBook = snapshotManager.undo();
+
+        if (newAddressBook != null) {
+            this.setAddressBook(newAddressBook);
+        }
+    }
+
+    @Override
+    public void redo() {
+        AddressBook newAddressBook = snapshotManager.redo();
+
+        if (newAddressBook != null) {
+            this.setAddressBook(newAddressBook);
+        }
     }
 
     @Override

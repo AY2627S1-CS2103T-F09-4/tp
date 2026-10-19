@@ -127,6 +127,19 @@ public class Person {
                 && otherPerson.getPhone().equals(getPhone());
     }
 
+    /** Returns a copy of this Person instance by copying every attribute*/
+    public Person copy() {
+        Set<Tag> tagsCopy= new HashSet<>();
+        for (Tag tag : tags) {
+            tagsCopy.add(tag.copy());
+        }
+
+        Person copy = new Person(name.copy(), phone.copy(), email.copy(), address.copy(), subject.copy(),
+                gradeLevel.copy(), photoPath.copy(), taskList.copy(), tagsCopy);
+
+        return copy;
+    }
+
     /**
      * Returns true if both persons have the same identity and data fields.
      * This defines a stronger notion of equality between two persons.

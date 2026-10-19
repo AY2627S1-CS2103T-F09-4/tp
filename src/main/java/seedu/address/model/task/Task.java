@@ -53,6 +53,11 @@ public class Task {
         return new Task(description, newStatus);
     }
 
+    /** Returns a copy of this Task instance */
+    public Task copy() {
+        return new Task(description, status);
+    }
+
     @Override
     public String toString() {
         return description;

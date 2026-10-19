@@ -51,6 +51,11 @@ public class Email {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this Email instance */
+    public Email copy() {
+        return new Email(this.value);
+    }
+
     @Override
     public String toString() {
         return value;

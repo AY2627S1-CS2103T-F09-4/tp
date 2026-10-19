@@ -152,6 +152,21 @@ public class AddCommandTest {
         public ObservableList<Person> getPersonList() {
             throw new AssertionError("This method should not be called.");
         }
+
+        @Override
+        public void save() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void undo() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void redo() {
+            throw new AssertionError("This method should not be called.");
+        }
     }
 
     /**

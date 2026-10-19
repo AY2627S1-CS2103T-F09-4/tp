@@ -33,6 +33,11 @@ public class Phone {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this Phone instance */
+    public Phone copy() {
+        return new Phone(this.value);
+    }
+
     @Override
     public String toString() {
         return value;

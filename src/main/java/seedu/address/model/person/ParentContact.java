@@ -75,6 +75,14 @@ public class ParentContact {
         return photoPath;
     }
 
+    /** Returns a copy of ParentContact by copying every attribute */
+    public ParentContact copy() {
+        ParentContact copy = new ParentContact(id, name.copy(), phone.copy(), email.copy(),
+                linkedStudentId, requirements, photoPath.copy());
+
+        return copy;
+    }
+
     /** Returns true if both parent contacts refer to the same person identity. */
     public boolean isSameContact(ParentContact other) {
         return other != null

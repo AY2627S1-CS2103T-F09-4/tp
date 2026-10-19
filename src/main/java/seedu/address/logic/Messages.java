@@ -21,6 +21,8 @@ public class Messages {
     public static final String MESSAGE_INVALID_PARENT_DISPLAYED_INDEX = "The parent index provided is invalid.";
     public static final String MESSAGE_DUPLICATE_FIELDS =
                 "Multiple values specified for the following single-valued field(s): ";
+    public static final String MESSAGE_UNABLE_TO_UNDO = "Nothing to undo!";
+    public static final String MESSAGE_UNABLE_TO_REDO = "Nothing to redo!";
 
     /**
      * Returns an error message indicating the duplicate prefixes.
