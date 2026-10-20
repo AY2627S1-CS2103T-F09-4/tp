@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.person.ParentContact;
-import seedu.address.model.person.ParentContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
 
@@ -119,6 +118,11 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.remove(contact);
     }
 
+    /**
+     * Creates a copy of the address book by copying every {@code Person} and {@code ParentContact}.
+     *
+     * @return the copied AddressBook.
+     */
     public AddressBook copy() {
         AddressBook copy = new AddressBook();
 

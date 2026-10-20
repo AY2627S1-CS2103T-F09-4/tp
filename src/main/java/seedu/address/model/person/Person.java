@@ -129,7 +129,7 @@ public class Person {
 
     /** Returns a copy of this Person instance by copying every attribute*/
     public Person copy() {
-        Set<Tag> tagsCopy= new HashSet<>();
+        Set<Tag> tagsCopy = new HashSet<>();
         for (Tag tag : tags) {
             tagsCopy.add(tag.copy());
         }

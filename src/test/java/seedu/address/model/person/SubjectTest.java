@@ -1,6 +1,7 @@
 package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -34,6 +35,13 @@ public class SubjectTest {
         assertTrue(Subject.isValidSubject("Additional Mathematics")); // with spaces
         assertTrue(Subject.isValidSubject("H2 Chemistry")); // with digits
         assertTrue(Subject.isValidSubject("-")); // one character
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        Subject first = new Subject("1");
+        Subject second = first.copy();
+        assertNotSame(first, second);
     }
 
     @Test

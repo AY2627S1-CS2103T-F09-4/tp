@@ -2,6 +2,7 @@ package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -41,6 +42,13 @@ public class GradeLevelTest {
         assertFalse(GradeLevel.NONE.isPresent());
         assertEquals("", GradeLevel.NONE.value);
         assertTrue(new GradeLevel("P6").isPresent());
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        GradeLevel first = new GradeLevel("1");
+        GradeLevel second = first.copy();
+        assertNotSame(first, second);
     }
 
     @Test

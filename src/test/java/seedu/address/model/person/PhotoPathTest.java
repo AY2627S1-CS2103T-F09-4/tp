@@ -1,6 +1,7 @@
 package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -18,6 +19,13 @@ public class PhotoPathTest {
         assertFalse(PhotoPath.NONE.isPresent());
         assertFalse(new PhotoPath("   ").isPresent());
         assertTrue(new PhotoPath("student.png").isPresent());
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        PhotoPath first = new PhotoPath("student.png");
+        PhotoPath second = first.copy();
+        assertNotSame(first, second);
     }
 
     @Test
