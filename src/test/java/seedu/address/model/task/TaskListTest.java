@@ -84,6 +84,43 @@ public class TaskListTest {
     }
 
     @Test
+    public void withoutTask_removesOnlyTargetTaskAndPreservesOriginal() {
+        TaskList original = new TaskList(List.of(new Task("a"), new Task("b"), new Task("c")));
+        TaskList updated = original.withoutTask(Index.fromOneBased(2));
+
+        assertEquals(List.of(new Task("a"), new Task("b"), new Task("c")), original.getTasks());
+        assertEquals(List.of(new Task("a"), new Task("c")), updated.getTasks());
+    }
+
+    @Test
+    public void withoutTask_firstLastAndOnlyTask() {
+        TaskList taskList = new TaskList(List.of(new Task("a"), new Task("b")));
+
+        assertEquals(List.of(new Task("b")), taskList.withoutTask(Index.fromOneBased(1)).getTasks());
+        assertEquals(List.of(new Task("a")), taskList.withoutTask(Index.fromOneBased(2)).getTasks());
+        assertEquals(new TaskList(),
+                new TaskList(List.of(new Task("a"))).withoutTask(Index.fromOneBased(1)));
+    }
+
+    @Test
+    public void withoutTask_repeatedTasks_removesOnlyTheTargetedOne() {
+        Task repeated = new Task("a");
+        TaskList taskList = new TaskList(List.of(repeated, repeated));
+
+        assertEquals(List.of(repeated), taskList.withoutTask(Index.fromOneBased(1)).getTasks());
+    }
+
+    @Test
+    public void withoutTask_invalidArguments_throwsException() {
+        TaskList taskList = new TaskList(List.of(new Task("a")));
+        Index second = Index.fromOneBased(2);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> taskList.withoutTask(second));
+        assertThrows(IndexOutOfBoundsException.class, () -> new TaskList().withoutTask(Index.fromOneBased(1)));
+        assertThrows(NullPointerException.class, () -> taskList.withoutTask(null));
+    }
+
+    @Test
     public void withTaskStatus_sameStatus_returnsEqualList() {
         TaskList original = new TaskList(List.of(new Task("do homework", TaskStatus.DONE)));
 

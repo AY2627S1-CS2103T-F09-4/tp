@@ -10,10 +10,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.commons.core.index.Index;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
+import seedu.address.model.person.Person;
 import seedu.address.model.schedule.ScheduledSession;
+import seedu.address.model.task.Task;
+import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.TypicalPersons;
 import seedu.address.testutil.TypicalSchedule;
 
@@ -76,6 +80,21 @@ public class JsonSerializableAddressBookTest {
 
         assertEquals(List.of(TypicalSchedule.ALICE_WEDNESDAY, TypicalSchedule.BENSON_MONDAY_OVERLAP),
                 restored.getScheduleList());
+    }
+
+    @Test
+    public void conversion_afterTaskDeleted_deletedTaskIsNotSaved() throws Exception {
+        Person withTasks = new PersonBuilder().withName("Zed Tester").withPhone("90000000")
+                .withTasks("a", "b", "c").build();
+        Person afterDelete = new Person(withTasks.getName(), withTasks.getPhone(), withTasks.getEmail(),
+                withTasks.getAddress(), withTasks.getSubject(), withTasks.getGradeLevel(), withTasks.getPhotoPath(),
+                withTasks.getTaskList().withoutTask(Index.fromOneBased(2)), withTasks.getTags());
+        AddressBook original = new AddressBook();
+        original.addPerson(afterDelete);
+
+        AddressBook restored = new JsonSerializableAddressBook(original).toModelType();
+
+        assertEquals(List.of(new Task("a"), new Task("c")), restored.getPersonList().get(0).getTaskList().getTasks());
     }
 
     @Test

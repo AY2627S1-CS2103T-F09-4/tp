@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddContactCommand;
 import seedu.address.logic.commands.AddPhotoCommand;
@@ -22,6 +23,7 @@ import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.DeletePhotoCommand;
+import seedu.address.logic.commands.DeleteTaskCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
 import seedu.address.logic.commands.ExitCommand;
@@ -77,6 +79,13 @@ public class AddressBookParserTest {
         AddTaskCommand command = (AddTaskCommand) parser.parseCommand(
                 AddTaskCommand.COMMAND_WORD + " 1 task/do homework");
         assertEquals(new AddTaskCommand(INDEX_FIRST_PERSON, new Task("do homework")), command);
+    }
+
+    @Test
+    public void parseCommand_deleteTask() throws Exception {
+        DeleteTaskCommand command = (DeleteTaskCommand) parser.parseCommand(
+                DeleteTaskCommand.COMMAND_WORD + " 1 tid/2");
+        assertEquals(new DeleteTaskCommand(INDEX_FIRST_PERSON, Index.fromOneBased(2)), command);
     }
 
     @Test
