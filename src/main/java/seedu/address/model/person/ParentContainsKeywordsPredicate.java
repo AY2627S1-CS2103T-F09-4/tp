@@ -38,6 +38,9 @@ public class ParentContainsKeywordsPredicate implements Predicate<ParentContact>
     }
 
     private boolean containsIgnoreCase(String field, String keyword) {
+        if (field == null) {
+            return false;
+        }
         return field.toLowerCase().contains(keyword.toLowerCase());
     }
 
