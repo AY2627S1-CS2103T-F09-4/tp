@@ -11,6 +11,8 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
+import seedu.address.model.reminder.Reminder;
+import seedu.address.model.reminder.ReminderList;
 import seedu.address.model.schedule.Schedule;
 import seedu.address.model.schedule.ScheduledSession;
 
@@ -23,6 +25,7 @@ public class AddressBook implements ReadOnlyAddressBook {
     private final UniquePersonList persons = new UniquePersonList();
     private final javafx.collections.ObservableList<ParentContact> parentContacts = FXCollections.observableArrayList();
     private final Schedule schedule = new Schedule();
+    private ReminderList reminders = new ReminderList();
 
     public AddressBook() {}
 
@@ -53,6 +56,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         setPersons(newData.getPersonList());
         parentContacts.setAll(newData.getParentContactList());
         schedule.setSessions(newData.getScheduleList());
+        reminders = new ReminderList(newData.getReminderList());
     }
 
     //// person-level operations
@@ -157,6 +161,14 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.remove(contact);
     }
 
+    public void addReminder(Reminder reminder) {
+        reminders = reminders.withReminder(reminder);
+    }
+
+    public void removeReminder(seedu.address.commons.core.index.Index index) {
+        reminders = reminders.withoutReminder(index);
+    }
+
     /**
      * Creates a copy of the address book by copying every {@code Person} and {@code ParentContact}.
      *
@@ -177,6 +189,9 @@ public class AddressBook implements ReadOnlyAddressBook {
                     .findFirst()
                     .orElseThrow();
             copy.addScheduledSession(session.withStudent(studentCopy));
+        }
+        for (Reminder reminder : reminders.getReminders()) {
+            copy.addReminder(new Reminder(reminder.text));
         }
 
         return copy;
@@ -207,6 +222,11 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public List<Reminder> getReminderList() {
+        return reminders.getReminders();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -219,11 +239,12 @@ public class AddressBook implements ReadOnlyAddressBook {
 
         return persons.equals(otherAddressBook.persons)
                 && parentContacts.equals(otherAddressBook.parentContacts)
-                && schedule.equals(otherAddressBook.schedule);
+                && schedule.equals(otherAddressBook.schedule)
+                && reminders.equals(otherAddressBook.reminders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persons, parentContacts, schedule);
+        return Objects.hash(persons, parentContacts, schedule, reminders);
     }
 }

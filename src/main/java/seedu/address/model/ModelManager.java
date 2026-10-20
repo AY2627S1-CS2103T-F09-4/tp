@@ -12,6 +12,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.storage.SnapshotManager;
 
@@ -167,6 +168,23 @@ public class ModelManager implements Model {
     @Override
     public ObservableList<ScheduledSession> getScheduleList() {
         return addressBook.getScheduleList();
+    }
+
+    @Override
+    public void addReminder(Reminder reminder) {
+        requireNonNull(reminder);
+        addressBook.addReminder(reminder);
+    }
+
+    @Override
+    public void deleteReminder(seedu.address.commons.core.index.Index index) {
+        requireNonNull(index);
+        addressBook.removeReminder(index);
+    }
+
+    @Override
+    public java.util.List<Reminder> getReminderList() {
+        return addressBook.getReminderList();
     }
 
     @Override

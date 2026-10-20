@@ -208,6 +208,38 @@ Examples:
 * `add-task 1 task/do homework`
 * `add-task 2 task/revise chapter 3 notes`
 
+### Adding a startup reminder: `add-reminder`
+
+Adds a tutor-level reminder that is not attached to any student.
+
+Format: `add-reminder r/REMINDER_TEXT`
+
+* `REMINDER_TEXT` may contain spaces but must not be blank.
+* Reminders are kept in insertion order. Duplicate reminder text is allowed.
+* Saved reminders are shown in a numbered dialog every time Tutoria starts.
+
+Example: `add-reminder r/Collect worksheets from cabinet B`
+
+### Listing reminders: `list-reminders`
+
+Displays all reminders as a numbered list in insertion order.
+
+Format: `list-reminders`
+
+If no reminders have been set, Tutoria reports that the reminder list is empty.
+
+### Deleting a reminder: `delete-reminder`
+
+Deletes exactly one reminder using the index shown by `list-reminders`.
+
+Format: `delete-reminder INDEX`
+
+* `INDEX` must be a positive integer within the current reminder list.
+* Example: `delete-reminder 2` deletes the second reminder.
+
+The startup reminder dialog can be closed with Enter, Escape, or its close control. Closing the dialog only dismisses
+it for the current session; it does not delete reminders. Use `delete-reminder` to remove a reminder permanently.
+
 ### Marking tasks as done or not: `mark-task`
 
 Marks a task as completed or incompleted.
@@ -355,3 +387,6 @@ Furthermore, certain edits can cause the  to behave in unexpected ways (e.g., if
  **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                            |
  **List**   | `list`                                                                                                                                                                |
  **Help**   | `help`                                                                                                                                                                |
+ **Add reminder** | `add-reminder r/REMINDER_TEXT`<br> e.g., `add-reminder r/Collect worksheets from cabinet B` |
+ **List reminders** | `list-reminders` |
+ **Delete reminder** | `delete-reminder INDEX`<br> e.g., `delete-reminder 2` |

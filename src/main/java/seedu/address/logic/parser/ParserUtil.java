@@ -17,6 +17,7 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Subject;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.task.Task;
@@ -162,6 +163,16 @@ public class ParserUtil {
             throw new ParseException(Task.MESSAGE_CONSTRAINTS);
         }
         return new Task(trimmedDescription);
+    }
+
+    /** Parses trimmed, non-blank reminder text. */
+    public static Reminder parseReminder(String text) throws ParseException {
+        requireNonNull(text);
+        String trimmedText = text.trim();
+        if (!Reminder.isValidText(trimmedText)) {
+            throw new ParseException(Reminder.MESSAGE_CONSTRAINTS);
+        }
+        return new Reminder(trimmedText);
     }
 
     /**

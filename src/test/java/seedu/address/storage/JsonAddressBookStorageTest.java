@@ -20,6 +20,7 @@ import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskList;
 import seedu.address.model.task.TaskStatus;
@@ -108,6 +109,22 @@ public class JsonAddressBookStorageTest {
         assertEquals(original, new AddressBook(readBack));
         assertEquals(List.of(new Task("do homework"), new Task("revise notes", TaskStatus.DONE)),
                 readBack.getPersonList().get(0).getTaskList().getTasks());
+    }
+
+    @Test
+    public void readAndSaveAddressBook_withReminders_preservesOrderAcrossReload() throws Exception {
+        Path filePath = testFolder.resolve("AddressBookWithReminders.json");
+        AddressBook original = getTypicalAddressBook();
+        original.addReminder(new Reminder("Collect worksheets"));
+        original.addReminder(new Reminder("Confirm December availability"));
+
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+        storage.saveAddressBook(original);
+        ReadOnlyAddressBook readBack = storage.readAddressBook().get();
+
+        assertEquals(original, new AddressBook(readBack));
+        assertEquals(List.of(new Reminder("Collect worksheets"),
+                new Reminder("Confirm December availability")), readBack.getReminderList());
     }
 
     @Test

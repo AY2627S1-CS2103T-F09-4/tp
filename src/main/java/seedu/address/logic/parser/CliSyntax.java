@@ -19,6 +19,7 @@ public class CliSyntax {
     public static final Prefix PREFIX_STATUS = new Prefix("status/");
     public static final Prefix PREFIX_LINK = new Prefix("link/");
     public static final Prefix PREFIX_REQUIREMENT = new Prefix("r/");
+    public static final Prefix PREFIX_REMINDER = new Prefix("r/");
     public static final Prefix PREFIX_DAY = new Prefix("day/");
     public static final Prefix PREFIX_FROM = new Prefix("from/");
     public static final Prefix PREFIX_TO = new Prefix("to/");

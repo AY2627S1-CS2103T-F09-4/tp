@@ -13,6 +13,7 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
 
 /**
@@ -26,6 +27,7 @@ class JsonSerializableAddressBook {
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
     private final List<JsonAdaptedParentContact> parentContacts = new ArrayList<>();
     private final List<JsonAdaptedScheduledSession> schedule = new ArrayList<>();
+    private final List<JsonAdaptedReminder> reminders = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonSerializableAddressBook} with the given persons.
@@ -33,7 +35,8 @@ class JsonSerializableAddressBook {
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
             @JsonProperty("parentContacts") List<JsonAdaptedParentContact> parentContacts,
-            @JsonProperty("schedule") List<JsonAdaptedScheduledSession> schedule) {
+            @JsonProperty("schedule") List<JsonAdaptedScheduledSession> schedule,
+            @JsonProperty("reminders") List<JsonAdaptedReminder> reminders) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
@@ -43,6 +46,15 @@ class JsonSerializableAddressBook {
         if (schedule != null) {
             this.schedule.addAll(schedule);
         }
+        if (reminders != null) {
+            this.reminders.addAll(reminders);
+        }
+    }
+
+    /** Compatibility constructor for existing callers that predate reminders. */
+    public JsonSerializableAddressBook(List<JsonAdaptedPerson> persons,
+            List<JsonAdaptedParentContact> parentContacts, List<JsonAdaptedScheduledSession> schedule) {
+        this(persons, parentContacts, schedule, null);
     }
 
     /**
@@ -57,6 +69,7 @@ class JsonSerializableAddressBook {
         for (ScheduledSession session : source.getScheduleList()) {
             schedule.add(new JsonAdaptedScheduledSession(session, source.getPersonList()));
         }
+        reminders.addAll(source.getReminderList().stream().map(JsonAdaptedReminder::new).toList());
     }
 
     /**
@@ -82,6 +95,10 @@ class JsonSerializableAddressBook {
         }
         for (JsonAdaptedScheduledSession adapted : schedule) {
             addressBook.addScheduledSession(adapted.toModelType(addressBook.getPersonList()));
+        }
+        for (JsonAdaptedReminder adapted : reminders) {
+            Reminder reminder = adapted.toModelType();
+            addressBook.addReminder(reminder);
         }
         return addressBook;
     }
