@@ -191,6 +191,14 @@ public class AddressBookTest {
     }
 
     @Test
+    public void readOnlyAddressBook_defaultListsAreEmpty() {
+        AddressBookStub stub = new AddressBookStub(List.of(ALICE));
+
+        assertEquals(List.of(), stub.getScheduleList());
+        assertEquals(List.of(), stub.getParentContactList());
+    }
+
+    @Test
     public void toStringMethod() {
         String expected = AddressBook.class.getCanonicalName() + "{persons=" + addressBook.getPersonList() + "}";
         assertEquals(expected, addressBook.toString());
