@@ -31,6 +31,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.testutil.ParentContactBuilder;
 import seedu.address.testutil.PersonBuilder;
 
@@ -111,6 +112,11 @@ class ParentContactCardTest {
 
         @Override
         public ObservableList<ParentContact> getParentContactList() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ObservableList<ScheduledSession> getScheduleList() {
             throw new AssertionError("This method should not be called.");
         }
 
