@@ -20,8 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddTaskCommand;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeleteTaskCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.ScheduleStudentCommand;
 import seedu.address.logic.commands.UnscheduleStudentCommand;
@@ -97,6 +99,17 @@ public class LogicManagerTest {
 
         logic.execute(UnscheduleStudentCommand.COMMAND_WORD + slot);
         assertEquals(0, logic.getScheduleList().size());
+    }
+
+    @Test
+    public void execute_deleteTask_removesTaskFromStudent() throws Exception {
+        model.addPerson(AMY);
+        logic.execute(AddTaskCommand.COMMAND_WORD + " 1 task/do homework");
+        assertEquals(1, logic.getFilteredPersonList().get(0).getTaskList().size());
+
+        logic.execute(DeleteTaskCommand.COMMAND_WORD + " 1 tid/1");
+
+        assertEquals(0, logic.getFilteredPersonList().get(0).getTaskList().size());
     }
 
     @Test
