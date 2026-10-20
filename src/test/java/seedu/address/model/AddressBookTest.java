@@ -39,14 +39,14 @@ public class AddressBookTest {
 
     @Test
     public void reminderOperations_preserveOrderAndCopyResetData() {
-        Reminder first = new Reminder("First");
-        Reminder second = new Reminder("Second");
+        Reminder first = new Reminder(1, "First");
+        Reminder second = new Reminder(2, "Second");
         addressBook.addReminder(first);
         addressBook.addReminder(second);
         assertEquals(List.of(first, second), addressBook.getReminderList());
 
         AddressBook copy = addressBook.copy();
-        addressBook.removeReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        addressBook.removeReminder(1);
         assertEquals(List.of(second), addressBook.getReminderList());
         assertEquals(List.of(first, second), copy.getReminderList());
 

@@ -3,6 +3,10 @@ package seedu.address.logic.parser;
 import static java.util.Objects.requireNonNull;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -17,7 +21,6 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Subject;
-import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.task.Task;
@@ -166,13 +169,25 @@ public class ParserUtil {
     }
 
     /** Parses trimmed, non-blank reminder text. */
-    public static Reminder parseReminder(String text) throws ParseException {
+    public static String parseReminderText(String text) throws ParseException {
         requireNonNull(text);
         String trimmedText = text.trim();
-        if (!Reminder.isValidText(trimmedText)) {
-            throw new ParseException(Reminder.MESSAGE_CONSTRAINTS);
+        if (!seedu.address.model.reminder.Reminder.isValidText(trimmedText)) {
+            throw new ParseException(seedu.address.model.reminder.Reminder.MESSAGE_CONSTRAINTS);
         }
-        return new Reminder(trimmedText);
+        return trimmedText;
+    }
+
+    /** Parses a strict local reminder timestamp in {@code YYYY-MM-DD HH:mm} format. */
+    public static LocalDateTime parseReminderTime(String value) throws ParseException {
+        requireNonNull(value);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
+                .withResolverStyle(ResolverStyle.STRICT);
+        try {
+            return LocalDateTime.parse(value.trim(), formatter);
+        } catch (DateTimeParseException e) {
+            throw new ParseException("Due time must use a valid YYYY-MM-DD HH:mm value.", e);
+        }
     }
 
     /**

@@ -115,16 +115,16 @@ public class JsonAddressBookStorageTest {
     public void readAndSaveAddressBook_withReminders_preservesOrderAcrossReload() throws Exception {
         Path filePath = testFolder.resolve("AddressBookWithReminders.json");
         AddressBook original = getTypicalAddressBook();
-        original.addReminder(new Reminder("Collect worksheets"));
-        original.addReminder(new Reminder("Confirm December availability"));
+        original.addReminder(new Reminder(1, "Collect worksheets"));
+        original.addReminder(new Reminder(2, "Confirm December availability"));
 
         JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
         storage.saveAddressBook(original);
         ReadOnlyAddressBook readBack = storage.readAddressBook().get();
 
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(List.of(new Reminder("Collect worksheets"),
-                new Reminder("Confirm December availability")), readBack.getReminderList());
+        assertEquals(List.of(new Reminder(1, "Collect worksheets"),
+                new Reminder(2, "Confirm December availability")), readBack.getReminderList());
     }
 
     @Test

@@ -7,10 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import seedu.address.commons.core.index.Index;
-
 /** An immutable, ordered list of tutor-level reminders. */
-public class ReminderList {
+public final class ReminderList {
     private final List<Reminder> reminders;
 
     public ReminderList() {
@@ -20,8 +18,13 @@ public class ReminderList {
     /** Creates a reminder list containing {@code reminders} in order. */
     public ReminderList(List<Reminder> reminders) {
         requireNonNull(reminders);
-        this.reminders = new ArrayList<>(reminders);
-        this.reminders.forEach(Objects::requireNonNull);
+        this.reminders = reminders.stream().map(reminder -> {
+            Objects.requireNonNull(reminder);
+            return reminder.copy();
+        }).toList();
+        if (this.reminders.stream().map(Reminder::getId).distinct().count() != this.reminders.size()) {
+            throw new IllegalArgumentException("Reminder IDs must be unique.");
+        }
     }
 
     public List<Reminder> getReminders() {
@@ -32,25 +35,32 @@ public class ReminderList {
         return reminders.size();
     }
 
-    public Reminder getReminder(Index index) {
-        requireNonNull(index);
-        return reminders.get(index.getZeroBased());
+    public Reminder getReminderById(int id) {
+        return reminders.stream().filter(reminder -> reminder.getId() == id).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown reminder ID: " + id));
+    }
+
+    public boolean containsId(int id) {
+        return reminders.stream().anyMatch(reminder -> reminder.getId() == id);
     }
 
     /** Returns a new list with {@code reminder} appended. */
     public ReminderList withReminder(Reminder reminder) {
         requireNonNull(reminder);
+        if (containsId(reminder.getId())) {
+            throw new IllegalArgumentException("Reminder IDs must be unique.");
+        }
         List<Reminder> updated = new ArrayList<>(reminders);
         updated.add(reminder);
         return new ReminderList(updated);
     }
 
-    /** Returns a new list without the reminder at {@code index}. */
-    public ReminderList withoutReminder(Index index) {
-        requireNonNull(index);
-        List<Reminder> updated = new ArrayList<>(reminders);
-        updated.remove(index.getZeroBased());
-        return new ReminderList(updated);
+    /** Returns a new list without the reminder identified by {@code id}. */
+    public ReminderList withoutReminderId(int id) {
+        if (!containsId(id)) {
+            throw new IllegalArgumentException("Unknown reminder ID: " + id);
+        }
+        return new ReminderList(reminders.stream().filter(reminder -> reminder.getId() != id).toList());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package seedu.address.ui;
 
+import java.time.Clock;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -10,6 +11,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import seedu.address.model.reminder.Reminder;
+import seedu.address.model.reminder.ReminderDisplay;
 
 /** Startup dialog that displays persistent tutor-level reminders. */
 class ReminderDialog {
@@ -19,11 +21,19 @@ class ReminderDialog {
     private final List<Reminder> reminders;
     private final Stage owner;
     private final Runnable onDismiss;
+    private final Clock clock;
+    private final String header;
     private Alert alert;
 
-    ReminderDialog(Stage owner, List<Reminder> reminders, Runnable onDismiss) {
+    ReminderDialog(Stage owner, List<Reminder> reminders, Clock clock, Runnable onDismiss) {
+        this(owner, reminders, clock, HEADER, onDismiss);
+    }
+
+    ReminderDialog(Stage owner, List<Reminder> reminders, Clock clock, String header, Runnable onDismiss) {
         this.owner = owner;
         this.reminders = List.copyOf(reminders);
+        this.clock = clock;
+        this.header = header;
         this.onDismiss = onDismiss;
     }
 
@@ -32,11 +42,11 @@ class ReminderDialog {
         if (reminders.isEmpty()) {
             return false;
         }
-        alert = new Alert(Alert.AlertType.INFORMATION, formatReminders(reminders), ButtonType.CLOSE);
+        alert = new Alert(Alert.AlertType.INFORMATION, formatReminders(reminders, clock), ButtonType.CLOSE);
         alert.initOwner(owner);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle(TITLE);
-        alert.setHeaderText(HEADER);
+        alert.setHeaderText(header);
         alert.getDialogPane().getStylesheets().add("view/DarkTheme.css");
 
         Button closeButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CLOSE);
@@ -54,15 +64,10 @@ class ReminderDialog {
         return true;
     }
 
-    static String formatReminders(List<Reminder> reminders) {
-        StringBuilder content = new StringBuilder();
-        for (int i = 0; i < reminders.size(); i++) {
-            if (i > 0) {
-                content.append(System.lineSeparator());
-            }
-            content.append(i + 1).append(". ").append(reminders.get(i));
-        }
-        return content.toString();
+    static String formatReminders(List<Reminder> reminders, Clock clock) {
+        return ReminderDisplay.sorted(reminders, clock).stream()
+                .map(reminder -> ReminderDisplay.format(reminder, clock))
+                .collect(java.util.stream.Collectors.joining(System.lineSeparator()));
     }
 
     boolean isShowing() {

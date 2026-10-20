@@ -100,25 +100,22 @@ public class ModelManagerTest {
 
     @Test
     public void reminderOperations_addAccessDeleteAndPreventExternalMutation() {
-        Reminder first = new Reminder("First");
-        Reminder second = new Reminder("Second");
-        modelManager.addReminder(first);
-        modelManager.addReminder(second);
+        Reminder first = modelManager.addReminder("First", null);
+        Reminder second = modelManager.addReminder("Second", null);
 
         assertEquals(List.of(first, second), modelManager.getReminderList());
         assertThrows(UnsupportedOperationException.class, () ->
-                modelManager.getReminderList().add(new Reminder("Third")));
+                modelManager.getReminderList().add(new Reminder(3, "Third")));
 
-        modelManager.deleteReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        modelManager.deleteReminder(1);
         assertEquals(List.of(second), modelManager.getReminderList());
     }
 
     @Test
     public void undoRedo_reminder_restoresReminderState() {
-        Reminder reminder = new Reminder("First");
-        modelManager.addReminder(reminder);
+        Reminder reminder = modelManager.addReminder("First", null);
         modelManager.save();
-        modelManager.deleteReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        modelManager.deleteReminder(1);
         modelManager.save();
 
         modelManager.undo();

@@ -26,6 +26,7 @@ public class AddressBook implements ReadOnlyAddressBook {
     private final javafx.collections.ObservableList<ParentContact> parentContacts = FXCollections.observableArrayList();
     private final Schedule schedule = new Schedule();
     private ReminderList reminders = new ReminderList();
+    private int nextReminderId = 1;
 
     public AddressBook() {}
 
@@ -57,6 +58,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.setAll(newData.getParentContactList());
         schedule.setSessions(newData.getScheduleList());
         reminders = new ReminderList(newData.getReminderList());
+        nextReminderId = newData.getNextReminderId();
     }
 
     //// person-level operations
@@ -161,12 +163,30 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.remove(contact);
     }
 
+    /** Adds an already identified reminder, primarily while loading or copying data. */
     public void addReminder(Reminder reminder) {
         reminders = reminders.withReminder(reminder);
+        nextReminderId = Math.max(nextReminderId, reminder.getId() + 1);
     }
 
-    public void removeReminder(seedu.address.commons.core.index.Index index) {
-        reminders = reminders.withoutReminder(index);
+    /** Creates and adds a reminder with the next never-reused ID. */
+    public Reminder createReminder(String text, java.time.LocalDateTime dueAt) {
+        Reminder reminder = new Reminder(nextReminderId, text, dueAt);
+        addReminder(reminder);
+        return reminder;
+    }
+
+    public void removeReminder(int id) {
+        reminders = reminders.withoutReminderId(id);
+    }
+
+    /** Replaces reminders and ID allocation state when loading persisted data. */
+    public void setReminderData(List<Reminder> reminders, int nextReminderId) {
+        if (nextReminderId <= 0 || reminders.stream().anyMatch(reminder -> reminder.getId() >= nextReminderId)) {
+            throw new IllegalArgumentException("Next reminder ID must exceed all reminder IDs.");
+        }
+        this.reminders = new ReminderList(reminders);
+        this.nextReminderId = nextReminderId;
     }
 
     /**
@@ -191,8 +211,9 @@ public class AddressBook implements ReadOnlyAddressBook {
             copy.addScheduledSession(session.withStudent(studentCopy));
         }
         for (Reminder reminder : reminders.getReminders()) {
-            copy.addReminder(new Reminder(reminder.text));
+            copy.addReminder(reminder.copy());
         }
+        copy.nextReminderId = nextReminderId;
 
         return copy;
     }
@@ -227,6 +248,11 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public int getNextReminderId() {
+        return nextReminderId;
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -240,11 +266,12 @@ public class AddressBook implements ReadOnlyAddressBook {
         return persons.equals(otherAddressBook.persons)
                 && parentContacts.equals(otherAddressBook.parentContacts)
                 && schedule.equals(otherAddressBook.schedule)
-                && reminders.equals(otherAddressBook.reminders);
+                && reminders.equals(otherAddressBook.reminders)
+                && nextReminderId == otherAddressBook.nextReminderId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persons, parentContacts, schedule, reminders);
+        return Objects.hash(persons, parentContacts, schedule, reminders, nextReminderId);
     }
 }

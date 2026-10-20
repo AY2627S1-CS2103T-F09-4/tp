@@ -41,6 +41,7 @@ public class MainWindow extends UiPart<Stage> {
     private HelpWindow helpWindow;
     private CommandBox commandBox;
     private ReminderDialog reminderDialog;
+    private ReminderAlertScheduler reminderAlertScheduler;
 
     @FXML
     private StackPane commandBoxPlaceholder;
@@ -146,8 +147,22 @@ public class MainWindow extends UiPart<Stage> {
         commandBox = new CommandBox(this::executeCommand);
         commandBoxPlaceholder.getChildren().add(commandBox.getRoot());
 
-        reminderDialog = new ReminderDialog(primaryStage, logic.getReminderList(), commandBox::requestFocus);
+        reminderDialog = new ReminderDialog(primaryStage, logic.getReminderList(), logic.getClock(),
+                commandBox::requestFocus);
         reminderDialog.showIfNeeded();
+        reminderAlertScheduler = new ReminderAlertScheduler(logic::getReminderList, this::showDueReminders,
+                logic.getClock());
+        reminderAlertScheduler.start();
+        primaryStage.setOnHidden(event -> reminderAlertScheduler.stop());
+    }
+
+    private boolean showDueReminders(java.util.List<seedu.address.model.reminder.Reminder> reminders) {
+        if (reminderDialog != null && reminderDialog.isShowing()) {
+            return false;
+        }
+        reminderDialog = new ReminderDialog(primaryStage, reminders, logic.getClock(), "Reminders due now",
+                commandBox::requestFocus);
+        return reminderDialog.showIfNeeded();
     }
 
     /**
@@ -187,6 +202,9 @@ public class MainWindow extends UiPart<Stage> {
                 (int) primaryStage.getX(), (int) primaryStage.getY());
         logic.setGuiSettings(guiSettings);
         helpWindow.hide();
+        if (reminderAlertScheduler != null) {
+            reminderAlertScheduler.stop();
+        }
         primaryStage.hide();
     }
 

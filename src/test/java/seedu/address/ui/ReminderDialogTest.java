@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,6 +27,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.reminder.Reminder;
 
 class ReminderDialogTest {
+    private static final Clock CLOCK = Clock.systemDefaultZone();
     @BeforeAll static void initialiseJavaFx() throws Exception {
         FxTestSupport.initialiseJavaFx();
         FxTestSupport.runOnFxThread(() -> javafx.application.Platform.setImplicitExit(false));
@@ -30,7 +35,7 @@ class ReminderDialogTest {
 
     @Test void showIfNeeded_emptyList_doesNotShowDialog() throws Exception {
         FxTestSupport.runOnFxThread(() -> {
-            ReminderDialog dialog = new ReminderDialog(null, List.of(), () -> { });
+            ReminderDialog dialog = new ReminderDialog(null, List.of(), CLOCK, () -> { });
             assertFalse(dialog.showIfNeeded());
             assertFalse(dialog.isShowing());
         });
@@ -42,11 +47,12 @@ class ReminderDialogTest {
             owner.setScene(new Scene(new StackPane()));
             owner.show();
             ReminderDialog dialog = new ReminderDialog(owner,
-                    List.of(new Reminder("First"), new Reminder("Second")), () -> { });
+                    List.of(new Reminder(1, "First"), new Reminder(2, "Second")), CLOCK, () -> { });
 
             assertTrue(dialog.showIfNeeded());
             assertTrue(dialog.isShowing());
-            assertEquals("1. First" + System.lineSeparator() + "2. Second",
+            assertEquals("[ID 1] First [EVERY STARTUP]" + System.lineSeparator()
+                            + "[ID 2] Second [EVERY STARTUP]",
                     dialog.getAlert().getContentText());
             Button closeButton = (Button) dialog.getAlert().getDialogPane().lookupButton(ButtonType.CLOSE);
             assertTrue(closeButton.isDefaultButton());
@@ -57,21 +63,35 @@ class ReminderDialogTest {
         });
     }
 
+    @Test void formatReminders_allStatusesIncludesFarFutureAndUsesUrgencyOrder() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-10-20T04:00:00Z"), ZoneId.of("Asia/Singapore"));
+        List<Reminder> reminders = List.of(
+                new Reminder(1, "Untimed"),
+                new Reminder(2, "Far future", LocalDateTime.of(2026, 12, 1, 9, 0)),
+                new Reminder(3, "Due soon", LocalDateTime.of(2026, 10, 20, 13, 0)),
+                new Reminder(4, "Overdue", LocalDateTime.of(2026, 10, 20, 11, 59)));
+
+        assertEquals("[ID 4] Overdue [2026-10-20 11:59] [OVERDUE]" + System.lineSeparator()
+                + "[ID 3] Due soon [2026-10-20 13:00] [DUE SOON]" + System.lineSeparator()
+                + "[ID 2] Far future [2026-12-01 09:00] [UPCOMING]" + System.lineSeparator()
+                + "[ID 1] Untimed [EVERY STARTUP]", ReminderDialog.formatReminders(reminders, fixedClock));
+    }
+
     @Test void closeButton_dismissesWithoutDeletingReminders() throws Exception {
         FxTestSupport.runOnFxThread(() -> {
             Model model = new ModelManager();
-            model.addReminder(new Reminder("Keep me"));
+            model.addReminder("Keep me", null);
             Stage owner = new Stage();
             owner.setScene(new Scene(new StackPane()));
             owner.show();
-            ReminderDialog dialog = new ReminderDialog(owner, model.getReminderList(), () -> { });
+            ReminderDialog dialog = new ReminderDialog(owner, model.getReminderList(), CLOCK, () -> { });
             dialog.showIfNeeded();
 
             Button closeButton = (Button) dialog.getAlert().getDialogPane().lookupButton(ButtonType.CLOSE);
             closeButton.fire();
 
             assertFalse(dialog.isShowing());
-            assertEquals(List.of(new Reminder("Keep me")), model.getReminderList());
+            assertEquals(List.of(new Reminder(1, "Keep me")), model.getReminderList());
             owner.close();
         });
     }
@@ -82,7 +102,7 @@ class ReminderDialogTest {
             Stage owner = new Stage();
             owner.setScene(new Scene(new StackPane()));
             owner.show();
-            ReminderDialog dialog = new ReminderDialog(owner, List.of(new Reminder("First")), () ->
+            ReminderDialog dialog = new ReminderDialog(owner, List.of(new Reminder(1, "First")), CLOCK, () ->
                     dismissed.set(true));
             dialog.showIfNeeded();
 
@@ -99,7 +119,7 @@ class ReminderDialogTest {
             Stage owner = new Stage();
             owner.setScene(new Scene(new StackPane()));
             owner.show();
-            ReminderDialog dialog = new ReminderDialog(owner, List.of(new Reminder("First")), () -> { });
+            ReminderDialog dialog = new ReminderDialog(owner, List.of(new Reminder(1, "First")), CLOCK, () -> { });
             dialog.showIfNeeded();
             Button closeButton = (Button) dialog.getAlert().getDialogPane().lookupButton(ButtonType.CLOSE);
 

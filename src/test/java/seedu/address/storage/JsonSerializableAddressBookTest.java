@@ -6,6 +6,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -70,14 +71,14 @@ public class JsonSerializableAddressBookTest {
     @Test
     public void conversion_addressBookWithReminders_roundTripsThroughJsonInOrder() throws Exception {
         AddressBook original = new AddressBook();
-        original.addReminder(new Reminder("First"));
-        original.addReminder(new Reminder("Second"));
+        original.addReminder(new Reminder(1, "First"));
+        original.addReminder(new Reminder(2, "Second"));
 
         String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(original));
         AddressBook restored = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class).toModelType();
 
         assertEquals(original, restored);
-        assertEquals(List.of(new Reminder("First"), new Reminder("Second")), restored.getReminderList());
+        assertEquals(List.of(new Reminder(1, "First"), new Reminder(2, "Second")), restored.getReminderList());
     }
 
     @Test
@@ -86,6 +87,61 @@ public class JsonSerializableAddressBookTest {
                 "{\"persons\":[],\"reminders\":[{\"text\":\"   \"}]}",
                 JsonSerializableAddressBook.class);
         assertThrows(IllegalValueException.class, Reminder.MESSAGE_CONSTRAINTS, data::toModelType);
+    }
+
+    @Test
+    public void conversion_timedReminderAndNextId_roundTrips() throws Exception {
+        AddressBook original = new AddressBook();
+        original.addReminder(new Reminder(3, "Timed", LocalDateTime.of(2026, 10, 22, 18, 0)));
+        original.setReminderData(original.getReminderList(), 8);
+
+        AddressBook restored = JsonUtil.fromJsonString(
+                JsonUtil.toJsonString(new JsonSerializableAddressBook(original)),
+                JsonSerializableAddressBook.class).toModelType();
+
+        assertEquals(original, restored);
+        assertEquals(8, restored.getNextReminderId());
+    }
+
+    @Test
+    public void toModelType_oldTextOnlyReminders_assignsDeterministicIdsAndDerivesNextId() throws Exception {
+        String json = "{\"persons\":[],\"reminders\":[{\"text\":\"First\"},{\"text\":\"Second\"}]}";
+
+        AddressBook restored = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class).toModelType();
+
+        assertEquals(List.of(new Reminder(1, "First"), new Reminder(2, "Second")), restored.getReminderList());
+        assertEquals(3, restored.getNextReminderId());
+    }
+
+    @Test
+    public void toModelType_mixedOldAndNewIds_skipsUsedIdsDuringMigration() throws Exception {
+        String json = "{\"persons\":[],\"reminders\":[{\"text\":\"Old\"},"
+                + "{\"id\":1,\"text\":\"New\"}]}";
+
+        AddressBook restored = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class).toModelType();
+
+        assertEquals(List.of(new Reminder(2, "Old"), new Reminder(1, "New")), restored.getReminderList());
+        assertEquals(3, restored.getNextReminderId());
+    }
+
+    @Test
+    public void toModelType_duplicateInvalidIdsOrNextId_throwsIllegalValueException() throws Exception {
+        assertInvalidReminderJson("{\"persons\":[],\"reminders\":[{\"id\":1,\"text\":\"A\"},"
+                + "{\"id\":1,\"text\":\"B\"}]}");
+        assertInvalidReminderJson("{\"persons\":[],\"reminders\":[{\"id\":0,\"text\":\"A\"}]}");
+        assertInvalidReminderJson("{\"persons\":[],\"reminders\":[{\"id\":4,\"text\":\"A\"}],"
+                + "\"nextReminderId\":4}");
+    }
+
+    @Test
+    public void toModelType_invalidDueTimestamp_throwsIllegalValueException() throws Exception {
+        assertInvalidReminderJson("{\"persons\":[],\"reminders\":[{\"id\":1,\"text\":\"A\","
+                + "\"dueAt\":\"2026-02-30 18:00\"}]}");
+    }
+
+    private static void assertInvalidReminderJson(String json) throws Exception {
+        JsonSerializableAddressBook data = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
+        assertThrows(IllegalValueException.class, data::toModelType);
     }
 
     @Test

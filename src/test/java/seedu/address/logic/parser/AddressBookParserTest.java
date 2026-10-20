@@ -39,7 +39,6 @@ import seedu.address.logic.commands.UnscheduleStudentCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
-import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskStatus;
@@ -87,7 +86,7 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_addReminder() throws Exception {
-        assertEquals(new AddReminderCommand(new Reminder("Collect worksheets")),
+        assertEquals(new AddReminderCommand("Collect worksheets"),
                 parser.parseCommand("add-reminder r/Collect worksheets"));
     }
 
@@ -98,7 +97,7 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_deleteReminder() throws Exception {
-        assertEquals(new DeleteReminderCommand(INDEX_FIRST_PERSON),
+        assertEquals(new DeleteReminderCommand(1),
                 parser.parseCommand("delete-reminder 1"));
     }
 
