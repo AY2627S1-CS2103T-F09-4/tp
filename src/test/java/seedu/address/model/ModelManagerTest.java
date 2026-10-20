@@ -74,6 +74,65 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void save_validAddressBook_savesSnapshot() {
+        modelManager.addPerson(ALICE);
+        modelManager.save();
+
+        modelManager.addPerson(BENSON);
+        modelManager.save();
+
+        modelManager.undo();
+
+        assertTrue(modelManager.hasPerson(ALICE));
+        assertFalse(modelManager.hasPerson(BENSON));
+    }
+
+    @Test
+    public void undo_previousSnapshotExists_restoresPreviousState() {
+        modelManager.addPerson(ALICE);
+        modelManager.save();
+
+        modelManager.addPerson(BENSON);
+        modelManager.save();
+
+        modelManager.undo();
+
+        assertTrue(modelManager.hasPerson(ALICE));
+        assertFalse(modelManager.hasPerson(BENSON));
+    }
+
+    @Test
+    public void redo_previousUndoExists_restoresNextState() {
+        modelManager.addPerson(ALICE);
+        modelManager.save();
+
+        modelManager.addPerson(BENSON);
+        modelManager.save();
+
+        modelManager.undo();
+        modelManager.redo();
+
+        assertTrue(modelManager.hasPerson(ALICE));
+        assertTrue(modelManager.hasPerson(BENSON));
+    }
+
+    @Test
+    public void undo_noPreviousSnapshot_doesNothing() {
+        modelManager.undo();
+        AddressBook expected = new AddressBook();
+        expected.addPerson(ALICE);
+
+        assertEquals(expected, new AddressBook(modelManager.getAddressBook()));
+    }
+
+    @Test
+    public void redo_noNextSnapshot_doesNothing() {
+        modelManager.redo();
+
+        assertEquals(new AddressBook(), new AddressBook(modelManager.getAddressBook()));
+    }
+
+    @Test
     public void equals() {
         AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON).build();
         AddressBook differentAddressBook = new AddressBook();

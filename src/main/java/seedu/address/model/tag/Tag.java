@@ -32,6 +32,11 @@ public class Tag {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this Phone instance */
+    public Tag copy() {
+        return new Tag(tagName);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {

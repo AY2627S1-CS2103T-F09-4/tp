@@ -2,6 +2,7 @@ package seedu.address.model.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -115,5 +116,13 @@ public class TaskListTest {
 
         assertEquals(first, same);
         assertFalse(first.equals(differentOrder));
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        List<Task> source = new ArrayList<>(List.of(new Task("do homework")));
+        TaskList first = new TaskList(source);
+        TaskList second = first.copy();
+        assertNotSame(first, second);
     }
 }

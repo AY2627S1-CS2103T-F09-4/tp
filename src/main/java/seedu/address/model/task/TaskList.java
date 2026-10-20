@@ -77,6 +77,16 @@ public class TaskList {
         return new TaskList(updatedTasks);
     }
 
+    /** Returns a copy of this TaskList instance */
+    public TaskList copy() {
+        List<Task> taskCopy = new ArrayList<>();
+        for (Task task : tasks) {
+            taskCopy.add(task.copy());
+        }
+
+        return new TaskList(taskCopy);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {

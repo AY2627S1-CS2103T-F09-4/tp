@@ -1,6 +1,7 @@
 package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -42,6 +43,13 @@ public class PhoneTest {
         assertTrue(Phone.isValidPhone("124293842033123")); // exactly 15 digits
         assertTrue(Phone.isValidPhone("+6591234567")); // leading plus sign
         assertTrue(Phone.isValidPhone("+911")); // leading plus sign, exactly 3 digits
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        Phone first = new Phone("93121534");
+        Phone second = first.copy();
+        assertNotSame(first, second);
     }
 
     @Test

@@ -279,6 +279,30 @@ Examples:
 * `list` followed by `delete 2` deletes the 2nd parent in the list.
 * `find Betsy` followed by `delete 1` deletes the 1st parent in the results of the `find` command.
 
+### Undoing a command: "undo"
+
+Reverses the last command that modified Students or Parents.
+
+Format: `undo`
+
+* Since the commands `list`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `undo` reverses their commands but does not modify anything.
+
+Examples:
+* `edit 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
+* `edit 1 n/John`,`list`, `undo` and `undo` will change the first student's name to `John`, list all students, then the first `undo` does nothing since `list` does not change anything, and the second `undo` changes `John` to what it was before.
+
+### Redoing a command: "redo"
+
+Reverses the last `undo` command.
+
+Format: `redo`
+
+* Since undoing the commands `list`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `redo` reverses their commands but does not modify anything.
+
+Examples:
+* `edit 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
+* `list`, `undo` and then `redo` will first list all students, then `undo` and `redo` does nothing since `list` does not change anything.
+
 ### Clearing all entries: `clear`
 
 Clears all entries from Tutoria.

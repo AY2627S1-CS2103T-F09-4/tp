@@ -62,10 +62,10 @@ public interface Model {
      */
     void setPerson(Person target, Person editedPerson);
 
-    /** Returns an unmodifiable view of the filtered person list */
+    /** Returns an unmodifiable view of the filtered person list. */
     ObservableList<Person> getFilteredPersonList();
 
-    /** Returns an unmodifiable view of the person list */
+    /** Returns an unmodifiable view of the person list. */
     ObservableList<Person> getPersonList();
 
     /**
@@ -90,5 +90,18 @@ public interface Model {
         return getAddressBook().getParentContactList();
     }
 
+    /**
+     * Updates the filter of the filtered parent list to filter by the given {@code predicate}.
+     * @throws NullPointerException if {@code predicate} is null.
+     */
     void updateParentList(Predicate<ParentContact> predicate);
+
+    /** Snapshots the current address book contents. */
+    void save();
+
+    /** Replaces address book data with the data in the previous snapshot. */
+    void undo();
+
+    /** Replaces address book data with the data in the previous snapshot. */
+    void redo();
 }

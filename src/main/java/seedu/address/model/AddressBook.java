@@ -118,6 +118,24 @@ public class AddressBook implements ReadOnlyAddressBook {
         parentContacts.remove(contact);
     }
 
+    /**
+     * Creates a copy of the address book by copying every {@code Person} and {@code ParentContact}.
+     *
+     * @return the copied AddressBook.
+     */
+    public AddressBook copy() {
+        AddressBook copy = new AddressBook();
+
+        for (Person student : persons) {
+            copy.addPerson(student.copy());
+        }
+        for (ParentContact parent : parentContacts) {
+            copy.addParentContact(parent.copy());
+        }
+
+        return copy;
+    }
+
     //// util methods
 
     @Override

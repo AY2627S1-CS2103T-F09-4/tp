@@ -37,6 +37,11 @@ public class Subject {
         return test.matches(VALIDATION_REGEX);
     }
 
+    /** Returns a copy of this Subject instance */
+    public Subject copy() {
+        return new Subject(this.value);
+    }
+
     @Override
     public String toString() {
         return value;

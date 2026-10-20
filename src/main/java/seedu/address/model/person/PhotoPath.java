@@ -47,6 +47,11 @@ public class PhotoPath {
                 || lowerCasePhotoPath.endsWith(PNG_EXTENSION);
     }
 
+    /** Returns a copy of this PhotoPath instance */
+    public PhotoPath copy() {
+        return new PhotoPath(this.value);
+    }
+
     @Override
     public String toString() {
         return value;

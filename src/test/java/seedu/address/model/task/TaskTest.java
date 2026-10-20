@@ -2,6 +2,7 @@ package seedu.address.model.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,6 +55,13 @@ public class TaskTest {
 
         assertFalse(notDone.equals(done));
         assertFalse(notDone.hashCode() == done.hashCode());
+    }
+
+    @Test
+    public void copy_doesNotEqualOriginal() {
+        Task first = new Task("1", TaskStatus.DONE);
+        Task second = first.copy();
+        assertNotSame(first, second);
     }
 
     @Test

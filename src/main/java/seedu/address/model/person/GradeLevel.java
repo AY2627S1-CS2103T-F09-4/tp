@@ -3,6 +3,8 @@ package seedu.address.model.person;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
+import java.util.Objects;
+
 /**
  * Represents a Person's (optional) grade level in the address book, e.g. "Sec 3" or "P6".
  * An empty value means that no grade level was specified.
@@ -43,6 +45,14 @@ public class GradeLevel {
      */
     public static boolean isValidGradeLevel(String test) {
         return test.matches(VALIDATION_REGEX);
+    }
+
+    /** Returns a copy of this GradeLevel instance */
+    public GradeLevel copy() {
+        if (Objects.equals(this.value, "")) {
+            return GradeLevel.NONE;
+        }
+        return new GradeLevel(this.value);
     }
 
     /**

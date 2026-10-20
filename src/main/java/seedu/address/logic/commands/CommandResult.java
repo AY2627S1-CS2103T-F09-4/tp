@@ -19,16 +19,22 @@ public class CommandResult {
     /** The application should exit. */
     private final boolean exit;
 
+    private final boolean undo;
+
+    private final boolean redo;
+
     private final String keyword;
 
     /**
      * Constructs a {@code CommandResult} with the specified fields.
      */
-    public CommandResult(String feedbackToUser, boolean showHelp, boolean exit) {
+    public CommandResult(String feedbackToUser, boolean showHelp, boolean exit, boolean undo, boolean redo) {
         this.feedbackToUser = requireNonNull(feedbackToUser);
         this.showHelp = showHelp;
         this.exit = exit;
         this.keyword = null;
+        this.undo = undo;
+        this.redo = redo;
     }
 
     /**
@@ -36,7 +42,7 @@ public class CommandResult {
      * and other fields set to their default value.
      */
     public CommandResult(String feedbackToUser) {
-        this(feedbackToUser, false, false);
+        this(feedbackToUser, false, false, false, false);
     }
 
     /**
@@ -47,6 +53,8 @@ public class CommandResult {
         this.showHelp = false;
         this.exit = false;
         this.keyword = keyword;
+        undo = false;
+        redo = false;
     }
 
     public String getFeedbackToUser() {
@@ -59,6 +67,14 @@ public class CommandResult {
 
     public boolean isExit() {
         return exit;
+    }
+
+    public boolean isUndo() {
+        return undo;
+    }
+
+    public boolean isRedo() {
+        return redo;
     }
 
     public String getKeyword() {
