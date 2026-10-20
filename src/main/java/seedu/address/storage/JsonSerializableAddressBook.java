@@ -1,7 +1,9 @@
 package seedu.address.storage;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,6 +30,7 @@ class JsonSerializableAddressBook {
     private final List<JsonAdaptedParentContact> parentContacts = new ArrayList<>();
     private final List<JsonAdaptedScheduledSession> schedule = new ArrayList<>();
     private final List<JsonAdaptedReminder> reminders = new ArrayList<>();
+    private final Integer nextReminderId;
 
     /**
      * Constructs a {@code JsonSerializableAddressBook} with the given persons.
@@ -36,7 +39,9 @@ class JsonSerializableAddressBook {
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
             @JsonProperty("parentContacts") List<JsonAdaptedParentContact> parentContacts,
             @JsonProperty("schedule") List<JsonAdaptedScheduledSession> schedule,
-            @JsonProperty("reminders") List<JsonAdaptedReminder> reminders) {
+            @JsonProperty("reminders") List<JsonAdaptedReminder> reminders,
+            @JsonProperty("nextReminderId") Integer nextReminderId) {
+        this.nextReminderId = nextReminderId;
         if (persons != null) {
             this.persons.addAll(persons);
         }
@@ -54,7 +59,7 @@ class JsonSerializableAddressBook {
     /** Compatibility constructor for existing callers that predate reminders. */
     public JsonSerializableAddressBook(List<JsonAdaptedPerson> persons,
             List<JsonAdaptedParentContact> parentContacts, List<JsonAdaptedScheduledSession> schedule) {
-        this(persons, parentContacts, schedule, null);
+        this(persons, parentContacts, schedule, null, null);
     }
 
     /**
@@ -63,6 +68,7 @@ class JsonSerializableAddressBook {
      * @param source future changes to this will not affect the created {@code JsonSerializableAddressBook}.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
+        nextReminderId = source.getNextReminderId();
         persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
         parentContacts.addAll(source.getParentContactList().stream()
                 .map(JsonAdaptedParentContact::new).collect(Collectors.toList()));
@@ -96,11 +102,38 @@ class JsonSerializableAddressBook {
         for (JsonAdaptedScheduledSession adapted : schedule) {
             addressBook.addScheduledSession(adapted.toModelType(addressBook.getPersonList()));
         }
-        for (JsonAdaptedReminder adapted : reminders) {
-            Reminder reminder = adapted.toModelType();
-            addressBook.addReminder(reminder);
+        List<Reminder> loadedReminders = loadReminders();
+        int minimumNextId = loadedReminders.stream().mapToInt(Reminder::getId).max().orElse(0) + 1;
+        int resolvedNextId = nextReminderId == null ? minimumNextId : nextReminderId;
+        if (resolvedNextId <= 0 || resolvedNextId < minimumNextId) {
+            throw new IllegalValueException("Next reminder ID must be positive and exceed every reminder ID.");
         }
+        addressBook.setReminderData(loadedReminders, resolvedNextId);
         return addressBook;
+    }
+
+    private List<Reminder> loadReminders() throws IllegalValueException {
+        Set<Integer> usedIds = new HashSet<>();
+        for (JsonAdaptedReminder reminder : reminders) {
+            Integer id = reminder.getId();
+            if (id != null && (!Reminder.isValidId(id) || !usedIds.add(id))) {
+                throw new IllegalValueException("Reminder IDs must be positive and unique.");
+            }
+        }
+        List<Reminder> loaded = new ArrayList<>();
+        int migrationId = 1;
+        for (JsonAdaptedReminder reminder : reminders) {
+            Integer id = reminder.getId();
+            if (id == null) {
+                while (usedIds.contains(migrationId)) {
+                    migrationId++;
+                }
+                id = migrationId++;
+                usedIds.add(id);
+            }
+            loaded.add(reminder.toModelType(id));
+        }
+        return loaded;
     }
 
 }

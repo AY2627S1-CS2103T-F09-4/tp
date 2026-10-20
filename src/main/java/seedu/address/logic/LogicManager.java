@@ -4,6 +4,7 @@ import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.time.Clock;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -95,6 +96,11 @@ public class LogicManager implements Logic {
     @Override
     public java.util.List<Reminder> getReminderList() {
         return model.getReminderList();
+    }
+
+    @Override
+    public Clock getClock() {
+        return model.getClock();
     }
 
     @Override

@@ -10,7 +10,7 @@ public class DeleteReminderCommandParser implements Parser<DeleteReminderCommand
     @Override
     public DeleteReminderCommand parse(String args) throws ParseException {
         try {
-            return new DeleteReminderCommand(ParserUtil.parseIndex(args));
+            return new DeleteReminderCommand(ParserUtil.parseIndex(args).getOneBased());
         } catch (ParseException pe) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
                     DeleteReminderCommand.MESSAGE_USAGE), pe);

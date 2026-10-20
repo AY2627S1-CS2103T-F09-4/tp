@@ -111,19 +111,20 @@ public class LogicManagerTest {
     public void execute_reminderCommands_mutateListAndPersistAcrossReload() throws Exception {
         logic.execute("add-reminder r/Collect worksheets");
         logic.execute("add-reminder r/Confirm December availability");
-        assertEquals(List.of(new Reminder("Collect worksheets"),
-                new Reminder("Confirm December availability")), logic.getReminderList());
+        assertEquals(List.of(new Reminder(1, "Collect worksheets"),
+                new Reminder(2, "Confirm December availability")), logic.getReminderList());
 
         CommandResult listResult = logic.execute(ListRemindersCommand.COMMAND_WORD);
-        assertEquals("Reminders:" + System.lineSeparator() + "1. Collect worksheets"
-                + System.lineSeparator() + "2. Confirm December availability", listResult.getFeedbackToUser());
+        assertEquals("Reminders:" + System.lineSeparator() + "[ID 1] Collect worksheets [EVERY STARTUP]"
+                + System.lineSeparator() + "[ID 2] Confirm December availability [EVERY STARTUP]",
+                listResult.getFeedbackToUser());
 
         CommandResult deleteResult = logic.execute(DeleteReminderCommand.COMMAND_WORD + " 1");
         assertEquals("Deleted reminder: Collect worksheets", deleteResult.getFeedbackToUser());
 
         JsonAddressBookStorage storage = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json"));
         ReadOnlyAddressBook reloaded = storage.readAddressBook().get();
-        assertEquals(List.of(new Reminder("Confirm December availability")), reloaded.getReminderList());
+        assertEquals(List.of(new Reminder(2, "Confirm December availability")), reloaded.getReminderList());
     }
 
     @Test

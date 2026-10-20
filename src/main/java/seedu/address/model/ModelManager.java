@@ -3,6 +3,8 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -27,12 +29,19 @@ public class ModelManager implements Model {
     private final FilteredList<Person> filteredPersons;
     private final FilteredList<ParentContact> parentList;
     private final SnapshotManager snapshotManager;
+    private final Clock clock;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
      */
     public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyUserPrefs userPrefs) {
+        this(addressBook, userPrefs, Clock.systemDefaultZone());
+    }
+
+    /** Initializes a ModelManager with an injectable time source. */
+    public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyUserPrefs userPrefs, Clock clock) {
         requireAllNonNull(addressBook, userPrefs);
+        requireNonNull(clock);
 
         logger.fine("Initializing with address book: " + addressBook + " and user prefs " + userPrefs);
 
@@ -41,6 +50,7 @@ public class ModelManager implements Model {
         this.filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         this.parentList = new FilteredList<>(this.addressBook.getParentContactList());
         this.snapshotManager = new SnapshotManager();
+        this.clock = clock;
         snapshotManager.saveSnapshot(this.addressBook);
     }
 
@@ -171,20 +181,24 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public void addReminder(Reminder reminder) {
-        requireNonNull(reminder);
-        addressBook.addReminder(reminder);
+    public Reminder addReminder(String text, LocalDateTime dueAt) {
+        requireNonNull(text);
+        return addressBook.createReminder(text, dueAt);
     }
 
     @Override
-    public void deleteReminder(seedu.address.commons.core.index.Index index) {
-        requireNonNull(index);
-        addressBook.removeReminder(index);
+    public void deleteReminder(int id) {
+        addressBook.removeReminder(id);
     }
 
     @Override
     public java.util.List<Reminder> getReminderList() {
         return addressBook.getReminderList();
+    }
+
+    @Override
+    public Clock getClock() {
+        return clock;
     }
 
     @Override

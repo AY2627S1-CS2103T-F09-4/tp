@@ -1,5 +1,7 @@
 package seedu.address.model;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
@@ -116,16 +118,20 @@ public interface Model {
     /** Returns an unmodifiable view of the scheduled sessions. */
     ObservableList<ScheduledSession> getScheduleList();
 
-    default void addReminder(Reminder reminder) {
+    default Reminder addReminder(String text, LocalDateTime dueAt) {
         throw new UnsupportedOperationException();
     }
 
-    default void deleteReminder(seedu.address.commons.core.index.Index index) {
+    default void deleteReminder(int id) {
         throw new UnsupportedOperationException();
     }
 
     default java.util.List<Reminder> getReminderList() {
         return java.util.List.of();
+    }
+
+    default Clock getClock() {
+        return Clock.systemDefaultZone();
     }
 
     /** Snapshots the current address book contents. */

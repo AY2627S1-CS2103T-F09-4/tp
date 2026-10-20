@@ -34,4 +34,9 @@ public interface ReadOnlyAddressBook {
         return List.of();
     }
 
+    /** Returns the next stable reminder ID. */
+    default int getNextReminderId() {
+        return 1;
+    }
+
 }

@@ -1,5 +1,7 @@
 package seedu.address.logic;
 
+import java.time.Clock;
+
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.logic.commands.CommandResult;
@@ -41,6 +43,10 @@ public interface Logic {
     /** Returns tutor-level reminders in insertion order. */
     default java.util.List<Reminder> getReminderList() {
         return java.util.List.of();
+    }
+
+    default Clock getClock() {
+        return Clock.systemDefaultZone();
     }
 
     /**
