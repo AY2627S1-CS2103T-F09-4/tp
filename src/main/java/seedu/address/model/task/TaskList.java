@@ -77,6 +77,18 @@ public class TaskList {
         return new TaskList(updatedTasks);
     }
 
+    /**
+     * Returns a new task list without the task at {@code index}; later tasks shift up by one.
+     *
+     * @throws IndexOutOfBoundsException if the index is beyond the end of the list.
+     */
+    public TaskList withoutTask(Index index) {
+        requireNonNull(index);
+        List<Task> updatedTasks = new ArrayList<>(tasks);
+        updatedTasks.remove(index.getZeroBased());
+        return new TaskList(updatedTasks);
+    }
+
     /** Returns a copy of this TaskList instance */
     public TaskList copy() {
         List<Task> taskCopy = new ArrayList<>();
