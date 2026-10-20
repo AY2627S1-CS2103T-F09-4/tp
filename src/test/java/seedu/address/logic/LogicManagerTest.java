@@ -23,6 +23,8 @@ import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ScheduleStudentCommand;
+import seedu.address.logic.commands.UnscheduleStudentCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
@@ -82,6 +84,19 @@ public class LogicManagerTest {
     public void execute_storageThrowsAdException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_AD_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_PERMISSION_ERROR_FORMAT, DUMMY_AD_EXCEPTION.getMessage()));
+    }
+
+    @Test
+    public void getScheduleList_afterScheduleAndUnscheduleCommands_reflectsSchedule() throws Exception {
+        model.addPerson(AMY);
+        String slot = " 1 day/monday from/10-00 to/12-00";
+
+        logic.execute(ScheduleStudentCommand.COMMAND_WORD + slot);
+        assertEquals(1, logic.getScheduleList().size());
+        assertEquals(AMY, logic.getScheduleList().get(0).getStudent());
+
+        logic.execute(UnscheduleStudentCommand.COMMAND_WORD + slot);
+        assertEquals(0, logic.getScheduleList().size());
     }
 
     @Test

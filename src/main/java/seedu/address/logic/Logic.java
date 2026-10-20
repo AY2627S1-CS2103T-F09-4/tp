@@ -7,6 +7,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * API of the Logic component
@@ -32,6 +33,9 @@ public interface Logic {
 
     /** Returns an unmodifiable view of the filtered list of parent contacts */
     ObservableList<ParentContact> getParentContactList();
+
+    /** Returns an unmodifiable view of the scheduled sessions */
+    ObservableList<ScheduledSession> getScheduleList();
 
     /**
      * Returns the user prefs' GUI settings.

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * Unmodifiable view of an address book
@@ -17,6 +18,11 @@ public interface ReadOnlyAddressBook {
     ObservableList<Person> getPersonList();
 
     default ObservableList<ParentContact> getParentContactList() {
+        return FXCollections.observableArrayList();
+    }
+
+    /** Returns an unmodifiable view of the scheduled sessions. */
+    default ObservableList<ScheduledSession> getScheduleList() {
         return FXCollections.observableArrayList();
     }
 

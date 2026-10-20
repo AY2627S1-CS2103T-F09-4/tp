@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * The API of the Model component.
@@ -95,6 +96,24 @@ public interface Model {
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateParentList(Predicate<ParentContact> predicate);
+
+    /**
+     * Adds {@code session} to the schedule. Overlapping sessions are allowed.
+     * The session's student must exist in the address book.
+     */
+    void addScheduledSession(ScheduledSession session);
+
+    /** Returns true if a session equal to {@code session} is in the schedule. */
+    boolean hasScheduledSession(ScheduledSession session);
+
+    /**
+     * Removes one session equal to {@code session} from the schedule.
+     * At least one such session must exist.
+     */
+    void deleteScheduledSession(ScheduledSession session);
+
+    /** Returns an unmodifiable view of the scheduled sessions. */
+    ObservableList<ScheduledSession> getScheduleList();
 
     /** Snapshots the current address book contents. */
     void save();

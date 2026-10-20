@@ -2,8 +2,10 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.DayOfWeek;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import seedu.address.commons.core.index.Index;
@@ -15,6 +17,7 @@ import seedu.address.model.person.GradeLevel;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Subject;
+import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskStatus;
@@ -25,6 +28,8 @@ import seedu.address.model.task.TaskStatus;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_INVALID_DAY =
+            "Day must be a day of the week, e.g. monday or mon (case-insensitive).";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -170,6 +175,40 @@ public class ParserUtil {
             throw new ParseException(TaskStatus.MESSAGE_CONSTRAINTS);
         }
         return TaskStatus.fromString(status);
+    }
+
+    /**
+     * Parses a {@code String day} into a {@code DayOfWeek}, ignoring case and surrounding whitespace.
+     * Accepts full names (e.g. "monday") or 3-letter abbreviations (e.g. "mon").
+     *
+     * @throws ParseException if the given day is not recognised.
+     */
+    public static DayOfWeek parseDay(String day) throws ParseException {
+        requireNonNull(day);
+        String trimmedDay = day.trim().toLowerCase(Locale.ROOT);
+        for (DayOfWeek candidate : DayOfWeek.values()) {
+            String fullName = candidate.name().toLowerCase(Locale.ROOT);
+            if (trimmedDay.equals(fullName) || trimmedDay.equals(fullName.substring(0, 3))) {
+                return candidate;
+            }
+        }
+        throw new ParseException(MESSAGE_INVALID_DAY);
+    }
+
+    /**
+     * Parses {@code from} and {@code to} (HH-mm) into a {@code TimeSlot}.
+     *
+     * @throws ParseException if either time is malformed or {@code from} is not before {@code to}.
+     */
+    public static TimeSlot parseTimeSlot(String from, String to) throws ParseException {
+        requireNonNull(from);
+        requireNonNull(to);
+        String trimmedFrom = from.trim();
+        String trimmedTo = to.trim();
+        if (!TimeSlot.isValidTimeSlot(trimmedFrom, trimmedTo)) {
+            throw new ParseException(TimeSlot.MESSAGE_CONSTRAINTS);
+        }
+        return TimeSlot.of(trimmedFrom, trimmedTo);
     }
 
     /**

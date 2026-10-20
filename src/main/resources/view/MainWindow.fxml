@@ -58,6 +58,11 @@
               <StackPane fx:id="parentListPanelPlaceholder" />
             </content>
           </Tab>
+          <Tab text="Schedule">
+            <content>
+              <StackPane fx:id="schedulePanelPlaceholder" />
+            </content>
+          </Tab>
         </TabPane>
 
         <StackPane fx:id="statusbarPlaceholder" VBox.vgrow="NEVER" />

@@ -13,6 +13,7 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * An Immutable AddressBook that is serializable to JSON format.
@@ -24,18 +25,23 @@ class JsonSerializableAddressBook {
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
     private final List<JsonAdaptedParentContact> parentContacts = new ArrayList<>();
+    private final List<JsonAdaptedScheduledSession> schedule = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonSerializableAddressBook} with the given persons.
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
-            @JsonProperty("parentContacts") List<JsonAdaptedParentContact> parentContacts) {
+            @JsonProperty("parentContacts") List<JsonAdaptedParentContact> parentContacts,
+            @JsonProperty("schedule") List<JsonAdaptedScheduledSession> schedule) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
         if (parentContacts != null) {
             this.parentContacts.addAll(parentContacts);
+        }
+        if (schedule != null) {
+            this.schedule.addAll(schedule);
         }
     }
 
@@ -48,6 +54,9 @@ class JsonSerializableAddressBook {
         persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
         parentContacts.addAll(source.getParentContactList().stream()
                 .map(JsonAdaptedParentContact::new).collect(Collectors.toList()));
+        for (ScheduledSession session : source.getScheduleList()) {
+            schedule.add(new JsonAdaptedScheduledSession(session, source.getPersonList()));
+        }
     }
 
     /**
@@ -70,6 +79,9 @@ class JsonSerializableAddressBook {
                 throw new IllegalValueException("Parent contacts list contains duplicate contact(s).");
             }
             addressBook.addParentContact(contact);
+        }
+        for (JsonAdaptedScheduledSession adapted : schedule) {
+            addressBook.addScheduledSession(adapted.toModelType(addressBook.getPersonList()));
         }
         return addressBook;
     }

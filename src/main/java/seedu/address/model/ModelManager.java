@@ -12,6 +12,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.storage.SnapshotManager;
 
 /**
@@ -143,6 +144,29 @@ public class ModelManager implements Model {
     public void updateParentList(Predicate<ParentContact> predicate) {
         requireNonNull(predicate);
         parentList.setPredicate(predicate);
+    }
+
+    @Override
+    public void addScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        addressBook.addScheduledSession(session);
+    }
+
+    @Override
+    public boolean hasScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        return addressBook.hasScheduledSession(session);
+    }
+
+    @Override
+    public void deleteScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        addressBook.removeScheduledSession(session);
+    }
+
+    @Override
+    public ObservableList<ScheduledSession> getScheduleList() {
+        return addressBook.getScheduleList();
     }
 
     @Override

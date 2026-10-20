@@ -8,6 +8,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
 import java.nio.file.Path;
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,12 @@ import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.MarkTaskCommand;
+import seedu.address.logic.commands.ScheduleStudentCommand;
+import seedu.address.logic.commands.UnscheduleStudentCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
@@ -80,6 +84,22 @@ public class AddressBookParserTest {
         MarkTaskCommand command = (MarkTaskCommand) parser.parseCommand(
                 MarkTaskCommand.COMMAND_WORD + " 1 tid/1 status/not done");
         assertEquals(new MarkTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PERSON, TaskStatus.NOT_DONE), command);
+    }
+
+    @Test
+    public void parseCommand_scheduleStudent() throws Exception {
+        ScheduleStudentCommand command = (ScheduleStudentCommand) parser.parseCommand(
+                ScheduleStudentCommand.COMMAND_WORD + " 1 day/monday from/10-00 to/12-00");
+        assertEquals(new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY,
+                TimeSlot.of("10-00", "12-00")), command);
+    }
+
+    @Test
+    public void parseCommand_unscheduleStudent() throws Exception {
+        UnscheduleStudentCommand command = (UnscheduleStudentCommand) parser.parseCommand(
+                UnscheduleStudentCommand.COMMAND_WORD + " 1 day/monday from/10-00 to/12-00");
+        assertEquals(new UnscheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY,
+                TimeSlot.of("10-00", "12-00")), command);
     }
 
     @Test
