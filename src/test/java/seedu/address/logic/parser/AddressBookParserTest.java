@@ -18,11 +18,13 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddContactCommand;
 import seedu.address.logic.commands.AddPhotoCommand;
+import seedu.address.logic.commands.AddReminderCommand;
 import seedu.address.logic.commands.AddTaskCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.DeletePhotoCommand;
+import seedu.address.logic.commands.DeleteReminderCommand;
 import seedu.address.logic.commands.DeleteTaskCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
@@ -30,12 +32,14 @@ import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ListRemindersCommand;
 import seedu.address.logic.commands.MarkTaskCommand;
 import seedu.address.logic.commands.ScheduleStudentCommand;
 import seedu.address.logic.commands.UnscheduleStudentCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.TimeSlot;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskStatus;
@@ -79,6 +83,23 @@ public class AddressBookParserTest {
         AddTaskCommand command = (AddTaskCommand) parser.parseCommand(
                 AddTaskCommand.COMMAND_WORD + " 1 task/do homework");
         assertEquals(new AddTaskCommand(INDEX_FIRST_PERSON, new Task("do homework")), command);
+    }
+
+    @Test
+    public void parseCommand_addReminder() throws Exception {
+        assertEquals(new AddReminderCommand(new Reminder("Collect worksheets")),
+                parser.parseCommand("add-reminder r/Collect worksheets"));
+    }
+
+    @Test
+    public void parseCommand_listReminders() throws Exception {
+        assertTrue(parser.parseCommand("list-reminders") instanceof ListRemindersCommand);
+    }
+
+    @Test
+    public void parseCommand_deleteReminder() throws Exception {
+        assertEquals(new DeleteReminderCommand(INDEX_FIRST_PERSON),
+                parser.parseCommand("delete-reminder 1"));
     }
 
     @Test

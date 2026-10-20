@@ -14,17 +14,21 @@ import static seedu.address.testutil.TypicalPersons.AMY;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddReminderCommand;
 import seedu.address.logic.commands.AddTaskCommand;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeleteReminderCommand;
 import seedu.address.logic.commands.DeleteTaskCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ListRemindersCommand;
 import seedu.address.logic.commands.ScheduleStudentCommand;
 import seedu.address.logic.commands.UnscheduleStudentCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -34,6 +38,8 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
+import seedu.address.model.task.Task;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -99,6 +105,35 @@ public class LogicManagerTest {
 
         logic.execute(UnscheduleStudentCommand.COMMAND_WORD + slot);
         assertEquals(0, logic.getScheduleList().size());
+    }
+
+    @Test
+    public void execute_reminderCommands_mutateListAndPersistAcrossReload() throws Exception {
+        logic.execute("add-reminder r/Collect worksheets");
+        logic.execute("add-reminder r/Confirm December availability");
+        assertEquals(List.of(new Reminder("Collect worksheets"),
+                new Reminder("Confirm December availability")), logic.getReminderList());
+
+        CommandResult listResult = logic.execute(ListRemindersCommand.COMMAND_WORD);
+        assertEquals("Reminders:" + System.lineSeparator() + "1. Collect worksheets"
+                + System.lineSeparator() + "2. Confirm December availability", listResult.getFeedbackToUser());
+
+        CommandResult deleteResult = logic.execute(DeleteReminderCommand.COMMAND_WORD + " 1");
+        assertEquals("Deleted reminder: Collect worksheets", deleteResult.getFeedbackToUser());
+
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json"));
+        ReadOnlyAddressBook reloaded = storage.readAddressBook().get();
+        assertEquals(List.of(new Reminder("Confirm December availability")), reloaded.getReminderList());
+    }
+
+    @Test
+    public void execute_addReminder_studentTasksRemainUnchanged() throws Exception {
+        Person studentWithTask = new PersonBuilder(AMY).withTasks("Do homework").build();
+        model.addPerson(studentWithTask);
+
+        logic.execute(AddReminderCommand.COMMAND_WORD + " r/Tutor note");
+
+        assertEquals(List.of(new Task("Do homework")), model.getPersonList().get(0).getTaskList().getTasks());
     }
 
     @Test

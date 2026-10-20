@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.testutil.AddressBookBuilder;
 
 public class ModelManagerTest {
@@ -95,6 +96,35 @@ public class ModelManagerTest {
         modelManager.addPerson(ALICE);
         modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
         assertThrows(UnsupportedOperationException.class, () -> modelManager.getScheduleList().remove(0));
+    }
+
+    @Test
+    public void reminderOperations_addAccessDeleteAndPreventExternalMutation() {
+        Reminder first = new Reminder("First");
+        Reminder second = new Reminder("Second");
+        modelManager.addReminder(first);
+        modelManager.addReminder(second);
+
+        assertEquals(List.of(first, second), modelManager.getReminderList());
+        assertThrows(UnsupportedOperationException.class, () ->
+                modelManager.getReminderList().add(new Reminder("Third")));
+
+        modelManager.deleteReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        assertEquals(List.of(second), modelManager.getReminderList());
+    }
+
+    @Test
+    public void undoRedo_reminder_restoresReminderState() {
+        Reminder reminder = new Reminder("First");
+        modelManager.addReminder(reminder);
+        modelManager.save();
+        modelManager.deleteReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        modelManager.save();
+
+        modelManager.undo();
+        assertEquals(List.of(reminder), modelManager.getReminderList());
+        modelManager.redo();
+        assertEquals(List.of(), modelManager.getReminderList());
     }
 
     @Test

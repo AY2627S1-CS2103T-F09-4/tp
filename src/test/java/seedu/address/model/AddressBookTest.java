@@ -23,6 +23,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.exceptions.DuplicatePersonException;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.testutil.PersonBuilder;
 
@@ -33,6 +34,24 @@ public class AddressBookTest {
     @Test
     public void constructor() {
         assertEquals(List.of(), addressBook.getPersonList());
+        assertEquals(List.of(), addressBook.getReminderList());
+    }
+
+    @Test
+    public void reminderOperations_preserveOrderAndCopyResetData() {
+        Reminder first = new Reminder("First");
+        Reminder second = new Reminder("Second");
+        addressBook.addReminder(first);
+        addressBook.addReminder(second);
+        assertEquals(List.of(first, second), addressBook.getReminderList());
+
+        AddressBook copy = addressBook.copy();
+        addressBook.removeReminder(seedu.address.commons.core.index.Index.fromOneBased(1));
+        assertEquals(List.of(second), addressBook.getReminderList());
+        assertEquals(List.of(first, second), copy.getReminderList());
+
+        addressBook.resetData(copy);
+        assertEquals(List.of(first, second), addressBook.getReminderList());
     }
 
     @Test

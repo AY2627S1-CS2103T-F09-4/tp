@@ -15,6 +15,7 @@ import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.model.task.Task;
 import seedu.address.testutil.PersonBuilder;
@@ -57,6 +58,34 @@ public class JsonSerializableAddressBookTest {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(TYPICAL_PERSONS_FILE,
                 JsonSerializableAddressBook.class).get();
         assertEquals(List.of(), dataFromFile.toModelType().getScheduleList());
+    }
+
+    @Test
+    public void toModelType_fileWithoutReminders_loadsWithEmptyReminderList() throws Exception {
+        JsonSerializableAddressBook data = JsonUtil.fromJsonString("{\"persons\":[]}",
+                JsonSerializableAddressBook.class);
+        assertEquals(List.of(), data.toModelType().getReminderList());
+    }
+
+    @Test
+    public void conversion_addressBookWithReminders_roundTripsThroughJsonInOrder() throws Exception {
+        AddressBook original = new AddressBook();
+        original.addReminder(new Reminder("First"));
+        original.addReminder(new Reminder("Second"));
+
+        String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(original));
+        AddressBook restored = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class).toModelType();
+
+        assertEquals(original, restored);
+        assertEquals(List.of(new Reminder("First"), new Reminder("Second")), restored.getReminderList());
+    }
+
+    @Test
+    public void toModelType_invalidReminder_throwsIllegalValueException() throws Exception {
+        JsonSerializableAddressBook data = JsonUtil.fromJsonString(
+                "{\"persons\":[],\"reminders\":[{\"text\":\"   \"}]}",
+                JsonSerializableAddressBook.class);
+        assertThrows(IllegalValueException.class, Reminder.MESSAGE_CONSTRAINTS, data::toModelType);
     }
 
     @Test

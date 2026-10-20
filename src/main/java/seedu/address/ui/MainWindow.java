@@ -39,6 +39,8 @@ public class MainWindow extends UiPart<Stage> {
     private SchedulePanel schedulePanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
+    private CommandBox commandBox;
+    private ReminderDialog reminderDialog;
 
     @FXML
     private StackPane commandBoxPlaceholder;
@@ -141,8 +143,11 @@ public class MainWindow extends UiPart<Stage> {
         StatusBarFooter statusBarFooter = new StatusBarFooter(dataFilePath);
         statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
 
-        CommandBox commandBox = new CommandBox(this::executeCommand);
+        commandBox = new CommandBox(this::executeCommand);
         commandBoxPlaceholder.getChildren().add(commandBox.getRoot());
+
+        reminderDialog = new ReminderDialog(primaryStage, logic.getReminderList(), commandBox::requestFocus);
+        reminderDialog.showIfNeeded();
     }
 
     /**

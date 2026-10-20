@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
+import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
 
 /**
@@ -114,6 +115,18 @@ public interface Model {
 
     /** Returns an unmodifiable view of the scheduled sessions. */
     ObservableList<ScheduledSession> getScheduleList();
+
+    default void addReminder(Reminder reminder) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void deleteReminder(seedu.address.commons.core.index.Index index) {
+        throw new UnsupportedOperationException();
+    }
+
+    default java.util.List<Reminder> getReminderList() {
+        return java.util.List.of();
+    }
 
     /** Snapshots the current address book contents. */
     void save();
