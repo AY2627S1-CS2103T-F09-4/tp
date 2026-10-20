@@ -11,6 +11,8 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
+import seedu.address.model.schedule.Schedule;
+import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * Wraps all data at the address-book level.
@@ -20,6 +22,7 @@ public class AddressBook implements ReadOnlyAddressBook {
 
     private final UniquePersonList persons = new UniquePersonList();
     private final javafx.collections.ObservableList<ParentContact> parentContacts = FXCollections.observableArrayList();
+    private final Schedule schedule = new Schedule();
 
     public AddressBook() {}
 
@@ -49,6 +52,7 @@ public class AddressBook implements ReadOnlyAddressBook {
 
         setPersons(newData.getPersonList());
         parentContacts.setAll(newData.getParentContactList());
+        schedule.setSessions(newData.getScheduleList());
     }
 
     //// person-level operations
@@ -78,6 +82,10 @@ public class AddressBook implements ReadOnlyAddressBook {
         requireNonNull(editedPerson);
 
         persons.setPerson(target, editedPerson);
+        List<ScheduledSession> updated = schedule.asUnmodifiableObservableList().stream()
+                .map(s -> s.getStudent().equals(target) ? s.withStudent(editedPerson) : s)
+                .toList();
+        schedule.setSessions(updated);
     }
 
     /**
@@ -86,6 +94,37 @@ public class AddressBook implements ReadOnlyAddressBook {
      */
     public void removePerson(Person key) {
         persons.remove(key);
+        schedule.removeIf(s -> s.getStudent().equals(key));
+    }
+
+    //// schedule-level operations
+
+    /**
+     * Adds a session to the schedule. Overlapping sessions are allowed.
+     * The session's student must exist in the address book.
+     */
+    public void addScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        schedule.add(session);
+    }
+
+    /**
+     * Returns true if a session equal to {@code session} is in the schedule.
+     */
+    public boolean hasScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        return schedule.contains(session);
+    }
+
+    /**
+     * Removes one session equal to {@code session} from the schedule.
+     * At least one such session must exist.
+     */
+    public void removeScheduledSession(ScheduledSession session) {
+        requireNonNull(session);
+        if (!schedule.remove(session)) {
+            throw new IllegalArgumentException("Session is not in the schedule.");
+        }
     }
 
     /**
@@ -132,6 +171,13 @@ public class AddressBook implements ReadOnlyAddressBook {
         for (ParentContact parent : parentContacts) {
             copy.addParentContact(parent.copy());
         }
+        for (ScheduledSession session : schedule.asUnmodifiableObservableList()) {
+            Person studentCopy = copy.persons.asUnmodifiableObservableList().stream()
+                    .filter(p -> p.equals(session.getStudent()))
+                    .findFirst()
+                    .orElseThrow();
+            copy.addScheduledSession(session.withStudent(studentCopy));
+        }
 
         return copy;
     }
@@ -156,6 +202,11 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public ObservableList<ScheduledSession> getScheduleList() {
+        return schedule.asUnmodifiableObservableList();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -167,11 +218,12 @@ public class AddressBook implements ReadOnlyAddressBook {
         }
 
         return persons.equals(otherAddressBook.persons)
-                && parentContacts.equals(otherAddressBook.parentContacts);
+                && parentContacts.equals(otherAddressBook.parentContacts)
+                && schedule.equals(otherAddressBook.schedule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persons, parentContacts);
+        return Objects.hash(persons, parentContacts, schedule);
     }
 }

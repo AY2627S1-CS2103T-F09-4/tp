@@ -7,6 +7,8 @@ import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
+import static seedu.address.testutil.TypicalSchedule.ALICE_MONDAY_MORNING;
+import static seedu.address.testutil.TypicalSchedule.BENSON_MONDAY_OVERLAP;
 
 import java.util.List;
 
@@ -71,6 +73,83 @@ public class ModelManagerTest {
     @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> modelManager.getFilteredPersonList().remove(0));
+    }
+
+    @Test
+    public void addScheduledSession_nullSession_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> modelManager.addScheduledSession(null));
+    }
+
+    @Test
+    public void addScheduledSession_validSession_appearsInScheduleList() {
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+        modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
+        modelManager.addScheduledSession(BENSON_MONDAY_OVERLAP);
+
+        assertEquals(List.of(ALICE_MONDAY_MORNING, BENSON_MONDAY_OVERLAP), modelManager.getScheduleList());
+    }
+
+    @Test
+    public void getScheduleList_modifyList_throwsUnsupportedOperationException() {
+        modelManager.addPerson(ALICE);
+        modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
+        assertThrows(UnsupportedOperationException.class, () -> modelManager.getScheduleList().remove(0));
+    }
+
+    @Test
+    public void undoRedo_scheduledSession_restoresSchedule() {
+        modelManager.addPerson(ALICE);
+        modelManager.save();
+
+        modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
+        modelManager.save();
+
+        modelManager.undo();
+        assertEquals(List.of(), modelManager.getScheduleList());
+
+        modelManager.redo();
+        assertEquals(List.of(ALICE_MONDAY_MORNING), modelManager.getScheduleList());
+    }
+
+    @Test
+    public void hasAndDeleteScheduledSession_nullSession_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> modelManager.hasScheduledSession(null));
+        assertThrows(NullPointerException.class, () -> modelManager.deleteScheduledSession(null));
+    }
+
+    @Test
+    public void deleteScheduledSession_existingSession_removesIt() {
+        modelManager.addPerson(ALICE);
+        modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
+        assertTrue(modelManager.hasScheduledSession(ALICE_MONDAY_MORNING));
+
+        modelManager.deleteScheduledSession(ALICE_MONDAY_MORNING);
+
+        assertFalse(modelManager.hasScheduledSession(ALICE_MONDAY_MORNING));
+        assertEquals(List.of(), modelManager.getScheduleList());
+    }
+
+    @Test
+    public void deleteScheduledSession_absentSession_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                modelManager.deleteScheduledSession(ALICE_MONDAY_MORNING));
+    }
+
+    @Test
+    public void undo_afterDeletingSession_restoresSession() {
+        modelManager.addPerson(ALICE);
+        modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
+        modelManager.save();
+
+        modelManager.deleteScheduledSession(ALICE_MONDAY_MORNING);
+        modelManager.save();
+
+        modelManager.undo();
+        assertEquals(List.of(ALICE_MONDAY_MORNING), modelManager.getScheduleList());
+
+        modelManager.redo();
+        assertEquals(List.of(), modelManager.getScheduleList());
     }
 
     @Test

@@ -36,6 +36,7 @@ public class MainWindow extends UiPart<Stage> {
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
     private ParentListPanel parentListPanel;
+    private SchedulePanel schedulePanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
 
@@ -50,6 +51,9 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private StackPane parentListPanelPlaceholder;
+
+    @FXML
+    private StackPane schedulePanelPlaceholder;
 
     @FXML
     private TabPane recordTabs;
@@ -126,6 +130,10 @@ public class MainWindow extends UiPart<Stage> {
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
         parentListPanel = new ParentListPanel(logic.getParentContactList(), logic, this::selectStudent);
         parentListPanelPlaceholder.getChildren().add(parentListPanel.getRoot());
+
+        schedulePanel = new SchedulePanel(logic.getScheduleList(), logic.getPersonList(),
+                logic.getFilteredPersonList());
+        schedulePanelPlaceholder.getChildren().add(schedulePanel.getRoot());
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
