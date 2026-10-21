@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
@@ -16,6 +17,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.Logic;
 import seedu.address.logic.commands.CommandResult;
+import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 
@@ -35,6 +37,7 @@ public class MainWindow extends UiPart<Stage> {
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
+    private CommandListPanel commandListPanel;
     private ParentListPanel parentListPanel;
     private SchedulePanel schedulePanel;
     private ResultDisplay resultDisplay;
@@ -59,7 +62,13 @@ public class MainWindow extends UiPart<Stage> {
     private StackPane schedulePanelPlaceholder;
 
     @FXML
+    private StackPane commandListPanelPlaceholder;
+
+    @FXML
     private TabPane recordTabs;
+
+    @FXML
+    private Tab commandsTab;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -131,6 +140,8 @@ public class MainWindow extends UiPart<Stage> {
     void fillInnerParts() {
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+        commandListPanel = new CommandListPanel(HelpCommand.COMMAND_SUMMARIES);
+        commandListPanelPlaceholder.getChildren().add(commandListPanel.getRoot());
         parentListPanel = new ParentListPanel(logic.getParentContactList(), logic, this::selectStudent);
         parentListPanelPlaceholder.getChildren().add(parentListPanel.getRoot());
 
@@ -189,6 +200,16 @@ public class MainWindow extends UiPart<Stage> {
         }
     }
 
+    /**
+     * Switches to the tab that lists every command.
+     */
+    private void showCommandsTab() {
+        assert commandsTab != null : "Commands tab was not injected from MainWindow.fxml";
+        assert recordTabs.getTabs().contains(commandsTab) : "Commands tab must be one of the record tabs";
+        logger.fine("Showing the Commands tab.");
+        recordTabs.getSelectionModel().select(commandsTab);
+    }
+
     void show() {
         primaryStage.show();
     }
@@ -240,7 +261,7 @@ public class MainWindow extends UiPart<Stage> {
             parentListPanel.setKeyword(commandResult.getKeyword());
 
             if (commandResult.isShowHelp()) {
-                handleHelp();
+                showCommandsTab();
             }
 
             if (commandResult.isExit()) {
