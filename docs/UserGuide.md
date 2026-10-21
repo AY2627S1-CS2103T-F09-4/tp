@@ -72,6 +72,7 @@ Shows a message explaining how to access the help page.
 
 Format: `help`
 
+---
 ### Adding a student: `add-student`
 
 Adds a student to Tutoria.
@@ -94,6 +95,7 @@ A student can have any number of tags, including zero.
 Examples:
 * `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 3 t/needsReminder`
 
+---
 ### Adding a parent: `add-parent`
 
 Adds a parent to Tutoria.
@@ -109,18 +111,22 @@ Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<RE
 Examples:
 * add-parent n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session
 
+---
 ### Listing all students: `list`
 
+---
 Shows a list of all students in Tutoria.
 
 Format: `list`
 
+---
 ### Listing all parents: `list-parents`
 
 Shows a list of all parents in Tutoria.
 
 Format: `list-parents`
 
+---
 ### Editing a student: `edit`
 
 Edits an existing student.
@@ -137,6 +143,7 @@ Examples:
 *  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st student to be `91234567` and `johndoe@example.com` respectively.
 *  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd student to be `Betsy Crower` and clears all existing tags.
 
+---
 ### Editing a parent: `edit-parent`
 
 Edits an existing parent.
@@ -147,6 +154,7 @@ Format: `edit-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<R
 * At least one of the optional fields must be provided.
 * Existing values will be updated to the input values.
 
+---
 ### Adding photos to a student: `add-photo`
 
 Adds a profile photo to an existing student.
@@ -167,6 +175,7 @@ Format: `add-photo INDEX f/FILE_PATH`
 Examples:
 * `list` followed by`add-photo 2 f/C:\Users\prana\Pictures\student.png` adds the photo to the 2nd student in the list.
 
+---
 ### Adding photos to a parent: `add-parent-photo`
 
 Adds a profile photo to an existing parent.
@@ -175,6 +184,7 @@ Format: `add-parent-photo INDEX f/FILE_PATH`
 
 * Details for the `add-photo` command apply here.
 
+---
 ### Deleting photos of a student: `delete-photo`
 
 Deletes the profile photo of an existing student.
@@ -185,29 +195,32 @@ Format: `delete-photo INDEX`
 * `INDEX` must not be larger than the number of students in the displayed list.
 * The index refers to the index number shown in the displayed list.
 
+---
 ### Deleting photos of a parent: `delete-parent-photo`
 
 Deletes the profile photo of an existing parent.
+
+Format: `delete-parent-photo INDEX`
 
 * `INDEX` must be a positive integer (1, 2, 3, …).
 * `INDEX` must not be larger than the number of students in the displayed list.
 * The index refers to the index number shown in the displayed list.
 
-Format: `delete-parent-photo INDEX`
-
+---
 ### Adding tasks to a student: `add-task`
 
 Adds tasks to an existing student.
 
+Format: `add-task <INDEX> task/<DESCRIPTION>`
+
 * `INDEX` is the index of the student in the displayed student list.
 * `DESCRIPTION` is the text of the task. It can contain spaces, but it cannot be blank.
-
-Format: `add-task <INDEX> task/<DESCRIPTION>`
 
 Examples:
 * `add-task 1 task/do homework`
 * `add-task 2 task/revise chapter 3 notes`
 
+---
 ### Adding a startup reminder: `add-reminder`
 
 Adds a tutor-level reminder that is not attached to any student.
@@ -220,6 +233,7 @@ Format: `add-reminder r/REMINDER_TEXT`
 
 Example: `add-reminder r/Collect worksheets from cabinet B`
 
+---
 ### Listing reminders: `list-reminders`
 
 Displays all reminders as a numbered list in insertion order.
@@ -228,6 +242,7 @@ Format: `list-reminders`
 
 If no reminders have been set, Tutoria reports that the reminder list is empty.
 
+---
 ### Deleting a reminder: `delete-reminder`
 
 Deletes exactly one reminder using the index shown by `list-reminders`.
@@ -240,6 +255,7 @@ Format: `delete-reminder INDEX`
 The startup reminder dialog can be closed with Enter, Escape, or its close control. Closing the dialog only dismisses
 it for the current session; it does not delete reminders. Use `delete-reminder` to remove a reminder permanently.
 
+---
 ### Marking tasks as done or not: `mark-task`
 
 Marks a task as completed or incompleted.
@@ -254,6 +270,7 @@ Examples:
 * `mark-task 1 tid/1 status/done` will color the task as green.
 * `mark-task 1 tid/1 status/not done` will color the task as red.
 
+---
 ### Locating students by name: `find`
 
 Finds students whose names contain any of the given keywords.
@@ -271,6 +288,7 @@ Examples:
 * `find alex david` returns `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
+---
 ### Searching for anything: `search`
 
 Searches for anything with the matching keyword, and highlights the keyword.
@@ -283,6 +301,7 @@ Format: `search KEYWORD`
 * The search considers anything that can be entered as a field in the `add` commands
 * Full words don't have to match; for example, `Han` matches `Hans`.
 
+---
 ### Deleting a student: `delete-student`
 
 Deletes the specified student from Tutoria.
@@ -294,9 +313,10 @@ Format: `delete-student INDEX`
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd student in the list.
-* `find Betsy` followed by `delete 1` deletes the 1st student in the results of the `find` command.
+* `list` followed by `delete-student 2` deletes the 2nd student in the list.
+* `find Betsy` followed by `delete-student 1` deletes the 1st student in the results of the `find` command.
 
+---
 ### Deleting a parent: `delete-parent`
 
 Deletes the specified parent from Tutoria.
@@ -308,10 +328,11 @@ Format: `delete-parent INDEX`
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd parent in the list.
-* `find Betsy` followed by `delete 1` deletes the 1st parent in the results of the `find` command.
+* `list` followed by `delete-parent 2` deletes the 2nd parent in the list.
+* `find Betsy` followed by `delete-parent 1` deletes the 1st parent in the results of the `find` command.
 
-### Undoing a command: "undo"
+---
+### Undoing a command: `undo`
 
 Reverses the last command that modified Students or Parents.
 
@@ -323,7 +344,8 @@ Examples:
 * `edit 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
 * `edit 1 n/John`,`list`, `undo` and `undo` will change the first student's name to `John`, list all students, then the first `undo` does nothing since `list` does not change anything, and the second `undo` changes `John` to what it was before.
 
-### Redoing a command: "redo"
+---
+### Redoing a command: `redo`
 
 Reverses the last `undo` command.
 
@@ -335,18 +357,21 @@ Examples:
 * `edit 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
 * `list`, `undo` and then `redo` will first list all students, then `undo` and `redo` does nothing since `list` does not change anything.
 
+---
 ### Clearing all entries: `clear`
 
 Clears all entries from Tutoria.
 
 Format: `clear`
 
+---
 ### Exiting the program: `exit`
 
 Exits the program.
 
 Format: `exit`
 
+---
 ### Saving the data
 
 Tutoria automatically saves data after every command. You do not need to save manually.
@@ -378,15 +403,29 @@ Furthermore, certain edits can cause the  to behave in unexpected ways (e.g., if
 
 ## Command summary
 
- Action     | Format, Examples                                                                                                                                                      |
-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- **Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague` |
- **Clear**  | `clear`                                                                                                                                                               |
- **Delete** | `delete INDEX`<br> e.g., `delete 3`                                                                                                                                   |
- **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`                                          |
- **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                            |
- **List**   | `list`                                                                                                                                                                |
- **Help**   | `help`                                                                                                                                                                |
- **Add reminder** | `add-reminder r/REMINDER_TEXT`<br> e.g., `add-reminder r/Collect worksheets from cabinet B` |
- **List reminders** | `list-reminders` |
- **Delete reminder** | `delete-reminder INDEX`<br> e.g., `delete-reminder 2` |
+| Action                   | Format, Examples                                                                                                                                                                                                                       |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Add student**          | `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...` <br> e.g., `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 3 t/needsReminder` |
+| **Add parent**           | `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...` <br/> e.g., `add-parent n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session`                                               |
+| **Clear**                | `clear`                                                                                                                                                                                                                                |
+| **Delete**               | `delete INDEX`<br> e.g., `delete 3`                                                                                                                                                                                                    |
+| **Edit student**         | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/SUBJECT] [g/GRADE_LEVEL] [t/TAG]…​`<br> e.g., `edit 1 p/91234567 e/johndoe@example.com`                                                                                        |
+| **Edit parent**          | `edit-parent` <br/> e.g., `edit-parent 1 n/Mrs.Tan`                                                                                                                                                                                    |
+| **Add student photo**    | `add-photo INDEX f/FILE_PATH` <br/> e.g., `add-photo 2 f/C:\Users\prana\Pictures\studentName.png`                                                                                                                                      |
+| **Add parent photo**     | `add-parent-photo INDEX f/FILE_PATH` <br/> e.g., `add-photo 2 f/C:\Users\prana\Pictures\parentName.png`                                                                                                                                |
+| **Delete student photo** | `delete-photo INDEX` <br/> e.g., `delete-photo 1`                                                                                                                                                                                      | 
+| **Delete parent photo**  | `delete-parent-photo INDEX` <br/> e.g., `delete-parent-photo 1`                                                                                                                                                                        |
+| **Add task**             | `add-task <INDEX> task/<DESCRIPTION>` <br/> e.g., `add-task 1 task/do homework`                                                                                                                                                        |
+| **Find**                 | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                                                                                             |
+| **List students**        | `list`                                                                                                                                                                                                                                 |
+| **List parents**         | `list-parents`                                                                                                                                                                                                                         |
+| **Mark task**            | `mark-task <INDEX> tid/<TASK_ID> status/<STATUS>` <br/> e.g., `mark-task 1 tid/1 status/done`                                                                                                                                          |
+| **Delete student**       | `delete-student INDEX` <br/> e.g., `delete-student 1`                                                                                                                                                                                  |
+| **Delete parent**        | `delete-parent INDEX` <br/> e.g., `delete-parent 1`                                                                                                                                                                                    |
+| **Help**                 | `help`                                                                                                                                                                                                                                 |
+| **Search**               | `search KEYWORD` <br/> e.g. `search John`                                                                                                                                                                                              |
+| **Undo**                 | `undo`                                                                                                                                                                                                                                 |
+| **Redo**                 | `redo`                                                                                                                                                                                                                                 |
+| **Add reminder**         | `add-reminder r/REMINDER_TEXT`<br> e.g., `add-reminder r/Collect worksheets from cabinet B`                                                                                                                                            |
+| **List reminders**       | `list-reminders`                                                                                                                                                                                                                       |
+| **Delete reminder**      | `delete-reminder INDEX`<br> e.g., `delete-reminder 2`                                                                                                                                                                                  |
