@@ -84,7 +84,7 @@ The `UI` component uses the JavaFX UI framework. The layouts of the `UiPart`s ar
 
 The `UI` component,
 
-* executes user commands using the `Logic` component. `CommandBox` passes the text the user enters to `MainWindow`, which calls `Logic#execute(String)` and shows the feedback in `ResultDisplay`. `MainWindow` also switches to the Students tab after `list` commands and to the Parents tab after parent commands such as `add-parent`.
+* executes user commands using the `Logic` component. `CommandBox` passes the text the user enters to `MainWindow`, which calls `Logic#execute(String)` and shows the feedback in `ResultDisplay`. `MainWindow` also switches to the Students tab after `list-students` commands and to the Parents tab after parent commands such as `add-parent`.
 * listens for changes to `Model` data so that the UI can be updated with the modified data. The panels observe the lists exposed by `Logic` (the displayed students, the parent contacts and the scheduled sessions), so they redraw automatically when the data changes.
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands and to obtain the data it displays.
 * depends on some classes in the `Model` component because it displays `Person`, `ParentContact`, `ScheduledSession` and `Reminder` objects from the model.
@@ -170,6 +170,124 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Historical records and statistics
+
+The statistics MVP measures teaching **workload, not profitability**. It has no payments, expenses, profit,
+charts or exports. Reports derive from explicitly entered source history, never from the recurring weekly schedule.
+
+**Model and identity.** `Person` now carries a persistent UUID `studentId`. New students receive a new UUID;
+`AddressBook.setPerson` transfers the target identity to replacement details, covering edits, photos and tasks.
+`Person.copy` preserves it. Existing detail-based `Person.equals`, hashing and name/phone duplicate detection remain
+compatible with existing callers; historical relationships and distinct-student counts explicitly use `studentId`.
+Student IDs are unique in a loaded address book and are never derived from mutable names or phone numbers.
+The older parent-contact name/phone link mechanism is separate and is not migrated by this feature.
+
+`model.statistics.LessonRecord` and `AssessmentRecord` are immutable Java records with their own UUID, student UUID
+and recorded student name. Lessons contain a date, subject, start/end time and explicit outcome. Assessments retain
+date, subject, category, title, score and maximum. The name snapshot makes orphan history identifiable after student
+deletion; listings use the current name while the student exists. Deletion removes weekly sessions as before, but
+does not remove history. Recreating a deleted student creates a different identity. `clear` explicitly clears everything.
+
+`ReadOnlyAddressBook` exposes immutable historical lists with empty defaults. `AddressBook.setHistory` validates
+unique record IDs and replaces both lists atomically. `Model.setHistory` exposes this mutation through `ModelManager`.
+Reset, copy, equality and hashing include both collections; immutable records can be shared by snapshot copies.
+Historical data is retained even when its student is no longer in the active student list.
+
+**Commands and parsing.** `AddressBookParser` routes the history command family to `HistoryCommandParser` and
+statistics to `StatsCommandParser`. They reuse `ArgumentTokenizer`, `ArgumentMultimap`, `ParserUtil.parseIndex`,
+and `CommandException`/`ParseException`. Unknown and duplicate prefixes, missing or blank fields, invalid calendar
+dates, non-HH:mm times, overnight/zero durations, invalid outcomes and invalid marks are rejected before mutation.
+Future historical dates are checked at execution using `LocalDate.now(model.getClock())`, not wall-clock calls
+inside parsers. New lessons snapshot the student's current subject. Corrections supply all editable fields and
+retain record and student identities. Wrong-student corrections use delete and re-record.
+
+Student-index operations use the displayed student list. Session and historical record numbers resolve against
+their complete current collections in storage order, independent of student filters. Parsers use `ParserUtil.parseIndex`
+for these positive integer arguments; execution rejects out-of-range numbers with instructions to list again.
+UUID command arguments are no longer accepted. History lists and business reports use the complete address book.
+`StatsCommand` and listing `HistoryCommand`s override `Command.isReadOnly`; `LogicManager` returns their
+`CommandResult` without writing JSON or saving a snapshot. This is essential because saving a snapshot after undo
+would otherwise discard the redo branch. Other commands retain their existing snapshot behavior.
+
+**Calculations.** `StatisticsReport` is a pure formatter/calculator with no storage or UI dependencies. Completed
+lessons alone contribute to business counts, duration and distinct student UUIDs. Calendar-month rows include zero
+months and obey the requested inclusive dates. Attendance is completed / (completed + absent), excluding cancelled
+and unrecorded entries. Zero denominators show N/A. Assessment groups use trimmed, case-insensitive subject and
+category keys, ordered by date then UUID for same-date ties; each group compares its first and last percentages.
+One or zero comparable records gives N/A. Marks use `BigDecimal`, intermediate percentages have twelve decimal places,
+and displayed hours/percentages/changes round HALF_UP to two. Report defaults are January 1 through today from the
+injected clock. Explicit boundaries must be supplied together and ordered. No totals are cached or persisted.
+
+**Storage and compatibility.** `JsonAdaptedPerson` saves `studentId`; missing IDs in older JSON receive UUIDs when
+loaded and are persisted on the next save. `JsonSerializableAddressBook` saves `lessonRecords` and `assessmentRecords`
+through dedicated adapters. Absent collections default to empty; no records are inferred from schedules. Null or
+structurally invalid records, duplicate record IDs and duplicate student IDs fail loading via `IllegalValueException`.
+Deleted-student references are valid, so the loader deliberately does not require each historical UUID to refer to
+an active student. Future-date validation uses the model clock at command execution; JSON adapters validate structural
+constraints independently of the machine clock. Undo/redo snapshots preserve student IDs, historical UUIDs and records.
+
+**Verification.** `StatisticsReportTest` covers workload, inclusive boundaries, zero cases, attendance, grouping,
+same-date ties and percentage-point rounding. `StatisticsParserTest` covers malformed command input.
+`StatisticsIntegrationTest` uses a fixed Asia/Singapore clock and temporary JSON storage to test filtered indices,
+identity through edits/tasks/reload, deletions, corrections, undo/redo and read-only reports preserving redo and file
+contents. `StatisticsStorageTest` covers old data, UUID uniqueness, immutable history, copy/reset/equality, malformed
+records and deleted-student round trips. Manual smoke test: record a lesson and two assessments, run both reports,
+undo a mutation, run reports and lists, then redo; delete the student and check retained identifiable history.
+
+**MVP limits.** One lesson is one same-day interval. Repeated submissions create separate records; users must correct
+duplicates explicitly. Student reports require an active displayed student; retained deleted-student history remains
+available through lists and business totals. Historical lists show all entries and dates without pagination.
+
+### Attendance linked to recurring sessions
+
+`ScheduledSession.sessionId` is a persistent UUID for one weekly template belonging to one student. Fresh sessions
+receive fresh IDs, including duplicate slots; `withStudent` retains the ID, so student edits and deep snapshot copies
+preserve it. Equality and hashing include this identity plus session details. `isSameSlot` explicitly compares details
+for the existing `unschedule-student` workflow: the command resolves and removes the first actual matching session.
+`Schedule` rejects duplicate identities but allows overlapping or identical slots with distinct IDs.
+
+`list-schedule` is a read-only command returning all sessions with one-based numbers through `CommandResult`, independent of
+student filters. `MainWindow.selectTabForCommand` handles it before generic list routing, selecting the existing
+Schedule tab; successful `mark-attendance` also selects that tab. Each `ScheduleSessionCard` shows a `Session #N` label
+instead of a UUID field, separate from its `Student:` label. `ScheduleGrid` maps persistent session UUIDs to their
+positions in the original list before sorting cards into weekday/time lanes, so timetable numbers match command output.
+Cards retain their weekly layout. No dialog or separate attendance tab is introduced.
+
+`MarkAttendanceCommandParser` reuses strict date parsing and the existing tokenizer, rejecting missing, unknown or
+duplicate arguments. `MarkAttendanceCommand` accepts an `Index`, resolves against the complete schedule, then uses
+the resolved session UUID internally. It checks
+the requested weekday and future-date boundary using the model's injectable clock. Since weekly templates have no
+effective start/end dates, any matching weekday on or before today can be recorded; today's time need not have passed.
+
+`LessonRecord.sourceSessionId` is optional. First marking snapshots the student UUID/name, current subject and times
+into a new dated lesson. Subsequent marking finds the same `(sourceSessionId, date)` and updates only its outcome,
+preserving the historical UUID and details, including manual time/subject corrections. `AddressBook.setHistory`
+rejects duplicate linked occurrences and student mismatches against active templates, while allowing retained links
+to removed templates. `edit-lesson` retains the source ID and rejects date changes for linked history; tutors delete
+and re-record mistaken dates. Manual records remain unlinked and are never inferred or merged automatically.
+
+JSON adapters store `sessionId` and `sourceSessionId`. Missing session IDs migrate to UUIDs on loading and persist on
+the next save; missing source links remain null. Malformed IDs, duplicate template IDs and duplicate linked occurrences
+fail loading. Copy/reset and undo/redo retain both identities. Unscheduling or deleting a student keeps dated history;
+rescheduling an identical slot creates a new template. Existing statistics calculate from lesson records unchanged:
+unmarked occurrences create no records, counts or implicit absences.
+
+`AttendanceIntegrationTest` verifies repeated marking, all outcomes, filters, clock boundaries, historical corrections,
+undo/redo, reload, duplicate slots and retention. `AttendanceStorageTest` covers migration, immutable source links,
+ID validation and equality. UI tests verify Schedule-tab routing, number labels on narrow cards, and numbering despite
+timetable sorting. Manual check: schedule a session, run `list-schedule`, use its number to mark attendance for a
+matching past date, then change the status
+and confirm only one historical record exists. Undo, view the schedule, and redo to confirm listing preserves history.
+
+**Displayed numbers versus identity.** Schedule, lesson and assessment lists each number their own complete collection
+from 1 in insertion order. New entries append; edits retain their position. Deletion, unscheduling, reset and undo/redo
+can shift numbers, so documentation tells users to list again before choosing a record. No display-number allocation
+state or last-listed snapshot is persisted. UUIDs remain unchanged in model objects and JSON; no data migration is
+needed for this interface change. Success messages and normal lists hide UUIDs and source links, the student statistics
+heading uses the name only, and deleted students use `Name (deleted)`. Attendance, copying and undo/redo still resolve
+relationships through persistent identities. Integration tests cover renumbering, independent historical lists,
+filters, invalid targets, hidden UUIDs, reload, and redo surviving read-only listing.
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation
@@ -227,7 +345,7 @@ The `redo` command does the opposite — it calls `Model#redoAddressBook()`,
 
 </div>
 
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
+Step 5. The user then decides to execute the command `list-students`. Commands that do not modify the address book, such as `list-students`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
 
 ![UndoRedoState4](images/UndoRedoState4.png)
 
@@ -436,7 +554,7 @@ testers are expected to do more *exploratory* testing.
 
 1. Deleting a person while all persons are being shown
 
-   1. Prerequisites: List all persons using the `list` command, with multiple persons in the list.
+   1. Prerequisites: List all persons using the `list-students` command, with multiple persons in the list.
 
    1. Test case: `delete 1`<br>
       Expected: The first contact is deleted from the list. The status message shows the deleted contact's details.

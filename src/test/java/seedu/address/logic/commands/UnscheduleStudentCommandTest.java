@@ -60,12 +60,12 @@ public class UnscheduleStudentCommandTest {
 
     @Test
     public void execute_duplicateSessions_removesExactlyOne() throws Exception {
-        model.addScheduledSession(ALICE_MONDAY_MORNING);
+        model.addScheduledSession(new ScheduledSession(ALICE, DayOfWeek.MONDAY, MORNING));
         UnscheduleStudentCommand command = new UnscheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY, MORNING);
 
         command.execute(model);
 
-        long remaining = model.getScheduleList().stream().filter(ALICE_MONDAY_MORNING::equals).count();
+        long remaining = model.getScheduleList().stream().filter(ALICE_MONDAY_MORNING::isSameSlot).count();
         assertEquals(1, remaining);
         assertEquals(3, model.getScheduleList().size());
     }

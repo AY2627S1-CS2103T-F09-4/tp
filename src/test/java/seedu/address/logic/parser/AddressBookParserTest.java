@@ -133,9 +133,10 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_replacedCommandWords_throwsParseException() {
-        // "add" and "delete" were replaced by "add-student" and "delete-student"
+        // Student commands use explicit names rather than the original generic words.
         assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("add n/Amy"));
         assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("delete 1"));
+        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("list"));
     }
 
     @Test
@@ -188,9 +189,9 @@ public class AddressBookParserTest {
     }
 
     @Test
-    public void parseCommand_list() throws Exception {
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD) instanceof ListCommand);
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD + " 3") instanceof ListCommand);
+    public void parseCommand_listStudents() throws Exception {
+        assertTrue(parser.parseCommand("list-students") instanceof ListCommand);
+        assertTrue(parser.parseCommand("list-students 3") instanceof ListCommand);
     }
 
     @Test

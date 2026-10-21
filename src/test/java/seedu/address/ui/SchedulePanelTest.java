@@ -50,8 +50,8 @@ public class SchedulePanelTest {
 
         List<ScheduleSessionCard> cards = cards(panel);
         assertEquals(2, cards.size());
-        assertEquals("1. Alice Pauline", titleOf(cards.get(0)));
-        assertEquals("2. Benson Meier", titleOf(cards.get(1)));
+        assertEquals("Student: 1. Alice Pauline", titleOf(cards.get(0)));
+        assertEquals("Student: 2. Benson Meier", titleOf(cards.get(1)));
         assertTrue(cards.get(0).getStyle().contains(FIRST_COLOUR));
         assertTrue(cards.get(1).getStyle().contains(SECOND_COLOUR));
     }
@@ -84,8 +84,8 @@ public class SchedulePanelTest {
                 List.of(ALICE, BENSON), List.of(BENSON));
 
         List<ScheduleSessionCard> cards = cards(panel);
-        assertEquals("Alice Pauline", titleOf(cards.get(0)));
-        assertEquals("1. Benson Meier", titleOf(cards.get(1)));
+        assertEquals("Student: Alice Pauline", titleOf(cards.get(0)));
+        assertEquals("Student: 1. Benson Meier", titleOf(cards.get(1)));
     }
 
     @Test
@@ -109,13 +109,13 @@ public class SchedulePanelTest {
         ObservableList<Person> persons = FXCollections.observableArrayList(ALICE, BENSON);
         ObservableList<Person> displayed = FXCollections.observableArrayList(ALICE, BENSON);
         SchedulePanel panel = FxTestSupport.runOnFxThread(() -> new SchedulePanel(sessions, persons, displayed));
-        assertEquals("1. Alice Pauline", titleOf(cards(panel).get(0)));
+        assertEquals("Student: 1. Alice Pauline", titleOf(cards(panel).get(0)));
 
         FxTestSupport.runOnFxThread(() -> displayed.remove(ALICE));
-        assertEquals("Alice Pauline", titleOf(cards(panel).get(0)));
+        assertEquals("Student: Alice Pauline", titleOf(cards(panel).get(0)));
 
         FxTestSupport.runOnFxThread(() -> displayed.add(0, ALICE));
-        assertEquals("1. Alice Pauline", titleOf(cards(panel).get(0)));
+        assertEquals("Student: 1. Alice Pauline", titleOf(cards(panel).get(0)));
     }
 
     @Test

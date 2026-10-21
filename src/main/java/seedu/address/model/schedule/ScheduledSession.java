@@ -4,6 +4,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.time.DayOfWeek;
 import java.util.Objects;
+import java.util.UUID;
 
 import seedu.address.model.person.Person;
 
@@ -13,6 +14,7 @@ import seedu.address.model.person.Person;
  */
 public class ScheduledSession {
 
+    private final String sessionId;
     private final Person student;
     private final DayOfWeek day;
     private final TimeSlot timeSlot;
@@ -21,7 +23,13 @@ public class ScheduledSession {
      * Constructs a {@code ScheduledSession}. Every field must be non-null.
      */
     public ScheduledSession(Person student, DayOfWeek day, TimeSlot timeSlot) {
+        this(UUID.randomUUID().toString(), student, day, timeSlot);
+    }
+
+    /** Restores a recurring session with its persistent identity. */
+    public ScheduledSession(String sessionId, Person student, DayOfWeek day, TimeSlot timeSlot) {
         requireAllNonNull(student, day, timeSlot);
+        this.sessionId = UUID.fromString(sessionId).toString();
         this.student = student;
         this.day = day;
         this.timeSlot = timeSlot;
@@ -29,6 +37,10 @@ public class ScheduledSession {
 
     public Person getStudent() {
         return student;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
     public DayOfWeek getDay() {
@@ -41,7 +53,12 @@ public class ScheduledSession {
 
     /** Returns a copy of this session that refers to {@code newStudent}. */
     public ScheduledSession withStudent(Person newStudent) {
-        return new ScheduledSession(newStudent, day, timeSlot);
+        return new ScheduledSession(sessionId, newStudent, day, timeSlot);
+    }
+
+    /** Matches the existing day/time/student syntax without confusing slot matching with identity. */
+    public boolean isSameSlot(ScheduledSession other) {
+        return other != null && student.equals(other.student) && day == other.day && timeSlot.equals(other.timeSlot);
     }
 
     @Override
@@ -57,13 +74,11 @@ public class ScheduledSession {
         if (!(other instanceof ScheduledSession otherSession)) {
             return false;
         }
-        return student.equals(otherSession.student)
-                && day == otherSession.day
-                && timeSlot.equals(otherSession.timeSlot);
+        return sessionId.equals(otherSession.sessionId) && isSameSlot(otherSession);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(student, day, timeSlot);
+        return Objects.hash(sessionId, student, day, timeSlot);
     }
 }

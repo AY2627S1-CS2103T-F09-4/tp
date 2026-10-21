@@ -227,12 +227,7 @@ public class MainWindow extends UiPart<Stage> {
     private CommandResult executeCommand(String commandText) throws CommandException, ParseException {
         try {
             CommandResult commandResult = logic.execute(commandText);
-            if (commandText.trim().startsWith("add-parent") || commandText.trim().startsWith("list-parents")
-                    || commandText.trim().startsWith("edit-parent") || commandText.trim().startsWith("delete-parent")) {
-                recordTabs.getSelectionModel().select(1);
-            } else if (commandText.trim().startsWith("list")) {
-                recordTabs.getSelectionModel().select(0);
-            }
+            selectTabForCommand(commandText);
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
@@ -252,6 +247,19 @@ public class MainWindow extends UiPart<Stage> {
             logger.info("An error occurred while executing command: " + commandText);
             resultDisplay.setFeedbackToUser(e.getMessage());
             throw e;
+        }
+    }
+
+    /** Applies tab navigation only after a command has executed successfully. */
+    void selectTabForCommand(String commandText) {
+        String word = commandText.trim().split("\\s+", 2)[0];
+        if (word.equals("list-schedule") || word.equals("mark-attendance")) {
+            recordTabs.getSelectionModel().select(2);
+        } else if (word.startsWith("add-parent") || word.equals("list-parents")
+                || word.equals("edit-parent") || word.startsWith("delete-parent")) {
+            recordTabs.getSelectionModel().select(1);
+        } else if (word.startsWith("list")) {
+            recordTabs.getSelectionModel().select(0);
         }
     }
 }

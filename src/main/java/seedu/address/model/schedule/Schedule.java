@@ -20,6 +20,9 @@ public class Schedule {
     /** Adds {@code session} to the schedule. */
     public void add(ScheduledSession session) {
         requireNonNull(session);
+        if (sessions.stream().anyMatch(s -> s.getSessionId().equals(session.getSessionId()))) {
+            throw new IllegalArgumentException("Scheduled session IDs must be unique.");
+        }
         sessions.add(session);
     }
 
@@ -44,6 +47,9 @@ public class Schedule {
     /** Replaces the contents of this schedule with {@code replacement}. */
     public void setSessions(List<ScheduledSession> replacement) {
         requireNonNull(replacement);
+        if (replacement.stream().map(ScheduledSession::getSessionId).distinct().count() != replacement.size()) {
+            throw new IllegalArgumentException("Scheduled session IDs must be unique.");
+        }
         sessions.setAll(replacement);
     }
 

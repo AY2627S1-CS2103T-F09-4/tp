@@ -30,6 +30,8 @@ import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.ListParentsCommand;
 import seedu.address.logic.commands.ListRemindersCommand;
+import seedu.address.logic.commands.ListScheduleCommand;
+import seedu.address.logic.commands.MarkAttendanceCommand;
 import seedu.address.logic.commands.MarkTaskCommand;
 import seedu.address.logic.commands.RedoCommand;
 import seedu.address.logic.commands.ScheduleStudentCommand;
@@ -71,6 +73,18 @@ public class AddressBookParser {
         logger.fine("Command word: " + commandWord + "; Arguments: " + arguments);
 
         return switch (commandWord) {
+            case ListScheduleCommand.COMMAND_WORD -> {
+                if (!arguments.isBlank()) {
+                    throw new ParseException("Usage: " + ListScheduleCommand.COMMAND_WORD);
+                }
+                yield new ListScheduleCommand();
+            }
+            case MarkAttendanceCommand.COMMAND_WORD -> new MarkAttendanceCommandParser().parse(arguments);
+            case "record-lesson", "record-assessment", "edit-lesson", "edit-assessment", "delete-lesson",
+                    "delete-assessment", "list-lessons", "list-assessments" ->
+                new HistoryCommandParser(commandWord).parse(arguments);
+            case "stats" -> new StatsCommandParser(false).parse(arguments);
+            case "stats-student" -> new StatsCommandParser(true).parse(arguments);
             case AddContactCommand.COMMAND_WORD -> new AddContactCommandParser().parse(arguments);
             case DeleteParentCommand.COMMAND_WORD -> new DeleteParentCommandParser().parse(arguments);
             case ListParentsCommand.COMMAND_WORD -> new ListParentsCommand();
