@@ -3,18 +3,29 @@
 skinparam arrowThickness 1.1
 skinparam arrowColor LOGIC_COLOR_T4
 skinparam classBackgroundColor LOGIC_COLOR
+left to right direction
 
-package Logic as LogicPackage {
+package Logic {
+    Class "<<interface>>\nLogic" as Logic
+    Class LogicManager
 
-package "Parser Classes" as ParserClasses{
-}
-Class XYZCommand
-Class CommandResult
-Class "{abstract}\nCommand" as Command
+    package "Parser" as ParserPackage {
+        Class AddressBookParser
+        Class "<<interface>>\nParser<T>" as Parser
+        Class AddContactCommandParser
+        Class AddReminderCommandParser
+        Class ScheduleStudentCommandParser
+        Class HistoryCommandParser
+    }
 
-
-Class "<<interface>>\nLogic" as Logic
-Class LogicManager
+    package Commands {
+        Class "{abstract}\nCommand" as Command
+        Class CommandResult
+        Class AddContactCommand
+        Class AddReminderCommand
+        Class ScheduleStudentCommand
+        Class HistoryCommand
+    }
 }
 
 package Model {
@@ -28,19 +39,42 @@ Class HiddenOutside #FFFFFF
 HiddenOutside ..> Logic
 
 LogicManager .right.|> Logic
-LogicManager -right->"1" ParserClasses
-ParserClasses ..> XYZCommand : <<create>>
-
-XYZCommand -up-|> Command
+LogicManager --> "1" AddressBookParser
 LogicManager .left.> Command : <<call>>
-
 LogicManager --> Model
 LogicManager --> Storage
+
+AddressBookParser ..> AddContactCommandParser : <<create>>
+AddressBookParser ..> AddReminderCommandParser : <<create>>
+AddressBookParser ..> ScheduleStudentCommandParser : <<create>>
+AddressBookParser ..> HistoryCommandParser : <<create>>
+
+AddContactCommandParser .up.|> Parser
+AddReminderCommandParser .up.|> Parser
+ScheduleStudentCommandParser .up.|> Parser
+HistoryCommandParser .up.|> Parser
+
+AddContactCommandParser ..> AddContactCommand : <<create>>
+AddReminderCommandParser ..> AddReminderCommand : <<create>>
+ScheduleStudentCommandParser ..> ScheduleStudentCommand : <<create>>
+HistoryCommandParser ..> HistoryCommand : <<create>>
+
+AddContactCommand -up-|> Command
+AddReminderCommand -up-|> Command
+ScheduleStudentCommand -up-|> Command
+HistoryCommand -up-|> Command
+
+AddContactCommandParser -[hidden]down- AddReminderCommandParser
+AddReminderCommandParser -[hidden]down- ScheduleStudentCommandParser
+ScheduleStudentCommandParser -[hidden]down- HistoryCommandParser
+
+AddContactCommand -[hidden]down- AddReminderCommand
+AddReminderCommand -[hidden]down- ScheduleStudentCommand
+ScheduleStudentCommand -[hidden]down- HistoryCommand
+
 Storage --[hidden] Model
 Command .[hidden]up.> Storage
 Command .right.> Model
-note right of XYZCommand: XYZCommand = AddCommand, \nFindCommand, etc
-
 Logic ..> CommandResult
 LogicManager .down.> CommandResult
 Command .up.> CommandResult : <<create>>
