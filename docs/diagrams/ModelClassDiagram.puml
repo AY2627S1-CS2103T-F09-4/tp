@@ -27,7 +27,6 @@ Class Task
 Class String
 
 Class ParentContact
-Class SnapshotManager
 Class Reminder
 Class ReminderList
 Class Schedule
@@ -38,6 +37,10 @@ Class DayOfWeek
 
 Class I #FFFFFF
 }
+
+Package Storage as StoragePackage <<Rectangle>>{
+ Class SnapshotManager
+ }
 
 Class HiddenOutside #FFFFFF
 HiddenOutside ..> Model
