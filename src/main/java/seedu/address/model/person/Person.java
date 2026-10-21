@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.tag.Tag;
@@ -16,6 +17,8 @@ import seedu.address.model.task.TaskList;
  * Guarantees: details are present and not null, field values are validated, immutable.
  */
 public class Person {
+
+    private final String studentId;
 
     // Identity fields
     private final Name name;
@@ -61,7 +64,13 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
             PhotoPath photoPath, TaskList taskList, Set<Tag> tags) {
+        this(UUID.randomUUID().toString(), name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
+    }
+
+    private Person(String studentId, Name name, Phone phone, Email email, Address address, Subject subject,
+            GradeLevel gradeLevel, PhotoPath photoPath, TaskList taskList, Set<Tag> tags) {
         requireAllNonNull(name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
+        this.studentId = UUID.fromString(studentId).toString();
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -75,6 +84,15 @@ public class Person {
 
     public Name getName() {
         return name;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    /** Returns these details with the given persistent identity. Value equality remains detail-based. */
+    public Person withStudentId(String id) {
+        return new Person(id, name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
     }
 
     public Phone getPhone() {
@@ -137,7 +155,7 @@ public class Person {
         Person copy = new Person(name.copy(), phone.copy(), email.copy(), address.copy(), subject.copy(),
                 gradeLevel.copy(), photoPath.copy(), taskList.copy(), tagsCopy);
 
-        return copy;
+        return copy.withStudentId(studentId);
     }
 
     /**

@@ -2,6 +2,7 @@ package seedu.address.model;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
@@ -10,6 +11,8 @@ import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
+import seedu.address.model.statistics.AssessmentRecord;
+import seedu.address.model.statistics.LessonRecord;
 
 /**
  * The API of the Model component.
@@ -18,6 +21,11 @@ public interface Model {
     /** {@code Predicate} that always evaluates to true */
     Predicate<Person> PREDICATE_SHOW_ALL_PERSONS = unused -> true;
     Predicate<ParentContact> PREDICATE_SHOW_ALL_PARENTS = unused -> true;
+
+    /** Replaces historical source records. */
+    default void setHistory(List<LessonRecord> lessons, List<AssessmentRecord> assessments) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Returns the user prefs.

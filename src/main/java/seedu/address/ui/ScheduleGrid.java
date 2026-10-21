@@ -6,9 +6,12 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -31,7 +34,7 @@ class ScheduleGrid extends Pane {
     private static final int HEADER_HEIGHT = 30;
     private static final int AXIS_WIDTH = 60;
     private static final int MIN_HOUR_WIDTH = 120;
-    private static final int MIN_ROW_HEIGHT = 70;
+    private static final int MIN_ROW_HEIGHT = 90;
     private static final int INTERVAL_MINUTES = 30;
     private static final int MINUTES_IN_HOUR = 60;
     // Keeps content slightly smaller than the viewport so scrollbars do not flicker on and off.
@@ -98,6 +101,10 @@ class ScheduleGrid extends Pane {
         hourLines.clear();
         dayLines.clear();
         Arrays.fill(dayLanes, 1);
+        Map<String, Integer> sessionNumbers = new HashMap<>();
+        for (int i = 0; i < sessions.size(); i++) {
+            sessionNumbers.put(sessions.get(i).getSessionId(), i + 1);
+        }
 
         int minStart = VISIBLE_START_HOUR * MINUTES_IN_HOUR;
         int maxEnd = VISIBLE_END_HOUR * MINUTES_IN_HOUR;
@@ -137,7 +144,8 @@ class ScheduleGrid extends Pane {
                     .sorted(Comparator.comparingInt(ScheduleGrid::roundedStart)
                             .thenComparingInt(ScheduleGrid::roundedEnd))
                     .toList();
-            placeDay(day.getValue() - 1, daySessions, colourOf, titleOf);
+            placeDay(day.getValue() - 1, daySessions, colourOf, titleOf,
+                    session -> sessionNumbers.get(session.getSessionId()));
         }
 
         getChildren().addAll(hourLabels);
@@ -160,7 +168,7 @@ class ScheduleGrid extends Pane {
 
     /** Assigns each session in a day to a lane so that overlapping cards never share a lane. */
     private void placeDay(int dayIndex, List<ScheduledSession> daySessions, Function<Person, String> colourOf,
-            Function<Person, String> titleOf) {
+            Function<Person, String> titleOf, ToIntFunction<ScheduledSession> numberOf) {
         List<Integer> laneEnds = new ArrayList<>();
         int clusterEnd = -1;
 
@@ -186,7 +194,7 @@ class ScheduleGrid extends Pane {
 
             Person student = session.getStudent();
             ScheduleSessionCard card = new ScheduleSessionCard(session, colourOf.apply(student),
-                    titleOf.apply(student));
+                    titleOf.apply(student), numberOf.applyAsInt(session));
             placements.add(new Placement(card, dayIndex, start, end, lane));
             getChildren().add(card);
         }
