@@ -38,7 +38,7 @@ public class MainWindowScheduleNavigationTest {
             assertEquals("Parents", tabs.getSelectionModel().getSelectedItem().getText());
             window.selectTabForCommand("  list-schedule  ");
             assertEquals("Schedule", tabs.getSelectionModel().getSelectedItem().getText());
-            window.selectTabForCommand("list");
+            window.selectTabForCommand("list-students");
             assertEquals("Students", tabs.getSelectionModel().getSelectedItem().getText());
             window.selectTabForCommand("mark-attendance 1 date/2026-10-19 status/completed");
             assertEquals("Schedule", tabs.getSelectionModel().getSelectedItem().getText());

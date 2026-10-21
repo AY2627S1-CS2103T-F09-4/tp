@@ -26,7 +26,7 @@ Tutoria is a **desktop application for managing students under a tutor, optimize
 5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
    Some example commands you can try:
 
-   * `list` : Lists all students.
+   * `list-students` : Lists all students.
 
    * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to Tutoria.
 
@@ -58,7 +58,7 @@ Tutoria is a **desktop application for managing students under a tutor, optimize
 * Parameters can be in any order.<br>
   For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
 
-* Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
+* Extraneous parameters for commands that take no parameters, such as `help`, `list-students`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
@@ -109,11 +109,11 @@ Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<RE
 Examples:
 * add-parent n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session
 
-### Listing all students: `list`
+### Listing all students: `list-students`
 
 Shows a list of all students in Tutoria.
 
-Format: `list`
+Format: `list-students`
 
 ### Listing all parents: `list-parents`
 
@@ -165,7 +165,7 @@ Format: `add-photo INDEX f/FILE_PATH`
 * Tutoria stores the image’s file path, so the image may stop displaying if the original file is moved, renamed, or deleted.
 
 Examples:
-* `list` followed by`add-photo 2 f/C:\Users\prana\Pictures\student.png` adds the photo to the 2nd student in the list.
+* `list-students` followed by`add-photo 2 f/C:\Users\prana\Pictures\student.png` adds the photo to the 2nd student in the list.
 
 ### Adding photos to a parent: `add-parent-photo`
 
@@ -294,7 +294,7 @@ Format: `delete-student INDEX`
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd student in the list.
+* `list-students` followed by `delete-student 2` deletes the 2nd student in the list.
 * `find Betsy` followed by `delete 1` deletes the 1st student in the results of the `find` command.
 
 ### Deleting a parent: `delete-parent`
@@ -308,7 +308,7 @@ Format: `delete-parent INDEX`
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd parent in the list.
+* `list-parents` followed by `delete-parent 2` deletes the 2nd parent in the list.
 * `find Betsy` followed by `delete 1` deletes the 1st parent in the results of the `find` command.
 
 ### Undoing a command: "undo"
@@ -317,11 +317,11 @@ Reverses the last command that modified Students or Parents.
 
 Format: `undo`
 
-* Since the commands `list`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `undo` reverses their commands but does not modify anything.
+* Since the commands `list-students`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `undo` reverses their commands but does not modify anything.
 
 Examples:
 * `edit 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
-* `edit 1 n/John`,`list`, `undo` and `undo` will change the first student's name to `John`, list all students, then the first `undo` does nothing since `list` does not change anything, and the second `undo` changes `John` to what it was before.
+* `edit 1 n/John`,`list-students`, `undo` and `undo` will change the first student's name to `John`, list all students, then the first `undo` does nothing since `list-students` does not change anything, and the second `undo` changes `John` to what it was before.
 
 ### Redoing a command: "redo"
 
@@ -329,11 +329,11 @@ Reverses the last `undo` command.
 
 Format: `redo`
 
-* Since undoing the commands `list`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `redo` reverses their commands but does not modify anything.
+* Since undoing the commands `list-students`, `find`, `search`, `clear`, `help` or `exit` does not modify any student or parent values, `redo` reverses their commands but does not modify anything.
 
 Examples:
 * `edit 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
-* `list`, `undo` and then `redo` will first list all students, then `undo` and `redo` does nothing since `list` does not change anything.
+* `list-students`, `undo` and then `redo` will first list all students, then `undo` and `redo` does nothing since `list-students` does not change anything.
 
 ### Historical lessons and assessments
 
@@ -533,7 +533,7 @@ See [Historical lessons and assessments](#historical-lessons-and-assessments) fo
  **Delete** | `delete INDEX`<br> e.g., `delete 3`                                                                                                                                   |
  **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`                                          |
  **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                            |
- **List**   | `list`                                                                                                                                                                |
+ **List**   | `list-students`                                                                                                                                                                |
  **Help**   | `help`                                                                                                                                                                |
  **Add reminder** | `add-reminder r/REMINDER_TEXT`<br> e.g., `add-reminder r/Collect worksheets from cabinet B` |
  **List reminders** | `list-reminders` |
