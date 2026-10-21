@@ -19,6 +19,22 @@ Class Email
 Class Name
 Class Phone
 Class Tag
+Class GradeLevel
+Class PhotoPath
+Class Subject
+Class TaskList
+Class Task
+Class String
+
+Class ParentContact
+Class SnapshotManager
+Class Reminder
+Class ReminderList
+Class Schedule
+Class ScheduledSession
+Class TimeSlot
+
+Class DayOfWeek
 
 Class I #FFFFFF
 }
@@ -36,12 +52,29 @@ ModelManager -right-> "1" UserPrefs
 UserPrefs .up.|> ReadOnlyUserPrefs
 
 AddressBook *--> "1" UniquePersonList
+AddressBook --> "~*" ParentContact
+AddressBook *--> "1" Schedule
+AddressBook *--> "1" ReminderList
 UniquePersonList --> "~* all" Person
 Person *--> Name
 Person *--> Phone
 Person *--> Email
 Person *--> Address
 Person *--> "*" Tag
+Person *--> Subject
+Person *--> GradeLevel
+Person *--> PhotoPath
+Person *--> TaskList
+
+TaskList --> "*" Task
+
+ParentContact *--> Name
+ParentContact *--> Phone
+ParentContact *--> Email
+ParentContact *--> PhotoPath
+ParentContact *--> "id" String
+ParentContact *--> "linkedStudentId" String
+ParentContact *--> "~* requirements" String
 
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
@@ -51,4 +84,16 @@ Phone -[hidden]right-> Address
 Address -[hidden]right-> Email
 
 ModelManager --> "~* filtered" Person
+ModelManager --> "~* filtered" ParentContact
+
+ModelManager --> "1" SnapshotManager
+SnapshotManager --> "1..* snapshots of" AddressBook
+
+Schedule --> "*" ScheduledSession
+
+ScheduledSession --> "1" Person
+ScheduledSession --> "1" TimeSlot
+ScheduledSession --> "1 day" DayOfWeek
+
+ReminderList --> "*" Reminder
 @enduml
