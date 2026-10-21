@@ -6,7 +6,7 @@ title: User Guide
 Tutoria is a **desktop application for managing students under a tutor, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI). If you type quickly, Tutoria can help you manage students faster than traditional GUI applications.
 
 * Table of Contents
-{:toc}
+  {:toc}
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -26,15 +26,15 @@ Tutoria is a **desktop application for managing students under a tutor, optimize
 5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
    Some example commands you can try:
 
-   * `list-students` : Lists all students.
+    * `list-students` : Lists all students.
 
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to Tutoria.
+    * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to Tutoria.
 
-   * `delete 3` : Deletes the 3rd student shown in the current list.
+    * `delete 3` : Deletes the 3rd student shown in the current list.
 
-   * `clear` : Deletes all student.
+    * `clear` : Deletes all student.
 
-   * `exit` : Exits the app.
+    * `exit` : Exits the app.
 
 1. Refer to the [Features](#features) section below for details of each command.
 
@@ -208,37 +208,71 @@ Examples:
 * `add-task 1 task/do homework`
 * `add-task 2 task/revise chapter 3 notes`
 
-### Adding a startup reminder: `add-reminder`
+### Adding a reminder: `add-reminder`
 
-Adds a tutor-level reminder that is not attached to any student.
+Adds a persistent tutor-level reminder that is not attached to any student. A reminder can be untimed or have an
+optional due date and time. Duplicate reminder text is allowed.
 
-Format: `add-reminder r/REMINDER_TEXT`
+Format: `add-reminder r/REMINDER_TEXT [at/YYYY-MM-DD HH:mm]`
 
 * `REMINDER_TEXT` may contain spaces but must not be blank.
-* Reminders are kept in insertion order. Duplicate reminder text is allowed.
-* Saved reminders are shown in a numbered dialog every time Tutoria starts.
+* `at/` is optional. When provided, it must contain a valid date and 24-hour time in `YYYY-MM-DD HH:mm` format.
+* Untimed reminders are classified as `EVERY STARTUP`.
+* Each reminder receives a stable positive ID that does not change when reminders are reordered or deleted.
 
-Example: `add-reminder r/Collect worksheets from cabinet B`
+Examples:
+* `add-reminder r/Collect worksheets from cabinet B` adds an untimed reminder.
+* `add-reminder r/Call Alice's parent at/2026-10-30 18:00` adds a timed reminder.
+
+Before adding any reminders:
+
+![Empty reminder list before add-reminder](images/before_add-photo.png)
+
+After adding the untimed and timed reminders:
+
+![Reminder list after add-reminder](images/after_add-photo.png)
 
 ### Listing reminders: `list-reminders`
 
-Displays all reminders as a numbered list in insertion order.
+Displays every reminder with its stable ID, optional due date and time, and current urgency status.
 
 Format: `list-reminders`
 
-If no reminders have been set, Tutoria reports that the reminder list is empty.
+If no reminders have been set, Tutoria reports that no reminders have been set. Otherwise, reminders are displayed in
+this urgency order:
+
+1. `OVERDUE`: the due time is before the current minute.
+2. `DUE SOON`: the due time is within the current minute or the next 24 hours, inclusive.
+3. `UPCOMING`: the due time is more than 24 hours away.
+4. `EVERY STARTUP`: the reminder has no due time.
+
+Within each timed category, reminders with the earliest due time are shown first. Reminders with the same due time are
+ordered by stable ID. Untimed reminders are ordered by stable ID. Exactly 24 hours away is classified as `DUE SOON`.
+
+Example: `list-reminders`
+
+![Reminders listed in urgency order](images/list-reminder.png)
 
 ### Deleting a reminder: `delete-reminder`
 
-Deletes exactly one reminder using the index shown by `list-reminders`.
+Deletes exactly one reminder using the stable ID shown by `list-reminders`.
 
-Format: `delete-reminder INDEX`
+Format: `delete-reminder ID`
 
-* `INDEX` must be a positive integer within the current reminder list.
-* Example: `delete-reminder 2` deletes the second reminder.
+* `ID` must be a positive integer belonging to an existing reminder.
+* The ID is not the reminder's current position in the displayed list.
+* Deleting a reminder does not change the IDs of the remaining reminders, and deleted IDs are not reused.
 
-The startup reminder dialog can be closed with Enter, Escape, or its close control. Closing the dialog only dismisses
-it for the current session; it does not delete reminders. Use `delete-reminder` to remove a reminder permanently.
+Example: `delete-reminder 7` deletes the reminder with ID 7.
+
+![Successful deletion of a reminder](images/after_delete-reminder.png)
+
+When Tutoria starts, its reminder dialog displays all saved reminders in the same urgency order as `list-reminders`.
+The dialog can be closed with Enter, Escape, or its close control. Closing it only dismisses it for the current session
+and does not delete reminders. Use `delete-reminder` to remove a reminder permanently.
+
+If a timed reminder reaches its due minute while Tutoria is open, Tutoria displays an alert. Reminders reaching their
+due time together are grouped into one alert. Dismissing the alert does not delete the reminders.
 
 ### Marking tasks as done or not: `mark-task`
 
@@ -535,6 +569,6 @@ See [Historical lessons and assessments](#historical-lessons-and-assessments) fo
  **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`                                                                                                            |
  **List**   | `list-students`                                                                                                                                                                |
  **Help**   | `help`                                                                                                                                                                |
- **Add reminder** | `add-reminder r/REMINDER_TEXT`<br> e.g., `add-reminder r/Collect worksheets from cabinet B` |
+ **Add reminder** | `add-reminder r/REMINDER_TEXT [at/YYYY-MM-DD HH:mm]`<br> e.g., `add-reminder r/Call parent at/2026-10-30 18:00` |
  **List reminders** | `list-reminders` |
- **Delete reminder** | `delete-reminder INDEX`<br> e.g., `delete-reminder 2` |
+ **Delete reminder** | `delete-reminder ID`<br> e.g., `delete-reminder 7` |
