@@ -48,6 +48,7 @@ AddressBookParser ..> AddContactCommandParser : <<create>>
 AddressBookParser ..> AddReminderCommandParser : <<create>>
 AddressBookParser ..> ScheduleStudentCommandParser : <<create>>
 AddressBookParser ..> HistoryCommandParser : <<create>>
+AddressBookParser ..> Command
 
 AddContactCommandParser .up.|> Parser
 AddReminderCommandParser .up.|> Parser
@@ -77,5 +78,5 @@ Command .[hidden]up.> Storage
 Command .right.> Model
 Logic ..> CommandResult
 LogicManager .down.> CommandResult
-Command .up.> CommandResult : <<create>>
+Command .up.> CommandResult
 @enduml
