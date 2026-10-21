@@ -5,6 +5,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -16,6 +17,8 @@ import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
+import seedu.address.model.statistics.AssessmentRecord;
+import seedu.address.model.statistics.LessonRecord;
 import seedu.address.storage.SnapshotManager;
 
 /**
@@ -56,6 +59,11 @@ public class ModelManager implements Model {
 
     public ModelManager() {
         this(new AddressBook(), new UserPrefs());
+    }
+
+    @Override
+    public void setHistory(List<LessonRecord> lessons, List<AssessmentRecord> assessments) {
+        addressBook.setHistory(lessons, assessments);
     }
 
     //=========== UserPrefs ==================================================================================

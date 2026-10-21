@@ -192,12 +192,14 @@ public class AddressBookTest {
     @Test
     public void removeScheduledSession_existingSession_removesOnlyOneCopy() {
         AddressBook book = getTypicalAddressBookWithSchedule();
-        book.addScheduledSession(ALICE_MONDAY_MORNING);
+        ScheduledSession duplicate = new ScheduledSession(ALICE, ALICE_MONDAY_MORNING.getDay(),
+                ALICE_MONDAY_MORNING.getTimeSlot());
+        book.addScheduledSession(duplicate);
 
         book.removeScheduledSession(ALICE_MONDAY_MORNING);
 
         // the first copy is removed, so the remaining copy is last
-        assertEquals(List.of(ALICE_WEDNESDAY, BENSON_MONDAY_OVERLAP, ALICE_MONDAY_MORNING),
+        assertEquals(List.of(ALICE_WEDNESDAY, BENSON_MONDAY_OVERLAP, duplicate),
                 book.getScheduleList());
     }
 

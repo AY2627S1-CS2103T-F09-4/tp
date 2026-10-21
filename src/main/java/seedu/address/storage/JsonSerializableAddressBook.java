@@ -17,6 +17,8 @@ import seedu.address.model.person.ParentContact;
 import seedu.address.model.person.Person;
 import seedu.address.model.reminder.Reminder;
 import seedu.address.model.schedule.ScheduledSession;
+import seedu.address.model.statistics.AssessmentRecord;
+import seedu.address.model.statistics.LessonRecord;
 
 /**
  * An Immutable AddressBook that is serializable to JSON format.
@@ -31,6 +33,10 @@ class JsonSerializableAddressBook {
     private final List<JsonAdaptedScheduledSession> schedule = new ArrayList<>();
     private final List<JsonAdaptedReminder> reminders = new ArrayList<>();
     private final Integer nextReminderId;
+    @JsonProperty("lessonRecords")
+    private List<JsonAdaptedLessonRecord> lessonRecords = new ArrayList<>();
+    @JsonProperty("assessmentRecords")
+    private List<JsonAdaptedAssessmentRecord> assessmentRecords = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonSerializableAddressBook} with the given persons.
@@ -76,6 +82,8 @@ class JsonSerializableAddressBook {
             schedule.add(new JsonAdaptedScheduledSession(session, source.getPersonList()));
         }
         reminders.addAll(source.getReminderList().stream().map(JsonAdaptedReminder::new).toList());
+        lessonRecords.addAll(source.getLessonRecords().stream().map(JsonAdaptedLessonRecord::new).toList());
+        assessmentRecords.addAll(source.getAssessmentRecords().stream().map(JsonAdaptedAssessmentRecord::new).toList());
     }
 
     /**
@@ -90,7 +98,11 @@ class JsonSerializableAddressBook {
             if (addressBook.hasPerson(person)) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_PERSON);
             }
-            addressBook.addPerson(person);
+            try {
+                addressBook.addPerson(person);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalValueException(e.getMessage());
+            }
         }
         for (JsonAdaptedParentContact adapted : parentContacts) {
             ParentContact contact = adapted.toModelType();
@@ -100,7 +112,11 @@ class JsonSerializableAddressBook {
             addressBook.addParentContact(contact);
         }
         for (JsonAdaptedScheduledSession adapted : schedule) {
-            addressBook.addScheduledSession(adapted.toModelType(addressBook.getPersonList()));
+            try {
+                addressBook.addScheduledSession(adapted.toModelType(addressBook.getPersonList()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalValueException(e.getMessage());
+            }
         }
         List<Reminder> loadedReminders = loadReminders();
         int minimumNextId = loadedReminders.stream().mapToInt(Reminder::getId).max().orElse(0) + 1;
@@ -109,6 +125,28 @@ class JsonSerializableAddressBook {
             throw new IllegalValueException("Next reminder ID must be positive and exceed every reminder ID.");
         }
         addressBook.setReminderData(loadedReminders, resolvedNextId);
+        List<LessonRecord> lessons = new ArrayList<>();
+        List<AssessmentRecord> assessments = new ArrayList<>();
+        if (lessonRecords == null || assessmentRecords == null) {
+            throw new IllegalValueException("History collections must be arrays, not null.");
+        }
+        for (JsonAdaptedLessonRecord record : lessonRecords) {
+            if (record == null) {
+                throw new IllegalValueException("Lesson history cannot contain null entries.");
+            }
+            lessons.add(record.toModelType());
+        }
+        for (JsonAdaptedAssessmentRecord record : assessmentRecords) {
+            if (record == null) {
+                throw new IllegalValueException("Assessment history cannot contain null entries.");
+            }
+            assessments.add(record.toModelType());
+        }
+        try {
+            addressBook.setHistory(lessons, assessments);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalValueException(e.getMessage());
+        }
         return addressBook;
     }
 

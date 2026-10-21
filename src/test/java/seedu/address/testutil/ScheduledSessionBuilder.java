@@ -1,6 +1,7 @@
 package seedu.address.testutil;
 
 import java.time.DayOfWeek;
+import java.util.UUID;
 
 import seedu.address.model.person.Person;
 import seedu.address.model.schedule.ScheduledSession;
@@ -16,6 +17,7 @@ public class ScheduledSessionBuilder {
     public static final String DEFAULT_TO = "12-00";
 
     private Person student;
+    private String sessionId = UUID.randomUUID().toString();
     private DayOfWeek day;
     private TimeSlot timeSlot;
 
@@ -32,6 +34,7 @@ public class ScheduledSessionBuilder {
      * Initializes the builder with the data of {@code sessionToCopy}.
      */
     public ScheduledSessionBuilder(ScheduledSession sessionToCopy) {
+        sessionId = sessionToCopy.getSessionId();
         student = sessionToCopy.getStudent();
         day = sessionToCopy.getDay();
         timeSlot = sessionToCopy.getTimeSlot();
@@ -62,6 +65,6 @@ public class ScheduledSessionBuilder {
     }
 
     public ScheduledSession build() {
-        return new ScheduledSession(student, day, timeSlot);
+        return new ScheduledSession(sessionId, student, day, timeSlot);
     }
 }

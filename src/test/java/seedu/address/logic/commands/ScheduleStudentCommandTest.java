@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
-import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
@@ -40,16 +38,16 @@ public class ScheduleStudentCommandTest {
     }
 
     @Test
-    public void execute_validIndex_addsSession() {
+    public void execute_validIndex_addsSession() throws Exception {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         ScheduleStudentCommand command = new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY, MORNING);
 
-        Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
-        expectedModel.addScheduledSession(new ScheduledSession(student, DayOfWeek.MONDAY, MORNING));
         String expectedMessage = "Scheduled " + student.getName() + " on Monday from 10-00 to 12-00";
 
-        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+        assertEquals(expectedMessage, command.execute(model).getFeedbackToUser());
         assertEquals(1, model.getScheduleList().size());
+        assertTrue(model.getScheduleList().getFirst().isSameSlot(
+                new ScheduledSession(student, DayOfWeek.MONDAY, MORNING)));
     }
 
     @Test
@@ -63,17 +61,17 @@ public class ScheduleStudentCommandTest {
     }
 
     @Test
-    public void execute_filteredList_usesDisplayedIndex() {
+    public void execute_filteredList_usesDisplayedIndex() throws Exception {
         showPersonAtIndex(model, INDEX_SECOND_PERSON);
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         ScheduleStudentCommand command = new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.FRIDAY, MORNING);
 
-        Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
-        showPersonAtIndex(expectedModel, INDEX_SECOND_PERSON);
-        expectedModel.addScheduledSession(new ScheduledSession(student, DayOfWeek.FRIDAY, MORNING));
         String expectedMessage = "Scheduled " + student.getName() + " on Friday from 10-00 to 12-00";
 
-        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+        assertEquals(expectedMessage, command.execute(model).getFeedbackToUser());
+        assertEquals(1, model.getScheduleList().size());
+        assertTrue(model.getScheduleList().getFirst().isSameSlot(
+                new ScheduledSession(student, DayOfWeek.FRIDAY, MORNING)));
     }
 
     @Test
