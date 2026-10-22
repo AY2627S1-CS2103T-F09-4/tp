@@ -80,8 +80,7 @@ public class AddressBookParser {
                 yield new ListScheduleCommand();
             }
             case MarkAttendanceCommand.COMMAND_WORD -> new MarkAttendanceCommandParser().parse(arguments);
-            case "record-lesson", "record-assessment", "edit-lesson", "edit-assessment", "delete-lesson",
-                    "delete-assessment", "list-lessons", "list-assessments" ->
+            case "record-assessment", "edit-assessment", "delete-assessment", "list-lessons", "list-assessments" ->
                 new HistoryCommandParser(commandWord).parse(arguments);
             case "stats" -> new StatsCommandParser(false).parse(arguments);
             case "stats-student" -> new StatsCommandParser(true).parse(arguments);

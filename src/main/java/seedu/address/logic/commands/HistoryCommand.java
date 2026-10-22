@@ -2,7 +2,6 @@ package seedu.address.logic.commands;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,20 +14,17 @@ import seedu.address.model.Model;
 import seedu.address.model.person.Person;
 import seedu.address.model.statistics.AssessmentRecord;
 import seedu.address.model.statistics.LessonRecord;
-import seedu.address.model.statistics.LessonRecord.Outcome;
 
 /** Uses displayed record numbers while retaining stable identities inside historical entries. */
 public class HistoryCommand extends Command {
     private final String operation;
     private final Index target;
-    private final LessonDetails lesson;
     private final AssessmentDetails assessment;
 
-    /** Creates an operation with a displayed student or historical record number and its details. */
-    public HistoryCommand(String operation, Index target, LessonDetails lesson, AssessmentDetails assessment) {
+    /** Creates an operation with a displayed student or assessment record number and its details. */
+    public HistoryCommand(String operation, Index target, AssessmentDetails assessment) {
         this.operation = operation;
         this.target = target;
-        this.lesson = lesson;
         this.assessment = assessment;
     }
 
@@ -45,41 +41,17 @@ public class HistoryCommand extends Command {
             return new CommandResult(list(model, lessons, assessments));
         }
         try {
-            LocalDate date = lesson != null ? lesson.date() : assessment != null ? assessment.date() : null;
+            LocalDate date = assessment != null ? assessment.date() : null;
             if (date != null && date.isAfter(LocalDate.now(model.getClock()))) {
                 throw new IllegalArgumentException("Historical record dates cannot be in the future.");
             }
             String feedback;
-            if (operation.equals("record-lesson") || operation.equals("record-assessment")) {
+            if (operation.equals("record-assessment")) {
                 Person student = resolveStudent(model, target);
                 String changedId = UUID.randomUUID().toString();
-                if (lesson != null) {
-                    lessons.add(lesson.record(changedId, student.getStudentId(), student.getName().fullName,
-                            student.getSubject().value));
-                    feedback = "Recorded lesson #" + lessons.size() + ": " + student.getName() + " | " + date
-                            + " | " + lesson.outcome().name().toLowerCase(Locale.ROOT);
-                } else {
-                    assessments.add(assessment.record(changedId, student.getStudentId(), student.getName().fullName));
-                    feedback = "Recorded assessment #" + assessments.size() + ": " + student.getName() + " | " + date
-                            + " | " + assessment.title();
-                }
-            } else if (operation.endsWith("lesson")) {
-                LessonRecord old = resolveRecord(lessons, target, "lesson", "list-lessons");
-                if (operation.equals("delete-lesson")) {
-                    lessons.remove(old);
-                } else {
-                    if (old.sourceSessionId() != null && !old.date().equals(lesson.date())) {
-                        throw new IllegalArgumentException("A scheduled lesson's date cannot be changed. "
-                                + "Delete it and record the correct date instead.");
-                    }
-                    lessons.set(lessons.indexOf(old), new LessonRecord(old.id(), old.studentId(), old.studentName(),
-                            lesson.subject(), old.sourceSessionId() == null ? lesson.date() : old.date(),
-                            lesson.start(), lesson.end(), lesson.outcome(), old.sourceSessionId()));
-                }
-                feedback = (operation.equals("delete-lesson") ? "Deleted" : "Updated") + " lesson #"
-                        + target.getOneBased() + ": " + studentLabel(model, old.studentId(), old.studentName())
-                        + " | " + (lesson == null ? old.date() : lesson.date()) + " | "
-                        + (lesson == null ? old.outcome() : lesson.outcome()).name().toLowerCase(Locale.ROOT);
+                assessments.add(assessment.record(changedId, student.getStudentId(), student.getName().fullName));
+                feedback = "Recorded assessment #" + assessments.size() + ": " + student.getName() + " | " + date
+                        + " | " + assessment.title();
             } else {
                 AssessmentRecord old = resolveRecord(assessments, target, "assessment", "list-assessments");
                 if (operation.equals("delete-assessment")) {
@@ -150,15 +122,6 @@ public class HistoryCommand extends Command {
         return model.getAddressBook().getPersonList().stream().filter(p -> p.getStudentId().equals(id))
                 .map(p -> p.getName().fullName).findFirst()
                 .orElse(recordedName + " (deleted)");
-    }
-
-    /** Validated lesson arguments; new lessons capture the student's current subject. */
-    public record LessonDetails(LocalDate date, LocalTime start, LocalTime end, Outcome outcome, String subject) {
-        /** Creates a source record using the current or retained identity. */
-        public LessonRecord record(String id, String studentId, String name, String fallbackSubject) {
-            return new LessonRecord(id, studentId, name, subject == null ? fallbackSubject : subject,
-                    date, start, end, outcome);
-        }
     }
 
     /** Validated assessment arguments shared by recording and correction. */

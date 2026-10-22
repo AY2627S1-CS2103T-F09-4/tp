@@ -30,7 +30,7 @@ import seedu.address.testutil.PersonBuilder;
 
 public class StatisticsIntegrationTest {
     private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-10-21T00:00:00Z"), ZoneId.of("Asia/Singapore"));
-    private static final String LESSON = "record-lesson 1 date/2026-10-21 from/10:00 to/11:30 status/completed";
+    private static final String LESSON = "mark-attendance 1 date/2026-10-21 status/completed";
     private static final String ASSESSMENT = "record-assessment 1 date/2026-10-21 subject/Math"
             + " category/Quiz title/Test score/8 max/10";
 
@@ -42,7 +42,7 @@ public class StatisticsIntegrationTest {
     private JsonAddressBookStorage storage;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         SnapshotManager.reset();
         AddressBook book = new AddressBook();
         book.addPerson(new PersonBuilder().build());
@@ -51,12 +51,15 @@ public class StatisticsIntegrationTest {
         storage = new JsonAddressBookStorage(temporaryFolder.resolve("addressbook.json"));
         logic = new LogicManager(model, new StorageManager(storage,
                 new JsonUserPrefsStorage(temporaryFolder.resolve("preferences.json"))));
+        logic.execute("schedule-student 1 day/wednesday from/10-00 to/11-30");
+        logic.execute("schedule-student 2 day/wednesday from/10-00 to/11-30");
     }
 
     @Test
     public void reports_defaultYearThroughTodayAndExplicitInclusiveBoundaries() throws Exception {
         logic.execute(LESSON.replace("2026-10-21", "2025-12-31"));
-        logic.execute(LESSON.replace("2026-10-21", "2026-01-01"));
+        logic.execute("schedule-student 1 day/thursday from/10-00 to/11-30");
+        logic.execute("mark-attendance 3 date/2026-01-01 status/completed");
         logic.execute(LESSON);
         String current = feedback("stats");
         assertTrue(current.contains("2026-01-01 to 2026-10-21"));
@@ -70,7 +73,7 @@ public class StatisticsIntegrationTest {
         logic.execute(LESSON);
         Person bob = model.getPersonList().get(1);
         model.updateFilteredPersonList(p -> p.getStudentId().equals(bob.getStudentId()));
-        logic.execute(LESSON);
+        logic.execute(LESSON.replace("attendance 1", "attendance 2"));
         logic.execute(ASSESSMENT);
         assertEquals(bob.getStudentId(), model.getAddressBook().getLessonRecords().getLast().studentId());
         assertEquals(bob.getStudentId(), model.getAddressBook().getAssessmentRecords().getFirst().studentId());
@@ -78,7 +81,7 @@ public class StatisticsIntegrationTest {
         assertTrue(feedback("stats").contains(
                 "Completed lessons: 2; teaching hours: 3.00; distinct students taught: 2"));
         assertThrows(CommandException.class, () -> logic.execute("stats-student 2"));
-        assertThrows(CommandException.class, () -> logic.execute(LESSON.replace("lesson 1", "lesson 2")));
+        assertThrows(CommandException.class, () -> logic.execute(LESSON.replace("attendance 1", "attendance 3")));
         assertEquals(1, model.getFilteredPersonList().size());
     }
 
@@ -142,29 +145,22 @@ public class StatisticsIntegrationTest {
     }
 
     @Test
-    public void correctionsAndDeletes_preserveRecordIdentity_andAreUndoableEvenForDeletedStudents() throws Exception {
+    public void assessmentCorrectionsAndDeletes_areUndoableEvenForDeletedStudents() throws Exception {
         logic.execute(LESSON);
         logic.execute(ASSESSMENT);
-        String lessonId = model.getAddressBook().getLessonRecords().getFirst().id();
         String assessmentId = model.getAddressBook().getAssessmentRecords().getFirst().id();
         logic.execute("delete-student 1");
-        logic.execute("edit-lesson 1"
-                + " date/2026-01-01 from/09:00 to/10:00 status/absent subject/English");
         logic.execute("edit-assessment 1"
                 + " date/2026-01-01 subject/English category/Exam title/Corrected score/9 max/10");
-        assertEquals(lessonId, model.getAddressBook().getLessonRecords().getFirst().id());
         assertEquals(assessmentId, model.getAddressBook().getAssessmentRecords().getFirst().id());
-        assertTrue(feedback("list-lessons").contains("absent"));
-        logic.execute("delete-lesson 1");
         logic.execute("delete-assessment 1");
-        assertTrue(model.getAddressBook().getLessonRecords().isEmpty());
         assertTrue(model.getAddressBook().getAssessmentRecords().isEmpty());
+        assertEquals(1, model.getAddressBook().getLessonRecords().size());
         logic.execute("undo");
-        logic.execute("undo");
-        assertEquals(lessonId, model.getAddressBook().getLessonRecords().getFirst().id());
         assertTrue(feedback("list-assessments").contains("Corrected"));
+        assertEquals(assessmentId, model.getAddressBook().getAssessmentRecords().getFirst().id());
         logic.execute("redo");
-        assertTrue(model.getAddressBook().getLessonRecords().isEmpty());
+        assertTrue(model.getAddressBook().getAssessmentRecords().isEmpty());
     }
 
     @Test
@@ -174,7 +170,7 @@ public class StatisticsIntegrationTest {
         assertThrows(CommandException.class, () -> logic.execute(LESSON.replace("2026-10-21", "2026-10-22")));
         assertThrows(CommandException.class, () -> logic.execute(ASSESSMENT.replace("2026-10-21", "2026-10-22")));
         assertThrows(CommandException.class, () ->
-                logic.execute("delete-lesson 1"));
+                logic.execute("delete-assessment 1"));
         assertTrue(model.getAddressBook().getLessonRecords().isEmpty());
         assertTrue(SnapshotManager.canRedo());
         logic.execute("redo");
@@ -197,7 +193,7 @@ public class StatisticsIntegrationTest {
     @Test
     public void historicalNumbers_useWholeCollectionsAndRenumberWithoutChangingIdentities() throws Exception {
         logic.execute(LESSON);
-        logic.execute(LESSON.replace("lesson 1", "lesson 2"));
+        logic.execute(LESSON.replace("attendance 1", "attendance 2"));
         logic.execute(ASSESSMENT);
         logic.execute(ASSESSMENT.replace("assessment 1", "assessment 2"));
         String secondLessonId = model.getAddressBook().getLessonRecords().getLast().id();
@@ -205,15 +201,14 @@ public class StatisticsIntegrationTest {
         model.updateFilteredPersonList(p -> false);
         assertTrue(feedback("list-lessons").contains("2. Bob"));
         assertTrue(feedback("list-assessments").contains("2. Bob"));
-        logic.execute("edit-lesson 2 date/2026-10-20 from/09:00 to/10:00 status/absent subject/Math");
+        logic.execute(LESSON.replace("attendance 1", "attendance 2").replace("completed", "absent"));
         logic.execute("edit-assessment 2 date/2026-10-20 subject/Math category/Quiz title/Updated score/5 max/10");
         assertEquals(secondLessonId, model.getAddressBook().getLessonRecords().getLast().id());
         assertEquals(secondAssessmentId, model.getAddressBook().getAssessmentRecords().getLast().id());
-        logic.execute("delete-lesson 1");
         logic.execute("delete-assessment 1");
-        assertTrue(feedback("list-lessons").contains("1. Bob"));
+        assertTrue(feedback("list-lessons").contains("2. Bob"));
         assertTrue(feedback("list-assessments").contains("1. Bob"));
-        assertEquals(secondLessonId, model.getAddressBook().getLessonRecords().getFirst().id());
+        assertEquals(secondLessonId, model.getAddressBook().getLessonRecords().getLast().id());
         assertEquals(secondAssessmentId, model.getAddressBook().getAssessmentRecords().getFirst().id());
         logic.execute("undo");
         assertTrue(feedback("list-assessments").contains("2. Bob"));
@@ -230,14 +225,13 @@ public class StatisticsIntegrationTest {
         assertFalse(feedback("list-lessons").matches(uuidPattern));
         assertFalse(feedback("list-assessments").matches(uuidPattern));
         assertFalse(feedback("stats-student 1").matches(uuidPattern));
-        assertFalse(feedback("edit-lesson 1 date/2026-10-21 from/10:00 to/11:00 status/absent subject/Math")
+        assertFalse(feedback(LESSON.replace("completed", "absent"))
                 .matches(uuidPattern));
         assertFalse(feedback("edit-assessment 1 date/2026-10-21 subject/Math category/Quiz title/Test score/5 max/10")
                 .matches(uuidPattern));
         logic.execute("delete-student 1");
         assertTrue(feedback("list-lessons").contains("Amy Bee (deleted)"));
         assertFalse(feedback("list-lessons").matches(uuidPattern));
-        assertFalse(feedback("delete-lesson 1").matches(uuidPattern));
         assertFalse(feedback("delete-assessment 1").matches(uuidPattern));
     }
 
@@ -245,10 +239,7 @@ public class StatisticsIntegrationTest {
     public void historicalNumbers_outOfRangeLeaveDataAndRedoUnchanged() throws Exception {
         logic.execute(LESSON);
         logic.execute("undo");
-        assertThrows(CommandException.class, () -> logic.execute("delete-lesson 1"));
         assertThrows(CommandException.class, () -> logic.execute("delete-assessment 1"));
-        assertThrows(CommandException.class, () -> logic.execute(
-                "edit-lesson 1 date/2026-10-21 from/10:00 to/11:00 status/absent subject/Math"));
         assertThrows(CommandException.class, () -> logic.execute(
                 "edit-assessment 1 date/2026-10-21 subject/Math category/Quiz title/Test score/5 max/10"));
         assertTrue(SnapshotManager.canRedo());

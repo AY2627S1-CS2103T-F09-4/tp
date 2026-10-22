@@ -261,10 +261,11 @@ effective start/end dates, any matching weekday on or before today can be record
 
 `LessonRecord.sourceSessionId` is optional. First marking snapshots the student UUID/name, current subject and times
 into a new dated lesson. Subsequent marking finds the same `(sourceSessionId, date)` and updates only its outcome,
-preserving the historical UUID and details, including manual time/subject corrections. `AddressBook.setHistory`
+preserving the historical UUID and captured details. `AddressBook.setHistory`
 rejects duplicate linked occurrences and student mismatches against active templates, while allowing retained links
-to removed templates. `edit-lesson` retains the source ID and rejects date changes for linked history; tutors delete
-and re-record mistaken dates. Manual records remain unlinked and are never inferred or merged automatically.
+to removed templates. `mark-attendance` is the sole command for creating or updating dated lessons;
+`list-lessons` provides read-only history. Legacy manual records remain unlinked and are never inferred or merged
+automatically. There are no commands for editing lesson details or deleting individual lessons.
 
 JSON adapters store `sessionId` and `sourceSessionId`. Missing session IDs migrate to UUIDs on loading and persist on
 the next save; missing source links remain null. Malformed IDs, duplicate template IDs and duplicate linked occurrences
