@@ -72,15 +72,16 @@ The **API** of this component is specified in [`Ui.java`](https://github.com/AY2
 
 ![Structure of the UI Component](images/UiClassDiagram.png)
 
-The UI consists of a `MainWindow` that is made up of parts such as `CommandBox`, `ResultDisplay`, `StatusBarFooter` and an optional `HelpWindow`. The main area of the window has three tabs, each shown by its own panel: `PersonListPanel` (Students), `ParentListPanel` (Parents) and `SchedulePanel` (Schedule). Each panel creates one card for every item it displays:
+The UI consists of a `MainWindow` that is made up of parts such as `CommandBox`, `ResultDisplay`, `StatusBarFooter` and an optional `HelpWindow`. The main area of the window has four tabs, each shown by its own panel: `PersonListPanel` (Students), `ParentListPanel` (Parents), `SchedulePanel` (Schedule) and `CommandListPanel` (Commands). Each panel creates one card for every item it displays:
 
 * `PersonListPanel` creates a `PersonCard` for each student.
 * `ParentListPanel` creates a `ParentContactCard` for each parent contact.
 * `SchedulePanel` uses a `ScheduleGrid` to arrange a `ScheduleSessionCard` for each scheduled session.
+* `CommandListPanel` creates a `CommandCard` for each `CommandSummary` in `HelpCommand.COMMAND_SUMMARIES`.
 
 `MainWindow` also owns a `ReminderAlertScheduler`, which regularly checks whether any reminder has become due, and may show a `ReminderDialog` listing the reminders. `MainWindow`, its parts, the panels, `PersonCard` and `ParentContactCard` inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts. `ScheduleGrid`, `ScheduleSessionCard`, `ReminderDialog` and `ReminderAlertScheduler` do not extend `UiPart`.
 
-The `UI` component uses the JavaFX UI framework. The layouts of the `UiPart`s are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F09-4/tp/blob/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F09-4/tp/blob/master/src/main/java/seedu/address/ui/MainWindow.java), including its three tabs. The contents of the timetable in `SchedulePanel` are laid out in code by `ScheduleGrid`.
+The `UI` component uses the JavaFX UI framework. The layouts of the `UiPart`s are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F09-4/tp/blob/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F09-4/tp/blob/master/src/main/java/seedu/address/ui/MainWindow.java), including its four tabs. The contents of the timetable in `SchedulePanel` are laid out in code by `ScheduleGrid`.
 
 The `UI` component,
 
@@ -97,6 +98,15 @@ The `UI` component,
 * Cards snap to a 30-minute grid. A session whose times fall between grid lines is rounded outwards, so the card always covers the full session. Sessions that overlap on the same day are placed in separate lanes, which makes that day's row taller.
 * Each student is given a colour based on their position in the student list, so all of a student's sessions share one colour. The legend lists the scheduled students and their colours.
 * Each card shows the student's index in the displayed student list, name, subject, grade level, address and time slot. If a student is not in the displayed list, for example after a `find` command, the card shows only the name.
+
+#### Commands tab
+
+`CommandListPanel` lists every command in the app, so users can look up a command without leaving the main window.
+
+* The list comes from `HelpCommand.COMMAND_SUMMARIES`. Each `CommandSummary` holds a command word, its parameter format and a short description. When adding a new command, add a `CommandSummary` for it there so that it shows up in the list.
+* The list is read-only. `CommandListPanel` wraps it in an unmodifiable `ObservableList` so the `ListView` cannot change it.
+* Executing `help` returns a `CommandResult` with `isShowHelp()` set, and `MainWindow` then switches to the Commands tab instead of opening a separate window.
+* The banner above the list points users to `F1` for the full user guide. `F1` is the accelerator of the **F1 User Guide** menu item, which opens `HelpWindow` with the user guide URL and a button to copy it. The panel does not open a browser itself, so it does not depend on `java.awt.Desktop` or the system clipboard.
 
 ### Logic component
 
