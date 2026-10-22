@@ -23,7 +23,7 @@ Tutoria is a **desktop application for managing students under a tutor, optimize
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
    ![Ui](images/Ui.png)
 
-5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
+5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to see a list of all commands.<br>
    Some example commands you can try:
 
     * `list-students` : Lists all students.
@@ -66,11 +66,13 @@ Tutoria is a **desktop application for managing students under a tutor, optimize
 
 ### Viewing help: `help`
 
-Shows a message explaining how to access the help page.
-
-![help message](images/helpMessage.png)
+Shows every command in Tutoria, along with its format and what it does.
 
 Format: `help`
+
+* The list of commands is shown in the **Commands** tab, which `help` switches to.
+* Parameters in square brackets (e.g. `[t/TAG]`) are optional, and `...` means the parameter can be used multiple times.
+* For full details and examples of each command, open the **user guide** link at the top of the list, or refer to the command's section in this guide. To reach the link from the command box, press `Tab` three times, then press `Enter` or `Space` to open it.
 
 ### Adding a student: `add-student`
 
