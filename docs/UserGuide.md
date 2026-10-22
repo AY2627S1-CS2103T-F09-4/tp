@@ -439,21 +439,6 @@ The command opens the Schedule tab and confirms the student's name, date, times,
   removes the first matching slot, as before.
 * Attendance updates support undo/redo. `list-schedule` is read-only and preserves redo history.
 
-#### Recording additional lessons: `record-lesson`
-
-Format: `record-lesson INDEX date/YYYY-MM-DD from/HH:mm to/HH:mm status/STATUS`
-
-Example: `record-lesson 1 date/2026-10-01 from/10:00 to/11:30 status/completed`
-
-* Status is `completed`, `absent`, `cancelled`, or `unrecorded` (case-insensitive).
-* `unrecorded` explicitly means the outcome is unknown; a weekly session is never counted as unrecorded automatically.
-* The subject is copied from the student's subject at recording time. Later student edits do not rewrite history.
-* Dates must exist and cannot be after today. Times use 24-hour `HH:mm`; start must be before end on the same day.
-  Overnight lessons are unsupported. Today's records are allowed regardless of the current time.
-* The success message contains the lesson number. Each invocation creates a separate record: check for duplicates yourself.
-* Use this for extra or replacement lessons outside the timetable. Manual records are not automatically linked or
-  merged with attendance records, so avoid recording the same lesson both ways.
-
 #### Recording assessment marks: `record-assessment`
 
 Format: `record-assessment INDEX date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX`
@@ -471,27 +456,24 @@ word ending in `/`, which is reserved for command argument prefixes.
 * `list-assessments` lists all dated assessments, including the assessment number, student name, date, subject,
   category, title and raw marks.
 * Lists include all dates and students, regardless of search filters, in recording order. They take no arguments.
-* Use the number from the appropriate list when correcting or deleting an entry. Corrections replace all editable
-  fields and preserve the internal identity and student link; they also work after the student has been deleted.
+* Use the assessment number from `list-assessments` when correcting or deleting an assessment.
+  Corrections replace all editable fields and preserve the internal identity and student link; they also work after the student has been deleted.
 
 Correction formats:
 
 ```
-edit-lesson LESSON_NUMBER date/YYYY-MM-DD from/HH:mm to/HH:mm status/STATUS subject/SUBJECT
 edit-assessment ASSESSMENT_NUMBER date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX
-delete-lesson LESSON_NUMBER
 delete-assessment ASSESSMENT_NUMBER
 ```
 
-For example, to correct the third lesson shown by `list-lessons`, run
-`edit-lesson 3 date/2026-10-01 from/10:00 to/11:30 status/absent subject/Mathematics`.
 `delete-assessment 2` deletes the second item from `list-assessments`, independently of lesson or student numbers.
 Only positive integer numbers are accepted, not internal UUIDs.
-If an entry belongs to the wrong student, delete it and record it again using the correct displayed student index.
-Lessons created by `mark-attendance` remain linked internally to their weekly session. `edit-lesson` can correct the
-subject, times or status, but its date must stay the same. To change the date, delete the mistaken record, then mark
-attendance for the correct date (or use `record-lesson` for an extra lesson outside the weekly slot).
-Recording, correction and deletion support `undo` and `redo`.
+If an assessment belongs to the wrong student, delete it and record it again using the correct displayed student index.
+To correct a lesson's status, run `mark-attendance` again with the same session number and date.
+Lesson dates, times and subjects cannot be edited, and individual lesson records cannot be deleted.
+Use `undo` to reverse an accidental attendance marking while it is still available in undo history.
+Older manually recorded lessons remain visible in history and contribute to statistics.
+Recording attendance and recording, correcting or deleting assessments support `undo` and `redo`.
 
 Deleting a student preserves their history. Lists show their retained name with a `(deleted)` label.
 Recreating a student with the same name creates a new identity and does not inherit old history.
@@ -583,8 +565,8 @@ Furthermore, certain edits can cause the  to behave in unexpected ways (e.g., if
 
 ## Command summary
 
-Statistics commands: `record-lesson`, `record-assessment`, `list-lessons`, `list-assessments`, `edit-lesson`,
-`edit-assessment`, `delete-lesson`, `delete-assessment`, `stats`, and `stats-student`.
+Statistics commands: `record-assessment`, `list-lessons`, `list-assessments`, `edit-assessment`,
+`delete-assessment`, `stats`, and `stats-student`.
 Scheduled attendance: `list-schedule` and `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/STATUS`.
 See [Historical lessons and assessments](#historical-lessons-and-assessments) for syntax and examples.
 

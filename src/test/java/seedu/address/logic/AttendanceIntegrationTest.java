@@ -11,8 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,16 +99,13 @@ public class AttendanceIntegrationTest {
         mark(1, "2026-10-19", "completed");
         logic.execute("edit 1 n/New Name s/English");
         assertEquals(sessionId, model.getScheduleList().getFirst().getSessionId());
-        logic.execute("edit-lesson 1"
-                + " date/2026-10-19 from/09:00 to/10:00 status/absent subject/Science");
+        mark(1, "2026-10-19", "absent");
         mark(1, "2026-10-19", "completed");
         LessonRecord updated = model.getAddressBook().getLessonRecords().getFirst();
-        assertEquals("Science", updated.subject());
-        assertEquals("09:00", updated.start().toString());
+        assertEquals("Mathematics", updated.subject());
+        assertEquals("10:00", updated.start().toString());
         assertEquals("Amy Bee", updated.studentName());
         assertEquals(sessionId, updated.sourceSessionId());
-        assertThrows(CommandException.class, () -> logic.execute("edit-lesson 1"
-                + " date/2026-10-12 from/09:00 to/10:00 status/absent subject/Science"));
         mark(1, "2026-10-12", "completed");
         assertEquals("English", model.getAddressBook().getLessonRecords().getLast().subject());
     }
@@ -192,15 +192,38 @@ public class AttendanceIntegrationTest {
     }
 
     @Test
-    public void manualRecordsStayUnlinked_andDeletionAllowsRerecordingLinkedOccurrence() throws Exception {
-        logic.execute("record-lesson 1 date/2026-10-19 from/10:00 to/11:30 status/completed");
+    public void legacyManualRecords_remainUnlinkedAcrossMarkingAndReload() throws Exception {
+        LessonRecord legacy = new LessonRecord(UUID.randomUUID().toString(),
+                model.getPersonList().getFirst().getStudentId(), "Amy Bee", "Mathematics",
+                LocalDate.of(2026, 10, 19), LocalTime.of(10, 0), LocalTime.of(11, 30), Outcome.COMPLETED);
+        model.setHistory(List.of(legacy), List.of());
         mark(1, "2026-10-19", "completed");
+        mark(1, "2026-10-19", "absent");
         assertEquals(2, model.getAddressBook().getLessonRecords().size());
+        assertEquals(legacy, model.getAddressBook().getLessonRecords().getFirst());
         assertNull(model.getAddressBook().getLessonRecords().getFirst().sourceSessionId());
-        String oldId = model.getAddressBook().getLessonRecords().getLast().id();
-        logic.execute("delete-lesson 2");
+        assertTrue(feedback("stats").contains("Completed lessons: 1"));
+        assertTrue(feedback("list-lessons").contains("2. Amy Bee"));
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
+    }
+
+    @Test
+    public void removedLessonCommands_preserveDataAndRedo() throws Exception {
         mark(1, "2026-10-19", "completed");
-        assertNotEquals(oldId, model.getAddressBook().getLessonRecords().getLast().id());
+        mark(1, "2026-10-19", "absent");
+        logic.execute("undo");
+        AddressBook before = new AddressBook(model.getAddressBook());
+        String saved = Files.readString(storage.getAddressBookFilePath());
+        for (String command : List.of("record-lesson 1 date/2026-10-19 from/10:00 to/11:30 status/completed",
+                "edit-lesson 1 date/2026-10-19 from/09:00 to/10:00 status/absent subject/Science",
+                "delete-lesson 1")) {
+            assertThrows(ParseException.class, () -> logic.execute(command));
+            assertEquals(before, model.getAddressBook());
+            assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
+            assertTrue(SnapshotManager.canRedo());
+        }
+        logic.execute("redo");
+        assertEquals(Outcome.ABSENT, model.getAddressBook().getLessonRecords().getFirst().outcome());
     }
 
     @Test

@@ -1,10 +1,12 @@
 package seedu.address.logic.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.StatsCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -27,16 +29,13 @@ public class StatisticsParserTest {
     }
 
     @Test
-    public void lesson_rejectsInvalidDateTimeStatusAndPrefixes() throws Exception {
-        String valid = "record-lesson 1 date/2026-10-01 from/10:00 to/11:00 status/completed";
-        parser.parseCommand(valid);
-        String[] invalid = {valid.replace("2026-10-01", "2026-02-29"), valid.replace("10:00", "24:00"),
-            valid.replace("10:00", "10-00"), valid.replace("10:00", "11:00"),
-            valid.replace("11:00", "09:00"), valid.replace("completed", "present"),
-            valid.replace("date/2026-10-01 ", ""), valid + " status/absent", valid + " typo/value",
-            valid + " subject/Math", valid.replace("lesson 1", "lesson 0")};
-        for (String input : invalid) {
-            assertThrows(ParseException.class, () -> parser.parseCommand(input), input);
+    public void manualLessonCommands_areUnknown() {
+        for (String command : new String[]{"record-lesson", "edit-lesson", "delete-lesson"}) {
+            for (String arguments : new String[]{"", " 1", " 1 date/2026-10-19 status/completed"}) {
+                ParseException error = assertThrows(
+                        ParseException.class, () -> parser.parseCommand(command + arguments));
+                assertEquals(Messages.MESSAGE_UNKNOWN_COMMAND, error.getMessage());
+            }
         }
     }
 
@@ -57,11 +56,8 @@ public class StatisticsParserTest {
     @Test
     public void correctionDeletionAndLists_useRecordNumbersAndExactArguments() throws Exception {
         String id = "1";
-        parser.parseCommand("edit-lesson " + id
-                + " date/2026-10-01 from/10:00 to/11:00 status/absent subject/Math");
         parser.parseCommand("edit-assessment " + id
                 + " date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10");
-        parser.parseCommand("delete-lesson " + id);
         parser.parseCommand("delete-assessment " + id);
         for (String input : new String[]{"list-lessons", "list-assessments"}) {
             Command command = parser.parseCommand(input);
@@ -69,14 +65,13 @@ public class StatisticsParserTest {
             assertThrows(ParseException.class, () -> parser.parseCommand(input + " 1"));
         }
         assertThrows(ParseException.class, () ->
-                parser.parseCommand("delete-lesson 00000000-0000-0000-0000-000000000001"));
+                parser.parseCommand("delete-assessment 00000000-0000-0000-0000-000000000001"));
         assertThrows(ParseException.class, () -> parser.parseCommand("delete-assessment " + id + " extra"));
     }
 
     @Test
     public void numberedCommands_rejectNonpositiveNonnumericOverflowAndUuidTargets() {
-        String[] suffixes = {"delete-lesson %s", "delete-assessment %s",
-            "edit-lesson %s date/2026-10-01 from/10:00 to/11:00 status/absent subject/Math",
+        String[] suffixes = {"delete-assessment %s",
             "edit-assessment %s date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10",
             "mark-attendance %s date/2026-10-19 status/completed"};
         for (String suffix : suffixes) {
