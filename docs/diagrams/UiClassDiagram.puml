@@ -18,10 +18,12 @@ Class ReminderAlertScheduler
 Class PersonListPanel
 Class ParentListPanel
 Class SchedulePanel
+Class CommandListPanel
 Class PersonCard
 Class ParentContactCard
 Class ScheduleGrid
 Class ScheduleSessionCard
+Class CommandCard
 }
 
 package Logic <<Rectangle>> {
@@ -47,11 +49,13 @@ MainWindow *-down-> "1" ReminderAlertScheduler
 MainWindow *-down-> "1" PersonListPanel
 MainWindow *-down-> "1" ParentListPanel
 MainWindow *-down-> "1" SchedulePanel
+MainWindow *-down-> "1" CommandListPanel
 
 PersonListPanel -down-> "*" PersonCard
 ParentListPanel -down-> "*" ParentContactCard
 SchedulePanel -down-> "1" ScheduleGrid
 ScheduleGrid -down-> "*" ScheduleSessionCard
+CommandListPanel -down-> "*" CommandCard
 
 MainWindow -left-|> UiPart
 CommandBox --|> UiPart
@@ -61,8 +65,10 @@ HelpWindow --|> UiPart
 PersonListPanel --|> UiPart
 ParentListPanel --|> UiPart
 SchedulePanel --|> UiPart
+CommandListPanel --|> UiPart
 PersonCard --|> UiPart
 ParentContactCard --|> UiPart
+CommandCard --|> UiPart
 
 ReminderDialog .right.> Model
 ReminderAlertScheduler .right.> Model
@@ -81,6 +87,7 @@ ReminderDialog -[hidden]right- ReminderAlertScheduler
 ReminderAlertScheduler -[hidden]right- PersonListPanel
 PersonListPanel -[hidden]right- ParentListPanel
 ParentListPanel -[hidden]right- SchedulePanel
+SchedulePanel -[hidden]right- CommandListPanel
 Logic -[hidden]down- Model
 
 MainWindow -[hidden]-|> UiPart

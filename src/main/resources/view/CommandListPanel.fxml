@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
@@ -12,8 +11,7 @@
     <padding>
       <Insets top="5" right="10" bottom="5" left="15" />
     </padding>
-    <Label text="For more details on each command, visit the" style="-fx-text-fill: white;" />
-    <Hyperlink fx:id="userGuideLink" text="user guide" onAction="#openUserGuide" />
+    <Label text="For more details on each command, access the user guide using F1." style="-fx-text-fill: white;" />
   </HBox>
   <ListView fx:id="commandListView" VBox.vgrow="ALWAYS" />
 </VBox>

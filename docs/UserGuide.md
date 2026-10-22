@@ -72,7 +72,7 @@ Format: `help`
 
 * The list of commands is shown in the **Commands** tab, which `help` switches to.
 * Parameters in square brackets (e.g. `[t/TAG]`) are optional, and `...` means the parameter can be used multiple times.
-* For full details and examples of each command, open the **user guide** link at the top of the list, or refer to the command's section in this guide. To reach the link from the command box, press `Tab` three times, then press `Enter` or `Space` to open it.
+* For full details and examples of each command, press `F1` (or use the **F1 User Guide** menu) to open a window with the link to this user guide, or refer to the command's section in this guide.
 
 ---
 ### Adding a student: `add-student`
@@ -559,7 +559,7 @@ Furthermore, certain edits can cause the  to behave in unexpected ways (e.g., if
 ## Known issues
 
 1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
-2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
+2. **If you minimize the Help Window** and then press `F1` (or use the `F1 User Guide` menu) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
 
 --------------------------------------------------------------------------------------------------------------------
 
