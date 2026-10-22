@@ -126,7 +126,7 @@ public class CommandListPanel extends UiPart<Region> {
         return Optional.of(Desktop.getDesktop()::browse);
     }
 
-    private static void copyToSystemClipboard(String text) {
+    static void copyToSystemClipboard(String text) {
         final ClipboardContent content = new ClipboardContent();
         content.putString(text);
         Clipboard.getSystemClipboard().setContent(content);
@@ -135,7 +135,7 @@ public class CommandListPanel extends UiPart<Region> {
     /**
      * Runs {@code task} on a new thread, as {@code Desktop#browse} can block the JavaFX Application Thread.
      */
-    private static void launchInBackground(Runnable task) {
+    static void launchInBackground(Runnable task) {
         Thread browserThread = new Thread(task);
         // Prevents a slow browser launch from keeping the app open after it exits
         browserThread.setDaemon(true);

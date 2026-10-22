@@ -13,7 +13,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.Clipboard;
 import seedu.address.logic.commands.CommandSummary;
 import seedu.address.logic.commands.HelpCommand;
 
@@ -140,6 +144,42 @@ public class CommandListPanelTest {
 
         assertEquals(List.of(HelpWindow.USERGUIDE_URL), copiedTexts);
         assertEquals(CommandListPanel.LINK_COPIED_TEXT, userGuideLink(panel).getText());
+    }
+
+    @Test
+    public void copyToSystemClipboard_text_putsTextOnClipboard() throws Exception {
+        // Restores the clipboard afterwards so running the tests does not overwrite what the developer copied
+        String originalContent = FxTestSupport.runOnFxThread(() -> Clipboard.getSystemClipboard().getString());
+        try {
+            String copied = FxTestSupport.runOnFxThread(() -> {
+                CommandListPanel.copyToSystemClipboard(HelpWindow.USERGUIDE_URL);
+                return Clipboard.getSystemClipboard().getString();
+            });
+
+            assertEquals(HelpWindow.USERGUIDE_URL, copied);
+        } finally {
+            FxTestSupport.runOnFxThread(() -> {
+                if (originalContent != null) {
+                    CommandListPanel.copyToSystemClipboard(originalContent);
+                }
+            });
+        }
+    }
+
+    @Test
+    public void launchInBackground_task_runsTaskOnDaemonThread() throws Exception {
+        Thread testThread = Thread.currentThread();
+        AtomicReference<Thread> taskThread = new AtomicReference<>();
+        CountDownLatch taskRun = new CountDownLatch(1);
+
+        CommandListPanel.launchInBackground(() -> {
+            taskThread.set(Thread.currentThread());
+            taskRun.countDown();
+        });
+
+        assertTrue(taskRun.await(10, TimeUnit.SECONDS), "Task was not run");
+        assertNotEquals(testThread, taskThread.get());
+        assertTrue(taskThread.get().isDaemon());
     }
 
     private static CommandListPanel createPanel(List<CommandSummary> commandSummaries) throws Exception {
