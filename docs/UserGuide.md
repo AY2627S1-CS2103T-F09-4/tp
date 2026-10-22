@@ -70,10 +70,9 @@ Shows every command in Tutoria, along with its format and what it does.
 
 Format: `help`
 
-* The list of commands is shown in the **Commands** tab, which `help` switches to. You can also open the tab at any time by clicking it.
+* The list of commands is shown in the **Commands** tab, which `help` switches to.
 * Parameters in square brackets (e.g. `[t/TAG]`) are optional, and `...` means the parameter can be used multiple times.
-* For full details and examples of each command, click the **user guide** link at the top of the list, or refer to the command's section in this guide.
-* To open the help window with a link to this user guide instead, use the `Help` menu or press `F1`.
+* For full details and examples of each command, open the **user guide** link at the top of the list, or refer to the command's section in this guide. To reach the link from the command box, press `Tab` three times, then press `Enter` or `Space` to open it.
 
 ### Adding a student: `add-student`
 
