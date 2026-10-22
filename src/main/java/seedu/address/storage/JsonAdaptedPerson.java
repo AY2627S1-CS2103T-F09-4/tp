@@ -30,6 +30,8 @@ class JsonAdaptedPerson {
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Person's %s field is missing!";
 
     private final String name;
+    @JsonProperty("studentId")
+    private String studentId;
     private final String phone;
     private final String email;
     private final String address;
@@ -84,6 +86,7 @@ class JsonAdaptedPerson {
      * Converts a given {@code Person} into this class for Jackson use.
      */
     public JsonAdaptedPerson(Person source) {
+        studentId = source.getStudentId();
         name = source.getName().fullName;
         phone = source.getPhone().value;
         email = source.getEmail().value;
@@ -169,8 +172,13 @@ class JsonAdaptedPerson {
                 : new PhotoPath(photoPath);
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSubject, modelGradeLevel,
+        Person person = new Person(modelName, modelPhone, modelEmail, modelAddress, modelSubject, modelGradeLevel,
             modelPhotoPath, new TaskList(personTasks), modelTags);
+        try {
+            return studentId == null ? person : person.withStudentId(studentId);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalValueException("Student ID must be a UUID.");
+        }
     }
 
 }

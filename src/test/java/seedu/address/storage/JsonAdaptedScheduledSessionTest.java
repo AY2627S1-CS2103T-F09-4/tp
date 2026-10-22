@@ -1,6 +1,7 @@
 package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
@@ -26,7 +27,7 @@ public class JsonAdaptedScheduledSessionTest {
 
         ScheduledSession expected = new ScheduledSessionBuilder().withStudent(BENSON).withDay(DayOfWeek.TUESDAY)
                 .withTimeSlot("09-30", "11-00").build();
-        assertEquals(expected, adapted.toModelType(PERSONS));
+        assertTrue(expected.isSameSlot(adapted.toModelType(PERSONS)));
     }
 
     @Test

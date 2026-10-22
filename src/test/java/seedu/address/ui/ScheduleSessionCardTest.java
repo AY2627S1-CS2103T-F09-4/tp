@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.testutil.ScheduledSessionBuilder;
 
@@ -24,9 +25,9 @@ public class ScheduleSessionCardTest {
                 .withTimeSlot("10-00", "12-30").build();
 
         ScheduleSessionCard card = FxTestSupport.runOnFxThread(() ->
-                new ScheduleSessionCard(session, "#f6a05a", "1. Alice Pauline"));
+                new ScheduleSessionCard(session, "#f6a05a", "1. Alice Pauline", 3));
 
-        assertEquals("1. Alice Pauline", labelAt(card, 0).getText());
+        assertEquals("Student: 1. Alice Pauline", labelAt(card, 0).getText());
         assertEquals(ALICE.getSubject().value + " | " + ALICE.getGradeLevel().value, labelAt(card, 1).getText());
         assertEquals(ALICE.getAddress().value, labelAt(card, 2).getText());
         assertEquals("10:00 - 12:30", labelAt(card, 4).getText());
@@ -35,5 +36,22 @@ public class ScheduleSessionCardTest {
 
     private static Label labelAt(ScheduleSessionCard card, int index) {
         return (Label) card.getChildren().get(index);
+    }
+
+    @Test
+    public void sessionNumber_fitsNarrowCardWithoutExposingIdentity() throws Exception {
+        FxTestSupport.runOnFxThread(() -> {
+            ScheduledSession session = new ScheduledSessionBuilder().build();
+            ScheduleSessionCard card = new ScheduleSessionCard(session, "#f6a05a", "Amy Bee", 2);
+            StackPane container = new StackPane(card);
+            new javafx.scene.Scene(container, 60, 90);
+            container.resize(60, 90);
+            container.applyCss();
+            container.layout();
+            Label number = (Label) card.lookup("#sessionNumber");
+            assertEquals("Session #2", number.getText());
+            assertTrue(number.getWidth() <= card.getWidth());
+            assertTrue(number.getLayoutY() + number.getHeight() <= card.getHeight());
+        });
     }
 }

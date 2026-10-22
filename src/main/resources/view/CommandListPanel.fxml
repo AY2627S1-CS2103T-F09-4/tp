@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <HBox alignment="CENTER_LEFT" style="-fx-background-color: #383838;">
+    <padding>
+      <Insets top="5" right="10" bottom="5" left="15" />
+    </padding>
+    <Label text="For more details on each command, visit the" style="-fx-text-fill: white;" />
+    <Hyperlink fx:id="userGuideLink" text="user guide" onAction="#openUserGuide" />
+  </HBox>
+  <ListView fx:id="commandListView" VBox.vgrow="ALWAYS" />
+</VBox>

@@ -11,20 +11,20 @@ import seedu.address.model.schedule.ScheduledSession;
 
 /**
  * A coloured card showing a scheduled student's name, subject, grade level and address,
- * with the time slot at the bottom right. Sized to fit within a 30-minute card.
+ * with its time slot and displayed session number. Sized to fit within a 30-minute card.
  */
 class ScheduleSessionCard extends VBox {
 
     private static final String TEXT_STYLE = "-fx-font-size: 10px; -fx-text-fill: #1d1d1d;";
 
-    ScheduleSessionCard(ScheduledSession session, String colour, String title) {
+    ScheduleSessionCard(ScheduledSession session, String colour, String title, int number) {
         Person student = session.getStudent();
         setPadding(new Insets(2, 4, 2, 4));
         setSpacing(0);
         setStyle("-fx-background-color: " + colour + "; -fx-border-color: #1d1d1d; -fx-border-width: 1;");
         setMinSize(0, 0);
 
-        Label name = createLabel(title, TEXT_STYLE + " -fx-font-weight: bold;");
+        Label name = createLabel("Student: " + title, TEXT_STYLE + " -fx-font-weight: bold;");
         Label subjectAndGrade = createLabel(student.getSubject().value + " | " + student.getGradeLevel().value,
                 TEXT_STYLE);
         Label address = createLabel(student.getAddress().value, TEXT_STYLE);
@@ -37,6 +37,10 @@ class ScheduleSessionCard extends VBox {
         time.setAlignment(Pos.BOTTOM_RIGHT);
 
         getChildren().addAll(name, subjectAndGrade, address, spacer, time);
+
+        Label sessionNumber = createLabel("Session #" + number, TEXT_STYLE + " -fx-font-weight: bold;");
+        sessionNumber.setId("sessionNumber");
+        getChildren().add(sessionNumber);
     }
 
     private static Label createLabel(String text, String style) {

@@ -40,7 +40,7 @@ public class ScheduleTest {
     @Test
     public void add_identicalSessionTwice_bothKept() {
         schedule.add(ALICE_MONDAY_MORNING);
-        schedule.add(ALICE_MONDAY_MORNING);
+        schedule.add(new ScheduledSession(ALICE, ALICE_MONDAY_MORNING.getDay(), ALICE_MONDAY_MORNING.getTimeSlot()));
         assertEquals(2, schedule.asUnmodifiableObservableList().size());
     }
 
@@ -78,11 +78,13 @@ public class ScheduleTest {
 
     @Test
     public void remove_duplicateSessions_removesOnlyOne() {
+        ScheduledSession duplicate = new ScheduledSession(ALICE, ALICE_MONDAY_MORNING.getDay(),
+                ALICE_MONDAY_MORNING.getTimeSlot());
         schedule.add(ALICE_MONDAY_MORNING);
-        schedule.add(ALICE_MONDAY_MORNING);
+        schedule.add(duplicate);
 
         assertTrue(schedule.remove(ALICE_MONDAY_MORNING));
-        assertEquals(List.of(ALICE_MONDAY_MORNING), schedule.asUnmodifiableObservableList());
+        assertEquals(List.of(duplicate), schedule.asUnmodifiableObservableList());
     }
 
     @Test
