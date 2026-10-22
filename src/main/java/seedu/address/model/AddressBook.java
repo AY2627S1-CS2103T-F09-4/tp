@@ -15,6 +15,8 @@ import seedu.address.model.reminder.Reminder;
 import seedu.address.model.reminder.ReminderList;
 import seedu.address.model.schedule.Schedule;
 import seedu.address.model.schedule.ScheduledSession;
+import seedu.address.model.statistics.AssessmentRecord;
+import seedu.address.model.statistics.LessonRecord;
 
 /**
  * Wraps all data at the address-book level.
@@ -27,6 +29,8 @@ public class AddressBook implements ReadOnlyAddressBook {
     private final Schedule schedule = new Schedule();
     private ReminderList reminders = new ReminderList();
     private int nextReminderId = 1;
+    private List<LessonRecord> lessons = List.of();
+    private List<AssessmentRecord> assessments = List.of();
 
     public AddressBook() {}
 
@@ -59,6 +63,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         schedule.setSessions(newData.getScheduleList());
         reminders = new ReminderList(newData.getReminderList());
         nextReminderId = newData.getNextReminderId();
+        setHistory(newData.getLessonRecords(), newData.getAssessmentRecords());
     }
 
     //// person-level operations
@@ -76,6 +81,9 @@ public class AddressBook implements ReadOnlyAddressBook {
      * The person must not already exist in the address book.
      */
     public void addPerson(Person p) {
+        if (getPersonList().stream().anyMatch(person -> person.getStudentId().equals(p.getStudentId()))) {
+            throw new IllegalArgumentException("Student IDs must be unique.");
+        }
         persons.add(p);
     }
 
@@ -87,9 +95,10 @@ public class AddressBook implements ReadOnlyAddressBook {
     public void setPerson(Person target, Person editedPerson) {
         requireNonNull(editedPerson);
 
-        persons.setPerson(target, editedPerson);
+        Person identifiedPerson = editedPerson.withStudentId(target.getStudentId());
+        persons.setPerson(target, identifiedPerson);
         List<ScheduledSession> updated = schedule.asUnmodifiableObservableList().stream()
-                .map(s -> s.getStudent().equals(target) ? s.withStudent(editedPerson) : s)
+                .map(s -> s.getStudent().equals(target) ? s.withStudent(identifiedPerson) : s)
                 .toList();
         schedule.setSessions(updated);
     }
@@ -214,6 +223,7 @@ public class AddressBook implements ReadOnlyAddressBook {
             copy.addReminder(reminder.copy());
         }
         copy.nextReminderId = nextReminderId;
+        copy.setHistory(lessons, assessments);
 
         return copy;
     }
@@ -253,6 +263,37 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public List<LessonRecord> getLessonRecords() {
+        return lessons;
+    }
+
+    @Override
+    public List<AssessmentRecord> getAssessmentRecords() {
+        return assessments;
+    }
+
+    /** Replaces source history atomically; immutable records are safe to share between snapshots. */
+    public void setHistory(List<LessonRecord> lessons, List<AssessmentRecord> assessments) {
+        List<LessonRecord> newLessons = List.copyOf(lessons);
+        List<AssessmentRecord> newAssessments = List.copyOf(assessments);
+        if (newLessons.stream().map(LessonRecord::id).distinct().count() != newLessons.size()
+                || newAssessments.stream().map(AssessmentRecord::id).distinct().count() != newAssessments.size()) {
+            throw new IllegalArgumentException("Historical record IDs must be unique within each collection.");
+        }
+        List<LessonRecord> linked = newLessons.stream().filter(r -> r.sourceSessionId() != null).toList();
+        if (linked.stream().map(r -> r.sourceSessionId() + "/" + r.date()).distinct().count() != linked.size()) {
+            throw new IllegalArgumentException("Only one linked lesson is allowed per scheduled session and date.");
+        }
+        if (linked.stream().anyMatch(r -> getScheduleList().stream().anyMatch(s ->
+                s.getSessionId().equals(r.sourceSessionId())
+                    && !s.getStudent().getStudentId().equals(r.studentId())))) {
+            throw new IllegalArgumentException("Linked lesson must belong to the scheduled session's student.");
+        }
+        this.lessons = newLessons;
+        this.assessments = newAssessments;
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -267,11 +308,13 @@ public class AddressBook implements ReadOnlyAddressBook {
                 && parentContacts.equals(otherAddressBook.parentContacts)
                 && schedule.equals(otherAddressBook.schedule)
                 && reminders.equals(otherAddressBook.reminders)
-                && nextReminderId == otherAddressBook.nextReminderId;
+                && nextReminderId == otherAddressBook.nextReminderId
+                && lessons.equals(otherAddressBook.lessons)
+                && assessments.equals(otherAddressBook.assessments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persons, parentContacts, schedule, reminders, nextReminderId);
+        return Objects.hash(persons, parentContacts, schedule, reminders, nextReminderId, lessons, assessments);
     }
 }

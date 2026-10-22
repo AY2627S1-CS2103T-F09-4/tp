@@ -139,6 +139,21 @@ public class ScheduleGridTest {
         return new ScheduledSessionBuilder().withStudent(student).withDay(day).withTimeSlot(from, to).build();
     }
 
+    @Test
+    public void sessionNumbers_followListOrderDespiteTimetableSorting() throws Exception {
+        ScheduledSession friday = session(ALICE, DayOfWeek.FRIDAY, "10-00", "11-00");
+        ScheduledSession mondayLate = session(ALICE, DayOfWeek.MONDAY, "14-00", "15-00");
+        ScheduledSession mondayEarly = session(BENSON, DayOfWeek.MONDAY, "10-00", "11-00");
+        ScheduleGrid grid = layoutGrid(List.of(friday, mondayLate, mondayEarly));
+        List<Region> cards = cards(grid);
+        assertEquals("Session #3", ((Label) cards.get(0).lookup("#sessionNumber")).getText());
+        assertEquals("Session #2", ((Label) cards.get(1).lookup("#sessionNumber")).getText());
+        assertEquals("Session #1", ((Label) cards.get(2).lookup("#sessionNumber")).getText());
+        FxTestSupport.runOnFxThread(() -> grid.setSessions(List.of(friday, mondayLate),
+                student -> "#f6a05a", student -> student.getName().fullName));
+        assertEquals("Session #2", ((Label) cards(grid).get(0).lookup("#sessionNumber")).getText());
+    }
+
     private static ScheduleGrid layoutGrid(List<ScheduledSession> sessions) throws Exception {
         return FxTestSupport.runOnFxThread(() -> {
             ScheduleGrid grid = new ScheduleGrid();

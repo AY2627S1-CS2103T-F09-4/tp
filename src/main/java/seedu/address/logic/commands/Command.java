@@ -8,6 +8,11 @@ import seedu.address.model.Model;
  */
 public abstract class Command {
 
+    /** Whether execution may change persistent data or create an undo snapshot. */
+    public boolean isReadOnly() {
+        return false;
+    }
+
     /**
      * Executes the command and returns the result message.
      *

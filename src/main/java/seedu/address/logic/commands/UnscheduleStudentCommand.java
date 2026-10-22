@@ -57,10 +57,11 @@ public class UnscheduleStudentCommand extends Command {
         }
 
         Person student = lastShownList.get(targetIndex.getZeroBased());
-        ScheduledSession session = new ScheduledSession(student, day, timeSlot);
+        ScheduledSession slot = new ScheduledSession(student, day, timeSlot);
         String dayName = day.name().charAt(0) + day.name().substring(1).toLowerCase(Locale.ROOT);
 
-        if (!model.hasScheduledSession(session)) {
+        ScheduledSession session = model.getScheduleList().stream().filter(slot::isSameSlot).findFirst().orElse(null);
+        if (session == null) {
             throw new CommandException(String.format(MESSAGE_SESSION_NOT_FOUND,
                     student.getName(), dayName, timeSlot.getStartString(), timeSlot.getEndString()));
         }

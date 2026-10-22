@@ -9,20 +9,27 @@ Class "<<interface>>\nUi" as Ui
 Class "{abstract}\nUiPart" as UiPart
 Class UiManager
 Class MainWindow
-Class HelpWindow
-Class ResultDisplay
-Class PersonListPanel
-Class PersonCard
-Class StatusBarFooter
 Class CommandBox
-}
-
-package Model <<Rectangle>> {
-Class HiddenModel #FFFFFF
+Class ResultDisplay
+Class StatusBarFooter
+Class HelpWindow
+Class ReminderDialog
+Class ReminderAlertScheduler
+Class PersonListPanel
+Class ParentListPanel
+Class SchedulePanel
+Class PersonCard
+Class ParentContactCard
+Class ScheduleGrid
+Class ScheduleSessionCard
 }
 
 package Logic <<Rectangle>> {
 Class HiddenLogic #FFFFFF
+}
+
+package Model <<Rectangle>> {
+Class HiddenModel #FFFFFF
 }
 
 Class HiddenOutside #FFFFFF
@@ -30,31 +37,51 @@ HiddenOutside ..> Ui
 
 UiManager .left.|> Ui
 UiManager -down-> "1" MainWindow
-MainWindow *-down->  "1" CommandBox
+
+MainWindow *-down-> "1" CommandBox
 MainWindow *-down-> "1" ResultDisplay
-MainWindow *-down-> "1" PersonListPanel
 MainWindow *-down-> "1" StatusBarFooter
 MainWindow --> "0..1" HelpWindow
+MainWindow --> "0..1" ReminderDialog
+MainWindow *-down-> "1" ReminderAlertScheduler
+MainWindow *-down-> "1" PersonListPanel
+MainWindow *-down-> "1" ParentListPanel
+MainWindow *-down-> "1" SchedulePanel
 
 PersonListPanel -down-> "*" PersonCard
+ParentListPanel -down-> "*" ParentContactCard
+SchedulePanel -down-> "1" ScheduleGrid
+ScheduleGrid -down-> "*" ScheduleSessionCard
 
 MainWindow -left-|> UiPart
-
-ResultDisplay --|> UiPart
 CommandBox --|> UiPart
-PersonListPanel --|> UiPart
-PersonCard --|> UiPart
+ResultDisplay --|> UiPart
 StatusBarFooter --|> UiPart
 HelpWindow --|> UiPart
+PersonListPanel --|> UiPart
+ParentListPanel --|> UiPart
+SchedulePanel --|> UiPart
+PersonCard --|> UiPart
+ParentContactCard --|> UiPart
 
-PersonCard ..> Model
+ReminderDialog .right.> Model
+ReminderAlertScheduler .right.> Model
+PersonCard .right.> Model
+ParentContactCard .right.> Model
+ScheduleSessionCard .right.> Model
+
 UiManager -right-> Logic
-MainWindow -left-> Logic
+MainWindow -right-> Logic
 
-PersonListPanel -[hidden]left- HelpWindow
-HelpWindow -[hidden]left- CommandBox
-CommandBox -[hidden]left- ResultDisplay
-ResultDisplay -[hidden]left- StatusBarFooter
+CommandBox -[hidden]right- ResultDisplay
+ResultDisplay -[hidden]right- StatusBarFooter
+StatusBarFooter -[hidden]right- HelpWindow
+HelpWindow -[hidden]right- ReminderDialog
+ReminderDialog -[hidden]right- ReminderAlertScheduler
+ReminderAlertScheduler -[hidden]right- PersonListPanel
+PersonListPanel -[hidden]right- ParentListPanel
+ParentListPanel -[hidden]right- SchedulePanel
+Logic -[hidden]down- Model
 
 MainWindow -[hidden]-|> UiPart
 @enduml
