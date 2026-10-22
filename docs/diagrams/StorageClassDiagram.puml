@@ -18,8 +18,18 @@ Class JsonAddressBookStorage
 Class JsonSerializableAddressBook
 Class JsonAdaptedPerson
 Class JsonAdaptedTag
+Class JsonAdaptedTask
+Class JsonAdaptedParentContact
+Class JsonAdaptedScheduledSession
+Class JsonAdaptedReminder
 }
 
+Class SnapshotManager
+
+}
+
+package Model <<Rectangle>> {
+Class HiddenModel #FFFFFF
 }
 
 Class HiddenOutside #FFFFFF
@@ -31,6 +41,14 @@ StorageManager -down-> "1" JsonAddressBookStorage
 
 JsonAddressBookStorage ..> JsonSerializableAddressBook
 JsonSerializableAddressBook --> "*" JsonAdaptedPerson
+JsonSerializableAddressBook --> "*" JsonAdaptedParentContact
+JsonSerializableAddressBook --> "*" JsonAdaptedScheduledSession
+JsonSerializableAddressBook --> "*" JsonAdaptedReminder
 JsonAdaptedPerson --> "*" JsonAdaptedTag
+JsonAdaptedPerson --> "*" JsonAdaptedTask
+
+Storage .right.> Model
+SnapshotManager ..> Model
+Model ..> SnapshotManager
 
 @enduml
