@@ -1,5 +1,7 @@
 package seedu.address.ui;
 
+import static java.util.Objects.requireNonNull;
+
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -73,6 +75,7 @@ public class PersonCard extends UiPart<Region> {
     public PersonCard(Person person, int displayedIndex, String keyword) {
         super(FXML);
         this.keyword = keyword == null ? "" : keyword;
+        requireNonNull(person);
 
         PersonAttributesTextIndexFinder finder =
                 new PersonAttributesTextIndexFinder(person, this.keyword);
@@ -86,47 +89,26 @@ public class PersonCard extends UiPart<Region> {
     }
 
     private void setAttributes(Person person, PersonAttributesTextIndexFinder finder) {
-        name.getChildren().setAll(
-                createHighlightedText(
-                        person.getName().fullName,
-                        finder.getNameIndex()).getChildren());
+        setHighlightedText(name, person.getName().fullName, finder.getNameIndex());
+        setHighlightedText(phone, person.getPhone().value, finder.getPhoneIndex());
+        setHighlightedText(address, person.getAddress().value, finder.getAddressIndex());
+        setHighlightedText(email, person.getEmail().value, finder.getEmailIndex());
+        setHighlightedText(subject, person.getSubject().value, finder.getSubjectIndex());
+        setHighlightedTextForGradeLevel(person, finder);
+        setHighlightedTextForTasks(person, finder);
+        setHighlightedTextForTags(person, finder);
+    }
 
-        phone.getChildren().setAll(
-                createHighlightedText(
-                        person.getPhone().value,
-                        finder.getPhoneIndex()).getChildren());
-
-        address.getChildren().setAll(
-                createHighlightedText(
-                        person.getAddress().value,
-                        finder.getAddressIndex()).getChildren());
-
-        email.getChildren().setAll(
-                createHighlightedText(
-                        person.getEmail().value,
-                        finder.getEmailIndex()).getChildren());
-
-        subject.getChildren().setAll(
-                createHighlightedText(
-                        person.getSubject().value,
-                        finder.getSubjectIndex()).getChildren());
-
+    private void setHighlightedTextForGradeLevel(Person person, PersonAttributesTextIndexFinder finder) {
         gradeLevel.setVisible(person.getGradeLevel().isPresent());
         gradeLevel.setManaged(person.getGradeLevel().isPresent());
 
         if (person.getGradeLevel().isPresent()) {
-            gradeLevel.getChildren().setAll(
-                    createHighlightedText(
-                            person.getGradeLevel().value,
-                            finder.getGradeLevelIndex()).getChildren());
+            setHighlightedText(gradeLevel, person.getGradeLevel().value, finder.getGradeLevelIndex());
         }
+    }
 
-        for (int i = 0; i < person.getTaskList().getTasks().size(); i++) {
-            Task task = person.getTaskList().getTasks().get(i);
-
-            tasks.getChildren().add(
-                    createTaskRow(i + 1, task, finder.getTaskIndex(i)));
-        }
+    private void setHighlightedTextForTags(Person person, PersonAttributesTextIndexFinder finder) {
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> {
@@ -135,6 +117,19 @@ public class PersonCard extends UiPart<Region> {
 
                     tags.getChildren().add(tagText);
                 });
+    }
+
+    private void setHighlightedTextForTasks(Person person, PersonAttributesTextIndexFinder finder) {
+        for (int i = 0; i < person.getTaskList().getTasks().size(); i++) {
+            Task task = person.getTaskList().getTasks().get(i);
+
+            tasks.getChildren().add(
+                    createTaskRow(i + 1, task, finder.getTaskIndex(i)));
+        }
+    }
+
+    private void setHighlightedText(TextFlow attribute, String text, List<MatchRange> ranges) {
+        attribute.getChildren().setAll(createHighlightedText(text, ranges).getChildren());
     }
 
     private HBox createTaskRow(int taskId, Task task, List<MatchRange> ranges) {
@@ -199,14 +194,17 @@ public class PersonCard extends UiPart<Region> {
 
         currentIndex = colorStartingAndMatchingText(text, ranges, currentIndex, textFlow);
 
-        // Ordinary text after the final match.
+        colorEndingText(text, currentIndex, textFlow);
+
+        return textFlow;
+    }
+
+    private static void colorEndingText(String text, int currentIndex, TextFlow textFlow) {
         if (currentIndex < text.length()) {
             Text normalText = new Text(text.substring(currentIndex));
             normalText.getStyleClass().add("normal-card-text");
             textFlow.getChildren().add(normalText);
         }
-
-        return textFlow;
     }
 
     private int colorStartingAndMatchingText(String text, List<MatchRange> ranges, int currentIndex,
@@ -220,7 +218,6 @@ public class PersonCard extends UiPart<Region> {
                 continue;
             }
 
-            // Ordinary text before the match.
             if (currentIndex < start) {
                 Text normalText =
                         new Text(text.substring(currentIndex, start));
@@ -229,7 +226,6 @@ public class PersonCard extends UiPart<Region> {
             }
 
             if (!keyword.isEmpty()) {
-                // Matching text.
                 Text match = new Text(text.substring(start, end));
                 match.getStyleClass().add("search-match");
                 textFlow.getChildren().add(match);

@@ -83,7 +83,7 @@ public class ParentContainsKeywordsPredicateTest {
                 new ParentContainsKeywordsPredicate(List.of("Alice Tan"));
 
         assertTrue(predicate.test(new ParentContactBuilder()
-                .withLinkedStudentId("Alice Tan|91234567")
+                .withLinkedStudentName("Alice Tan")
                 .build()));
     }
 
@@ -123,7 +123,7 @@ public class ParentContainsKeywordsPredicateTest {
                 .withName("Alice Tan")
                 .withPhone("91234567")
                 .withEmail("alice@email.com")
-                .withLinkedStudentId("Alice Tan|91234567")
+                .withLinkedStudentName("Alice Tan")
                 .withRequirements("Vegetarian", "No peanuts")
                 .build()));
     }

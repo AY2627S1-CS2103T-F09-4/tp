@@ -25,6 +25,7 @@ public class ParentContactBuilder {
     private Phone phone;
     private Email email;
     private String linkedStudentId;
+    private String linkedStudentName;
     private List<String> requirements;
     private PhotoPath photoPath;
 
@@ -37,6 +38,7 @@ public class ParentContactBuilder {
         phone = new Phone(DEFAULT_PHONE);
         email = new Email(DEFAULT_EMAIL);
         linkedStudentId = null;
+        linkedStudentName = null;
         requirements = new ArrayList<>();
         photoPath = PhotoPath.NONE;
     }
@@ -50,6 +52,7 @@ public class ParentContactBuilder {
         phone = contactToCopy.getPhone();
         email = contactToCopy.getEmail();
         linkedStudentId = contactToCopy.getLinkedStudentId();
+        linkedStudentName = contactToCopy.getLinkedStudentName();
         requirements = new ArrayList<>(contactToCopy.getRequirements());
         photoPath = contactToCopy.getPhotoPath();
     }
@@ -95,6 +98,14 @@ public class ParentContactBuilder {
     }
 
     /**
+     * Sets the linked student's name.
+     */
+    public ParentContactBuilder withLinkedStudentName(String linkedStudentName) {
+        this.linkedStudentName = linkedStudentName;
+        return this;
+    }
+
+    /**
      * Sets the requirements of the parent contact.
      */
     public ParentContactBuilder withRequirements(String... requirements) {
@@ -120,6 +131,7 @@ public class ParentContactBuilder {
                 phone,
                 email,
                 linkedStudentId,
+                linkedStudentName,
                 requirements,
                 photoPath);
     }

@@ -37,7 +37,8 @@ public class ParentAttributesTextIndexFinder {
     }
 
     public List<MatchRange> getLinkedStudentIndex(int padding) {
-        return textIndexFinder.findPaddedMatchRanges(contact.getLinkedStudentId(), keyword, padding);
+        assert padding > 0;
+        return textIndexFinder.findPaddedMatchRanges(contact.getLinkedStudentName(), keyword, padding);
     }
 
     public List<MatchRange> getRequirementsIndex(int padding) {

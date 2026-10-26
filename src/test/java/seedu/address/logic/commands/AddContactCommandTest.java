@@ -14,12 +14,13 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.ParentContact;
+import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddContactCommandTest {
     private static final ParentContact PARENT = new ParentContact(
-            new Name("Mary Tan"), new Phone("98765432"), new Email("mary@example.com"), null,
+            new Name("Mary Tan"), new Phone("98765432"), new Email("mary@example.com"), null, null,
             List.of("Prefers email"));
 
     @Test
@@ -42,7 +43,7 @@ public class AddContactCommandTest {
         ModelManager model = new ModelManager();
         model.addParentContact(PARENT);
         ParentContact sameIdentity = new ParentContact(new Name("mary tan"), PARENT.getPhone(),
-                new Email("different@example.com"), null, List.of());
+                new Email("different@example.com"), null, null, List.of());
 
         assertThrows(CommandException.class, AddContactCommand.MESSAGE_DUPLICATE_PARENT, () ->
                 new AddContactCommand(sameIdentity, null).execute(model));
@@ -58,11 +59,13 @@ public class AddContactCommandTest {
     @Test
     public void execute_linkedStudent_success() throws Exception {
         ModelManager model = new ModelManager();
-        model.addPerson(new PersonBuilder().withName("John Tan").withPhone("91234567").build());
+        Person student = new PersonBuilder().withName("John Tan").withPhone("91234567").build();
+        model.addPerson(student);
 
         new AddContactCommand(PARENT, Index.fromOneBased(1)).execute(model);
 
-        assertEquals("John Tan|91234567", model.getParentContactList().get(0).getLinkedStudentId());
+        assertEquals(student.getStudentId(), model.getParentContactList().get(0).getLinkedStudentId());
+        assertEquals(student.getName().fullName, model.getParentContactList().get(0).getLinkedStudentName());
     }
 
     @Test
@@ -72,7 +75,7 @@ public class AddContactCommandTest {
         new AddContactCommand(PARENT, Index.fromOneBased(1)).execute(model);
 
         ParentContact anotherParent = new ParentContact(new Name("Peter Tan"), new Phone("91234568"),
-                new Email("peter@example.com"), null, List.of());
+                new Email("peter@example.com"), null, null, List.of());
         assertThrows(CommandException.class, AddContactCommand.MESSAGE_STUDENT_ALREADY_LINKED, () ->
                 new AddContactCommand(anotherParent, Index.fromOneBased(1)).execute(model));
     }

@@ -42,7 +42,7 @@ public class PersonListPanel extends UiPart<Region> {
     public void selectStudent(String studentId) {
         for (int i = 0; i < personListView.getItems().size(); i++) {
             Person person = personListView.getItems().get(i);
-            String id = person.getName().fullName + "|" + person.getPhone().value;
+            String id = person.getStudentId();
             if (id.equals(studentId)) {
                 personListView.getSelectionModel().select(i);
                 personListView.scrollTo(i);

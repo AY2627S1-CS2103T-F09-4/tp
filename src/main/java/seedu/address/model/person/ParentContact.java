@@ -14,27 +14,29 @@ public class ParentContact {
     private final Phone phone;
     private final Email email;
     private final String linkedStudentId;
+    private final String linkedStudentName;
     private final List<String> requirements;
     private final PhotoPath photoPath;
 
     /**
      * Creates a new parent contact with a generated identifier.
      */
-    public ParentContact(Name name, Phone phone, Email email, String linkedStudentId,
+    public ParentContact(Name name, Phone phone, Email email, String linkedStudentId, String linkedStudentName,
             List<String> requirements) {
-        this(UUID.randomUUID().toString(), name, phone, email, linkedStudentId, requirements);
+        this(UUID.randomUUID().toString(), name, phone, email, linkedStudentId, linkedStudentName, requirements);
     }
 
     /**
      * Creates a parent contact with the given identifier.
      */
     public ParentContact(String id, Name name, Phone phone, Email email, String linkedStudentId,
-            List<String> requirements) {
+                         String linkedStudentName, List<String> requirements) {
         this.id = requireNonNull(id);
         this.name = requireNonNull(name);
         this.phone = requireNonNull(phone);
         this.email = email;
         this.linkedStudentId = linkedStudentId;
+        this.linkedStudentName = linkedStudentName;
         this.requirements = List.copyOf(requireNonNull(requirements));
         this.photoPath = PhotoPath.NONE;
     }
@@ -43,12 +45,13 @@ public class ParentContact {
      * Creates a parent contact with the given identifier and photo path.
      */
     public ParentContact(String id, Name name, Phone phone, Email email, String linkedStudentId,
-            List<String> requirements, PhotoPath photoPath) {
+                         String linkedStudentName, List<String> requirements, PhotoPath photoPath) {
         this.id = requireNonNull(id);
         this.name = requireNonNull(name);
         this.phone = requireNonNull(phone);
         this.email = email;
         this.linkedStudentId = linkedStudentId;
+        this.linkedStudentName = linkedStudentName;
         this.requirements = List.copyOf(requireNonNull(requirements));
         this.photoPath = requireNonNull(photoPath);
     }
@@ -68,6 +71,9 @@ public class ParentContact {
     public String getLinkedStudentId() {
         return linkedStudentId;
     }
+    public String getLinkedStudentName() {
+        return linkedStudentName;
+    }
     public List<String> getRequirements() {
         return Collections.unmodifiableList(requirements);
     }
@@ -78,7 +84,7 @@ public class ParentContact {
     /** Returns a copy of ParentContact by copying every attribute */
     public ParentContact copy() {
         ParentContact copy = new ParentContact(id, name.copy(), phone.copy(), email.copy(),
-                linkedStudentId, requirements, photoPath.copy());
+                linkedStudentId, linkedStudentName, requirements, photoPath.copy());
 
         return copy;
     }

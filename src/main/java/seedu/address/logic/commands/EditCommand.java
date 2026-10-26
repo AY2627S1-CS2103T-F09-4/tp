@@ -111,8 +111,8 @@ public class EditCommand extends Command {
         PhotoPath updatedPhotoPath = personToEdit.getPhotoPath();
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedSubject,
-            updatedGradeLevel, updatedPhotoPath, personToEdit.getTaskList(), updatedTags);
+        return new Person(personToEdit.getStudentId(), updatedName, updatedPhone, updatedEmail, updatedAddress,
+                updatedSubject, updatedGradeLevel, updatedPhotoPath, personToEdit.getTaskList(), updatedTags);
     }
 
     @Override

@@ -38,17 +38,19 @@ public class AddContactCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         String studentId = null;
+        String studentName = null;
         if (linkIndex != null) {
             List<Person> students = model.getFilteredPersonList();
             if (linkIndex.getZeroBased() >= students.size()) {
                 throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
             }
             Person student = students.get(linkIndex.getZeroBased());
-            studentId = student.getName().fullName + "|" + student.getPhone().value;
+            studentId = student.getStudentId();
+            studentName = student.getName().fullName;
         }
         ParentContact toAdd = new ParentContact(
                 contact.getId(), contact.getName(), contact.getPhone(), contact.getEmail(),
-                studentId, contact.getRequirements());
+                studentId, studentName, contact.getRequirements());
         if (model.hasParentContact(toAdd)) {
             throw new CommandException(MESSAGE_DUPLICATE_PARENT);
         }

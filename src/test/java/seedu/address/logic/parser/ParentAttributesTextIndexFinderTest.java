@@ -63,7 +63,7 @@ class ParentAttributesTextIndexFinderTest {
     @Test
     void getLinkedStudentIndex_keywordMatchesLinkedStudent_returnsPaddedRange() {
         ParentContact contact = new ParentContactBuilder()
-                .withLinkedStudentId("Alice Tan|91234567")
+                .withLinkedStudentName("Alice Tan")
                 .build();
 
         ParentAttributesTextIndexFinder finder =

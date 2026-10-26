@@ -2,8 +2,11 @@ package seedu.address.model.person;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.logic.LogicManager;
 import seedu.address.model.task.Task;
 
 /**
@@ -11,6 +14,8 @@ import seedu.address.model.task.Task;
  */
 public class PersonContainsKeywordsPredicate implements Predicate<Person> {
     private final List<String> keywords;
+    private final Logger logger = LogsCenter.getLogger(LogicManager.class);
+    private Person person;
 
     public PersonContainsKeywordsPredicate(List<String> keywords) {
         this.keywords = keywords;
@@ -23,6 +28,7 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
     }
 
     private boolean matchesPerson(Person person, String keyword) {
+        this.person = person;
         return containsIgnoreCase(person.getName().fullName, keyword)
                 || containsIgnoreCase(person.getPhone().value, keyword)
                 || containsIgnoreCase(person.getEmail().value, keyword)
@@ -30,8 +36,17 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
                 || containsIgnoreCase(person.getGradeLevel().value, keyword)
                 || containsIgnoreCase(person.getSubject().value, keyword)
                 || checkIfTasksContainKeyword(person.getTaskList().getTasks(), keyword)
-                || person.getTags().stream()
+                || checkIfTagsContainKeyword(person, keyword);
+    }
+
+    private boolean checkIfTagsContainKeyword(Person person, String keyword) {
+        boolean result = person.getTags().stream()
                 .anyMatch(tag -> containsIgnoreCase(tag.tagName, keyword));
+        if (result) {
+            logger.info("Person " + person.getName().fullName + " matches " + keyword
+                    + " in attribute: Tags");
+        }
+        return result;
     }
 
     private boolean checkIfTasksContainKeyword(List<Task> tasks, String keyword) {
@@ -39,11 +54,23 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
         for (Task task : tasks) {
             result = result || containsIgnoreCase(task.toString(), keyword);
         }
+        if (result) {
+            logger.info("Person " + person.getName().fullName + " matches " + keyword
+                    + " in attribute: Tasks");
+        }
         return result;
     }
 
     private boolean containsIgnoreCase(String field, String keyword) {
-        return field.toLowerCase().contains(keyword.toLowerCase());
+        if (field == null) {
+            return false;
+        }
+        boolean result = field.toLowerCase().contains(keyword.toLowerCase());
+        if (result) {
+            logger.info("Person " + person.getName().fullName + " matches " + keyword
+                    + " in attribute: " + field);
+        }
+        return result;
     }
 
     @Override

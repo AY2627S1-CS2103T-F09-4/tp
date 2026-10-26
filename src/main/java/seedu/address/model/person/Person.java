@@ -67,7 +67,11 @@ public class Person {
         this(UUID.randomUUID().toString(), name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
     }
 
-    private Person(String studentId, Name name, Phone phone, Email email, Address address, Subject subject,
+    /**
+     * creates a standard Person. The studentId is randomized and subsequent changes to the student's attributes
+     * should require copying the same studentId.
+     */
+    public Person(String studentId, Name name, Phone phone, Email email, Address address, Subject subject,
             GradeLevel gradeLevel, PhotoPath photoPath, TaskList taskList, Set<Tag> tags) {
         requireAllNonNull(name, phone, email, address, subject, gradeLevel, photoPath, taskList, tags);
         this.studentId = UUID.fromString(studentId).toString();
