@@ -426,6 +426,7 @@ table td:last-child {
 </style>
 
 ### General commands
+
 | Command | Format / example |
 |---|---|
 | `help` | `help` |
@@ -434,6 +435,7 @@ table td:last-child {
 | `exit` | `exit` |
 
 ### Student management
+
 | Command | Format / example |
 |---|---|
 | `add-student` | `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...` |
@@ -444,6 +446,7 @@ table td:last-child {
 | `search` | `search KEYWORD [MORE_KEYWORDS]...` |
 
 ### Parent management
+
 | Command | Format / example |
 |---|---|
 | `add-parent` | `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...` |
@@ -452,6 +455,7 @@ table td:last-child {
 | `delete-parent` | `delete-parent INDEX` |
 
 ### Photos
+
 | Command | Format / example |
 |---|---|
 | `add-photo` | `add-photo INDEX f/<FILE_PATH>` |
@@ -460,6 +464,7 @@ table td:last-child {
 | `delete-parent-photo` | `delete-parent-photo INDEX` |
 
 ### Tasks
+
 | Command | Format / example |
 |---|---|
 | `add-task` | `add-task INDEX task/<DESCRIPTION>` |
@@ -467,6 +472,7 @@ table td:last-child {
 | `delete-task` | `delete-task INDEX tid/<TASK_ID>` |
 
 ### Reminders
+
 | Command | Format / example |
 |---|---|
 | `add-reminder` | `add-reminder r/<REMINDER_TEXT> [at/YYYY-MM-DD HH:mm]` |
@@ -474,6 +480,7 @@ table td:last-child {
 | `delete-reminder` | `delete-reminder ID` |
 
 ### Scheduling and attendance
+
 | Command | Format / example |
 |---|---|
 | `schedule-student` | `schedule-student INDEX day/DAY from/HH-mm to/HH-mm` |
@@ -482,6 +489,7 @@ table td:last-child {
 | `mark-attendance` | `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed\|absent\|cancelled\|unrecorded)` |
 
 ### Assessments and statistics
+
 | Command | Format / example |
 |---|---|
 | `record-assessment` | `record-assessment INDEX date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX` |
@@ -493,6 +501,8 @@ table td:last-child {
 | `list-lessons` | `list-lessons` |
 
 ### Data management
+
 | Command | Format / example |
 |---|---|
 | `clear` | `clear` |
+
