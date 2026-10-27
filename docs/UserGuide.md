@@ -7,8 +7,20 @@ Tutoria is a **desktop application designed to help tutors manage students, pare
 
 Tutoria helps tutors maintain student and parent records, manage tasks and reminders, schedule lessons, record attendance and assessments, and view statistics on student progress and teaching workload.
 
-* Table of Contents
-  {:toc}
+* [Quick start](#quick-start)
+* [Features](#features)
+  * [General commands](#general-commands)
+  * [Student management](#student-management)
+  * [Parent management](#parent-management)
+  * [Photos](#photos)
+  * [Tasks](#tasks)
+  * [Reminders](#reminders)
+  * [Scheduling and attendance](#scheduling-and-attendance)
+  * [Assessments and statistics](#assessments-and-statistics)
+  * [Data management](#data-management)
+* [FAQ](#faq)
+* [Known issues](#known-issues)
+* [Command summary](#command-summary)
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -323,23 +335,21 @@ Format: `clear`
 ## Command summary
 
 <style>
-.command-summary table {
+table {
   width: 100%;
   table-layout: fixed;
 }
-.command-summary th:first-child,
-.command-summary td:first-child {
+table th:first-child,
+table td:first-child {
   width: 14% !important;
   white-space: nowrap;
 }
-.command-summary th:last-child,
-.command-summary td:last-child {
+table th:last-child,
+table td:last-child {
   width: 86% !important;
   overflow-wrap: break-word;
 }
 </style>
-
-<div markdown="block" class="command-summary">
 
 ### General commands
 | Command | Format / example |
@@ -412,5 +422,3 @@ Format: `clear`
 | Command | Format / example |
 |---|---|
 | `clear` | `clear` |
-
-</div>
