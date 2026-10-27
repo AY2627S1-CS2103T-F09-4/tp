@@ -57,7 +57,24 @@ Tutoria helps tutors maintain student and parent records, manage tasks and remin
 
 <div markdown="block" class="alert alert-info">
 
-**Notes about the command format:** Words in `UPPER_CASE` are values supplied by the user. Square brackets indicate optional parts. Items followed by `...` may be repeated. Parameters may be entered in any order unless stated otherwise. Indexes refer to the currently displayed list.
+**Notes about the command format:**
+
+* Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
+  For example, in `add-student n/<NAME>`, replace `NAME` with a value such as `John Doe`.
+
+* Items in square brackets are optional.<br>
+  For example, `n/<NAME> [t/<TAG>]` can be used as `n/John Doe t/friend` or as `n/John Doe`.
+
+* Items followed by `...` can appear zero or more times.<br>
+  For example, `[t/<TAG>]...` may be omitted, or written as `t/friend` or `t/friend t/family`.
+
+* Parameters can be in any order.<br>
+  For example, if the command specifies `n/<NAME> p/<PHONE>`, `p/<PHONE> n/<NAME>` is also acceptable.
+
+* Extraneous parameters for commands that take no parameters, such as `help`, `list-students`, `exit`, and `clear`, are ignored.<br>
+  For example, `help 123` is interpreted as `help`.
+
+* If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </div>
 
 ### General commands
@@ -415,13 +432,18 @@ table {
 }
 table th:first-child,
 table td:first-child {
-  width: 14% !important;
-  white-space: nowrap;
+  width: 22% !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 table th:last-child,
 table td:last-child {
-  width: 86% !important;
+  width: 78% !important;
   overflow-wrap: break-word;
+}
+table td code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 </style>
 
