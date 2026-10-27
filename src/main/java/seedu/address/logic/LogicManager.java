@@ -1,5 +1,6 @@
 package seedu.address.logic;
 
+import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PARENTS;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.io.IOException;
@@ -56,6 +57,10 @@ public class LogicManager implements Logic {
 
         if (command.isReadOnly()) {
             return commandResult;
+        }
+        if (!commandResult.isSearch()) {
+            model.updateParentList(PREDICATE_SHOW_ALL_PARENTS);
+            model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
         }
 
         try {

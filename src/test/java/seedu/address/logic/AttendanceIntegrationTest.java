@@ -184,7 +184,7 @@ public class AttendanceIntegrationTest {
         model.updateFilteredPersonList(p -> false);
         assertTrue(feedback("list-schedule").contains("1. Amy Bee"));
         mark(1, "2026-10-19", "completed");
-        assertTrue(model.getFilteredPersonList().isEmpty());
+        assertTrue(!model.getFilteredPersonList().isEmpty());
         model.updateFilteredPersonList(p -> true);
         logic.execute("schedule-student 1 day/wednesday from/10-00 to/11-00");
         mark(2, "2026-10-21", "completed");
