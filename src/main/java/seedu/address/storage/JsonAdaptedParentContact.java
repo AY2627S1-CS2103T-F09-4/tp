@@ -19,6 +19,7 @@ class JsonAdaptedParentContact {
     private final String phone;
     private final String email;
     private final String linkedStudentId;
+    private final String linkedStudentName;
     private final List<String> requirements;
     private final String photoPath;
 
@@ -26,6 +27,7 @@ class JsonAdaptedParentContact {
     JsonAdaptedParentContact(@JsonProperty("id") String id, @JsonProperty("name") String name,
             @JsonProperty("phone") String phone, @JsonProperty("email") String email,
             @JsonProperty("linkedStudentId") String linkedStudentId,
+            @JsonProperty("linkedStudentName") String linkedStudentName,
             @JsonProperty("requirements") List<String> requirements,
             @JsonProperty("photoPath") String photoPath) {
         this.id = id;
@@ -33,6 +35,7 @@ class JsonAdaptedParentContact {
         this.phone = phone;
         this.email = email;
         this.linkedStudentId = linkedStudentId;
+        this.linkedStudentName = linkedStudentName;
         this.requirements = requirements == null ? new ArrayList<>() : requirements;
         this.photoPath = photoPath;
     }
@@ -43,6 +46,7 @@ class JsonAdaptedParentContact {
         phone = source.getPhone().value;
         email = source.getEmail() == null ? null : source.getEmail().value;
         linkedStudentId = source.getLinkedStudentId();
+        linkedStudentName = source.getLinkedStudentName();
         requirements = source.getRequirements();
         photoPath = source.getPhotoPath().value;
     }
@@ -66,6 +70,7 @@ class JsonAdaptedParentContact {
                 new Phone(phone),
                 email == null || email.isEmpty() ? null : new Email(email),
                 linkedStudentId,
+                linkedStudentName,
                 requirements,
                 photoPath == null || photoPath.isEmpty() ? PhotoPath.NONE : new PhotoPath(photoPath));
     }

@@ -36,6 +36,7 @@ public class AddContactCommandParser implements Parser<AddContactCommand> {
         Index link = map.getValue(PREFIX_LINK).isPresent()
                 ? ParserUtil.parseIndex(map.getValue(PREFIX_LINK).get()) : null;
         List<String> requirements = new ArrayList<>(map.getAllValues(PREFIX_REQUIREMENT));
-        return new AddContactCommand(new ParentContact(name, phone, email, null, requirements), link);
+        return new AddContactCommand(new ParentContact(name, phone, email, null, null,
+                requirements), link);
     }
 }

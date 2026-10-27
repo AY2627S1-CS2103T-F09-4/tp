@@ -43,7 +43,7 @@ public class AddParentPhotoCommand extends Command {
         ParentContact old = contacts.get(index.getZeroBased());
         ParentContact updated = new ParentContact(
                 old.getId(), old.getName(), old.getPhone(), old.getEmail(), old.getLinkedStudentId(),
-                old.getRequirements(), new PhotoPath(path.toString()));
+                old.getLinkedStudentName(), old.getRequirements(), new PhotoPath(path.toString()));
         model.setParentContact(old, updated);
         return new CommandResult("Added photo to parent: " + updated.getName());
     }

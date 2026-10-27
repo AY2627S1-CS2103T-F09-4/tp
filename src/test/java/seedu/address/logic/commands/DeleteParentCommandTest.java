@@ -19,7 +19,7 @@ import seedu.address.model.person.Phone;
 
 public class DeleteParentCommandTest {
     private static final ParentContact PARENT = new ParentContact(
-            new Name("Mary Tan"), new Phone("98765432"), new Email("mary@example.com"), null,
+            new Name("Mary Tan"), new Phone("98765432"), new Email("mary@example.com"), null, null,
             List.of("Prefers email"));
 
     @Test

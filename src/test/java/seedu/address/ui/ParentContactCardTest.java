@@ -206,6 +206,7 @@ class ParentContactCardTest {
     void constructorWithLinkedStudent_displaysStudentName() throws Exception {
         runOnFxThread(() -> {
             Person student = new PersonBuilder()
+                    .withId("12345")
                     .withName("Alice Tan")
                     .withPhone("91234567")
                     .build();
@@ -213,11 +214,11 @@ class ParentContactCardTest {
             LogicStub logic = new LogicStub();
             logic.getPersonList().add(student);
 
-            String linkedStudentId = student.getName().fullName
-                    + "|" + student.getPhone().value;
+            String linkedStudentId = student.getStudentId();
 
             ParentContact contact = new ParentContactBuilder()
                     .withLinkedStudentId(linkedStudentId)
+                    .withLinkedStudentName(student.getStudentId())
                     .build();
 
             ParentContactCard card = new ParentContactCard(

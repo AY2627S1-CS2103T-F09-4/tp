@@ -24,7 +24,7 @@ public class DeleteParentPhotoCommand extends Command {
         ParentContact old = model.getParentContactList().get(index.getZeroBased());
         ParentContact updated = new ParentContact(
                 old.getId(), old.getName(), old.getPhone(), old.getEmail(), old.getLinkedStudentId(),
-                old.getRequirements(), PhotoPath.NONE);
+                old.getLinkedStudentName(), old.getRequirements(), PhotoPath.NONE);
         model.setParentContact(old, updated);
         return new CommandResult("Deleted photo from parent: " + updated.getName());
     }

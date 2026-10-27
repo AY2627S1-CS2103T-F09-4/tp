@@ -39,6 +39,7 @@ public class EditParentCommand extends Command {
                 phone == null ? old.getPhone() : phone,
                 email == null ? old.getEmail() : email,
                 old.getLinkedStudentId(),
+                old.getLinkedStudentName(),
                 old.getRequirements());
         model.setParentContact(old, updated);
         return new CommandResult("Edited parent contact: " + updated.getName());
