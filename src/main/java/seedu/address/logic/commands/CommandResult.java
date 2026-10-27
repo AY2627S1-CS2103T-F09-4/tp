@@ -23,6 +23,8 @@ public class CommandResult {
 
     private final boolean redo;
 
+    private final boolean search;
+
     private final String keyword;
 
     /**
@@ -35,6 +37,7 @@ public class CommandResult {
         this.keyword = null;
         this.undo = undo;
         this.redo = redo;
+        this.search = false;
     }
 
     /**
@@ -55,6 +58,7 @@ public class CommandResult {
         this.keyword = keyword;
         undo = false;
         redo = false;
+        this.search = true;
     }
 
     public String getFeedbackToUser() {
@@ -75,6 +79,10 @@ public class CommandResult {
 
     public boolean isRedo() {
         return redo;
+    }
+
+    public boolean isSearch() {
+        return search;
     }
 
     public String getKeyword() {

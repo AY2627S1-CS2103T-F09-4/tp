@@ -72,9 +72,11 @@ public class StatisticsIntegrationTest {
     public void filteredIndices_targetDisplayedStudent_butBusinessUsesAllHistory() throws Exception {
         logic.execute(LESSON);
         Person bob = model.getPersonList().get(1);
-        model.updateFilteredPersonList(p -> p.getStudentId().equals(bob.getStudentId()));
+        filterListToBob(bob);
         logic.execute(LESSON.replace("attendance 1", "attendance 2"));
+        filterListToBob(bob);
         logic.execute(ASSESSMENT);
+        filterListToBob(bob);
         assertEquals(bob.getStudentId(), model.getAddressBook().getLessonRecords().getLast().studentId());
         assertEquals(bob.getStudentId(), model.getAddressBook().getAssessmentRecords().getFirst().studentId());
         assertTrue(feedback("stats-student 1").contains("Student: Bob"));
@@ -83,6 +85,10 @@ public class StatisticsIntegrationTest {
         assertThrows(CommandException.class, () -> logic.execute("stats-student 2"));
         assertThrows(CommandException.class, () -> logic.execute(LESSON.replace("attendance 1", "attendance 3")));
         assertEquals(1, model.getFilteredPersonList().size());
+    }
+
+    private void filterListToBob(Person bob) {
+        model.updateFilteredPersonList(p -> p.getStudentId().equals(bob.getStudentId()));
     }
 
     @Test
