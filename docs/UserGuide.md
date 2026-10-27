@@ -89,6 +89,11 @@ Adds a student to Tutoria.
 
 Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...`
 
+* `NAME` and `ADDRESS` must not be blank.
+* `PHONE` must contain 3 to 15 digits and may start with `+`.
+* `EMAIL` must be a valid email address.
+* `TAG` is optional, must be alphanumeric, and may be repeated.
+
 Example: `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 3`
 
 #### Listing all students: `list-students`
@@ -108,10 +113,17 @@ Deletes the student at the displayed index.
 
 Format: `delete-student INDEX`
 
+`INDEX` must be a positive integer referring to the currently displayed student list. If the list is filtered, the index refers to the filtered results.
+
 #### Locating students by name: `find`
 Finds students whose names contain any supplied keyword.
 
 Format: `find KEYWORD [MORE_KEYWORDS]`
+
+* The search is case-insensitive.
+* Keyword order does not matter.
+* Only student names are searched.
+* Students matching at least one keyword are returned.
 
 Example: `find alex david`
 
@@ -119,6 +131,8 @@ Example: `find alex david`
 Searches supported student and parent details and highlights matches.
 
 Format: `search KEYWORD [MORE_KEYWORDS]...`
+
+The search is case-insensitive and covers supported student and parent details. Unlike `find`, the complete search text is treated as the search keyword.
 
 Example: `search Mathematics`
 
@@ -128,6 +142,11 @@ Example: `search Mathematics`
 Adds a parent and can optionally link the parent to a student.
 
 Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
+
+* `PHONE` may contain 3 to 15 digits and may start with `+`.
+* `EMAIL` is optional but must be valid when supplied.
+* `link/` identifies a student in the displayed student list.
+* Requirements are optional and may be repeated.
 
 Example: `add-parent n/Mrs Tan p/98765432 e/tan@example.com link/1 r/No food during session`
 
@@ -141,6 +160,8 @@ Edits an existing parent.
 
 Format: `edit-parent INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>]`
 
+`INDEX` must be a positive integer referring to the displayed parent list. At least one optional field must be supplied.
+
 #### Deleting a parent: `delete-parent`
 Deletes the parent at the displayed index.
 
@@ -153,20 +174,31 @@ Adds or replaces a student's photo.
 
 Format: `add-photo INDEX f/<FILE_PATH>`
 
+* `INDEX` must refer to an existing student.
+* The file must exist, be readable, and be a valid JPG, JPEG, or PNG image no larger than 5 MB.
+* If a photo already exists, it is replaced.
+* Moving or deleting the original file may make the photo unavailable.
+
 #### Deleting a student photo: `delete-photo`
 Deletes a student's photo.
 
 Format: `delete-photo INDEX`
+
+`INDEX` must be a positive integer referring to the displayed student list.
 
 #### Adding a parent photo: `add-parent-photo`
 Adds or replaces a parent's photo.
 
 Format: `add-parent-photo INDEX f/<FILE_PATH>`
 
+The file requirements described for `add-photo` apply, but the index refers to the displayed parent list.
+
 #### Deleting a parent photo: `delete-parent-photo`
 Deletes a parent's photo.
 
 Format: `delete-parent-photo INDEX`
+
+`INDEX` must be a positive integer referring to the displayed parent list.
 
 ### Tasks
 
@@ -175,12 +207,16 @@ Adds a task to a student.
 
 Format: `add-task INDEX task/<DESCRIPTION>`
 
+`INDEX` refers to the displayed student list. The description may contain spaces but must not be blank.
+
 Example: `add-task 1 task/Prepare revision worksheet`
 
 #### Marking a task: `mark-task`
 Marks a task as done or not done.
 
 Format: `mark-task INDEX tid/<TASK_ID> status/(done|not done)`
+
+`TASK_ID` is the number shown beside the task in that student's task list. The status must be `done` or `not done`.
 
 Example: `mark-task 1 tid/1 status/done`
 
@@ -189,6 +225,8 @@ Deletes a task from a student's task list.
 
 Format: `delete-task INDEX tid/<TASK_ID>`
 
+`INDEX` identifies the student and `TASK_ID` identifies the task within that student's task list.
+
 ### Reminders
 
 #### Adding a reminder: `add-reminder`
@@ -196,12 +234,19 @@ Adds a tutor-level reminder.
 
 Format: `add-reminder r/<REMINDER_TEXT> [at/YYYY-MM-DD HH:mm]`
 
+* Reminder text must not be blank.
+* The optional time uses 24-hour `YYYY-MM-DD HH:mm` format.
+* Untimed reminders are classified as `EVERY STARTUP`.
+* Each reminder receives a stable ID.
+
 Example: `add-reminder r/Collect worksheets at/2026-10-30 18:00`
 
 #### Listing reminders: `list-reminders`
 Lists reminders in urgency order.
 
 Format: `list-reminders`
+
+Reminders are classified as `OVERDUE`, `DUE SOON`, `UPCOMING`, or `EVERY STARTUP`. Timed reminders are ordered by urgency and due time.
 
 #### Deleting a reminder: `delete-reminder`
 Deletes a reminder using its stable ID.
@@ -215,6 +260,8 @@ Schedules a recurring weekly lesson.
 
 Format: `schedule-student INDEX day/DAY from/HH-mm to/HH-mm`
 
+`INDEX` refers to the displayed student list. `DAY` is a weekday, times use 24-hour `HH-mm` format, and the end time must be later than the start time.
+
 Example: `schedule-student 1 day/Monday from/16-00 to/18-00`
 
 #### Listing scheduled lessons: `list-schedule`
@@ -222,15 +269,24 @@ Lists recurring sessions and their session numbers.
 
 Format: `list-schedule`
 
+The session numbers shown by this command are the numbers required by `mark-attendance`. They are separate from student indexes.
+
 #### Removing a scheduled lesson: `unschedule-student`
 Removes a matching recurring lesson.
 
 Format: `unschedule-student INDEX day/DAY from/HH-mm to/HH-mm`
 
+The first matching weekly session is removed. Previously recorded lessons are not deleted.
+
 #### Recording attendance: `mark-attendance`
 Records the outcome of a scheduled session for a date.
 
 Format: `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent|cancelled|unrecorded)`
+
+* Obtain `SESSION_NUMBER` from `list-schedule`.
+* The date must match the session weekday and cannot be later than today.
+* Repeating the command for the same session and date updates the outcome.
+* Available statuses are `completed`, `absent`, `cancelled`, and `unrecorded`.
 
 Example: `mark-attendance 1 date/2026-10-19 status/completed`
 
@@ -241,6 +297,10 @@ Records an assessment result.
 
 Format: `record-assessment INDEX date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX`
 
+* The date cannot be in the future.
+* Subject, category, and title must not be blank.
+* `max` must be positive, and `score` must be between zero and `max`.
+
 Example: `record-assessment 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions score/18 max/25`
 
 #### Listing assessments: `list-assessments`
@@ -248,30 +308,42 @@ Lists all recorded assessments.
 
 Format: `list-assessments`
 
+The assessment number shown by this command is used by `edit-assessment` and `delete-assessment`. The list is independent of student search filters.
+
 #### Editing an assessment: `edit-assessment`
 Replaces an assessment record.
 
 Format: `edit-assessment RECORD_NUMBER date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX`
+
+`RECORD_NUMBER` comes from `list-assessments`. The command replaces the assessment's editable details.
 
 #### Deleting an assessment: `delete-assessment`
 Deletes an assessment record.
 
 Format: `delete-assessment RECORD_NUMBER`
 
+`RECORD_NUMBER` comes from `list-assessments` and is not a student index or internal ID.
+
 #### Viewing overall workload: `stats`
 Shows workload statistics.
 
 Format: `stats [from/YYYY-MM-DD to/YYYY-MM-DD]`
+
+If no range is supplied, the default is January 1 of the current year through today. If a range is supplied, both dates are required and inclusive. The report measures workload, not profit.
 
 #### Viewing student progress: `stats-student`
 Shows attendance and assessment progress for a student.
 
 Format: `stats-student INDEX [from/YYYY-MM-DD to/YYYY-MM-DD]`
 
+`INDEX` refers to the displayed student list. Date ranges follow the same rules as `stats`: both dates must be supplied together and are inclusive.
+
 #### Listing recorded lessons: `list-lessons`
 Lists all recorded lessons.
 
 Format: `list-lessons`
+
+This lists recorded lessons, not merely scheduled sessions. The list includes lessons from all students and is independent of student search filters.
 
 ### Data management
 
@@ -279,6 +351,8 @@ Format: `list-lessons`
 Deletes all entries from Tutoria.
 
 Format: `clear`
+
+This removes students, parents, tasks, reminders, schedules, and historical records. Use `delete-student` instead if you want to preserve a student's history.
 
 --------------------------------------------------------------------------------------------------------------------
 ## FAQ
