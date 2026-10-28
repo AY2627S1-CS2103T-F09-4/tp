@@ -54,7 +54,7 @@ public class ModelManager implements Model {
         this.parentList = new FilteredList<>(this.addressBook.getParentContactList());
         this.snapshotManager = new SnapshotManager();
         this.clock = clock;
-        snapshotManager.saveSnapshot(this.addressBook);
+        snapshotManager.saveSnapshot(this.addressBook, "");
     }
 
     public ModelManager() {
@@ -210,26 +210,28 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public void save() {
-        snapshotManager.saveSnapshot(addressBook);
+    public void save(String feedbackToUser) {
+        snapshotManager.saveSnapshot(addressBook, feedbackToUser);
     }
 
     @Override
-    public void undo() {
+    public String undo() {
         AddressBook newAddressBook = snapshotManager.undo();
 
         if (newAddressBook != null) {
             this.setAddressBook(newAddressBook);
         }
+        return snapshotManager.getCommandMessage();
     }
 
     @Override
-    public void redo() {
+    public String redo() {
         AddressBook newAddressBook = snapshotManager.redo();
 
         if (newAddressBook != null) {
             this.setAddressBook(newAddressBook);
         }
+        return snapshotManager.getCommandMessage();
     }
 
     @Override

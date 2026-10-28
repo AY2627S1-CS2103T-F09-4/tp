@@ -175,17 +175,17 @@ public class AddCommandTest {
         }
 
         @Override
-        public void save() {
+        public void save(String feedbackToUser) {
             throw new AssertionError("This method should not be called.");
         }
 
         @Override
-        public void undo() {
+        public String undo() {
             throw new AssertionError("This method should not be called.");
         }
 
         @Override
-        public void redo() {
+        public String redo() {
             throw new AssertionError("This method should not be called.");
         }
     }

@@ -12,17 +12,20 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.storage.SnapshotManager;
+import seedu.address.testutil.PersonBuilder;
 
 public class UndoCommandTest {
 
     private Model model;
     private UndoCommand undoCommand;
+    private ListCommand listCommand;
 
     @BeforeEach
     public void setUp() {
         SnapshotManager.reset();
         model = new ModelManager();
         undoCommand = new UndoCommand();
+        listCommand = new ListCommand();
     }
 
     @Test
@@ -41,12 +44,29 @@ public class UndoCommandTest {
     @Test
     public void execute_undoAvailable_returnsSuccess() throws Exception {
         // Save a second snapshot so there is a previous state to undo.
-        model.save();
+        model.addPerson(new PersonBuilder().withName("John test").build());
+        model.save("Add");
 
         CommandResult result = undoCommand.execute(model);
 
-        assertEquals(UndoCommand.MESSAGE_SUCCESS, result.getFeedbackToUser());
+        assertEquals(UndoCommand.MESSAGE_SUCCESS + "Add", result.getFeedbackToUser());
         assertFalse(result.isShowHelp());
         assertFalse(result.isExit());
+
+        model.addPerson(new PersonBuilder().withName("John test").build());
+        model.save("Add");
+        String feedbackToUser = model.undo();
+
+        assertEquals("Add", feedbackToUser);
+    }
+
+    @Test
+    public void execute_undoAfterNotChangingAddressBook_returnsSuccess() throws Exception {
+        model.addPerson(new PersonBuilder().withName("John test").build());
+        model.save("Add");
+
+        listCommand.execute(model);
+        undoCommand.execute(model);
+        assertEquals(0, model.getAddressBook().getPersonList().size());
     }
 }

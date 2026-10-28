@@ -66,7 +66,7 @@ public class LogicManager implements Logic {
         try {
             storage.saveAddressBook(model.getAddressBook());
             if (!commandResult.isUndo() && !commandResult.isRedo()) {
-                model.save();
+                model.save("User input: " + commandText + "\nFeedback: " + commandResult.getFeedbackToUser());
             }
         } catch (AccessDeniedException e) {
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
