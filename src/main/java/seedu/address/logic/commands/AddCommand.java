@@ -30,7 +30,7 @@ public class AddCommand extends Command {
             + PREFIX_ADDRESS + "ADDRESS "
             + PREFIX_SUBJECT + "SUBJECT "
             + "[" + PREFIX_GRADE_LEVEL + "GRADE_LEVEL] "
-            + "[" + PREFIX_TAG + "TAG]...\n"
+            + "[" + PREFIX_TAG + "TAG_1, " + PREFIX_TAG + "TAG_2, ...]\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_NAME + "John Tan "
             + PREFIX_PHONE + "91234567 "

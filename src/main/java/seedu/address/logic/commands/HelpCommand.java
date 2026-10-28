@@ -30,7 +30,7 @@ public class HelpCommand extends Command {
                     "Lists all students."),
             new CommandSummary(ListParentsCommand.COMMAND_WORD, "",
                     "Lists all parents."),
-            new CommandSummary(EditCommand.COMMAND_WORD,
+            new CommandSummary(EditStudentCommand.COMMAND_WORD,
                     "INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/SUBJECT] [g/GRADE_LEVEL] [t/TAG]...",
                     "Edits the details of a student."),
             new CommandSummary(EditParentCommand.COMMAND_WORD,

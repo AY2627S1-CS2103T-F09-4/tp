@@ -104,7 +104,7 @@ Format: `exit`
 #### Adding a student: `add-student`
 Adds a student to Tutoria.
 
-Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...`
+Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG_1>, t/<TAG_2>, ...]`
 
 * `NAME` and `ADDRESS` must not be blank.
 * `PHONE` must contain 3 to 15 digits and may start with `+`.
@@ -118,10 +118,12 @@ Shows all students.
 
 Format: `list-students`
 
-#### Editing a student: `edit`
+#### Editing a student: `edit-student`
 Edits an existing student. At least one optional field must be supplied.
 
-Format: `edit INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG>]...`
+Format: `edit INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG_1>, t/<TAG_2>, ...]`
+
+* to remove the optional `<GRADE_LEVEL>`or `<TAG>`, use `g/` or `t/`.
 
 Example: `edit 1 p/91234567 s/Science`
 
@@ -158,7 +160,7 @@ Example: `search Mathematics`
 #### Adding a parent: `add-parent`
 Adds a parent and can optionally link the parent to a student.
 
-Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
+Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT_1>, r/<REQUIREMENT_2>, ...]`
 
 * `PHONE` may contain 3 to 15 digits and may start with `+`.
 * `EMAIL` is optional but must be valid when supplied.

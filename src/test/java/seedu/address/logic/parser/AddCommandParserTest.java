@@ -9,7 +9,7 @@ import static seedu.address.logic.commands.CommandTestUtil.GRADE_LEVEL_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.GRADE_LEVEL_DESC_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_ADDRESS_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_EMAIL_DESC;
-import static seedu.address.logic.commands.CommandTestUtil.INVALID_GRADE_LEVEL_DESC;
+import static seedu.address.logic.commands.CommandTestUtil.INVALID_GRADE_LEVEL_FOR_ADD_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_NAME_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_PHONE_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_SUBJECT_DESC;
@@ -233,7 +233,7 @@ public class AddCommandParserTest {
 
         // invalid grade level
         assertParseFailure(parser, NAME_DESC_BOB + PHONE_DESC_BOB + EMAIL_DESC_BOB + ADDRESS_DESC_BOB
-                + SUBJECT_DESC_BOB + INVALID_GRADE_LEVEL_DESC + TAG_DESC_HUSBAND + TAG_DESC_FRIEND,
+                + SUBJECT_DESC_BOB + INVALID_GRADE_LEVEL_FOR_ADD_DESC + TAG_DESC_HUSBAND + TAG_DESC_FRIEND,
                 GradeLevel.MESSAGE_CONSTRAINTS);
 
         // invalid tag
