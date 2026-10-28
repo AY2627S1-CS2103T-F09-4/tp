@@ -1,0 +1,19 @@
+@startuml
+!include style.puml
+skinparam ClassFontColor #000000
+skinparam ClassBorderColor #000000
+skinparam ClassBackgroundColor #FFFFAA
+
+title After command "add n/John"
+
+package Snapshots <<rectangle>> {
+    class Snapshot1 as "<u>ab0:AddressBook</u>"
+    class Snapshot2 as "<u>ab1:AddressBook</u>"
+}
+
+Snapshot1 -[hidden]right-> Snapshot2
+
+class Pointer as "Current Snapshot" #FFFFFF
+
+Pointer -up-> Snapshot2
+@end

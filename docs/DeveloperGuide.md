@@ -190,16 +190,44 @@ Searches all _user-visible_ attributes of `Person` and `ParentContact` objects i
 4. The relevant `UI` controllers use the `keyword` to highlight matching occurrences in the displayed attributes of the filtered `Person` and `ParentContact` objects.
 5. To prevent search filtering from affecting subsequent commands, `MainWindow` resets the filtered lists to reflect the address book's entries after commands other than `SearchCommand`.
 
-## Undo and Redo
-`Undo` reverses the changes to the `AddressBook` done by any command, and `Redo` reverses the changes made by `Undo`.
-* If a command doesn't change the `AddressBook`, `Undo` will not change anything. This goes the same for `Redo`.
+This is illustrated in the following diagram:
+![SearchCommandSequenceDiagram.png](images/SearchCommandSequenceDiagram.png)
+
+### Undo and Redo
+`Undo` reverses changes to the `AddressBook` and `Redo` reverses the changes made by `Undo`.
+* If a command doesn't change the `AddressBook`, such as `help`, `Undo` will ignore it. This also applies to `Redo`.
 * If some changes were undone and new changes are introduced, the changes that could have been redone will be lost.
 
-1. When any command is made, `SnapshotManager` saves the current `AddressBook` into a `List`, `snapshots`. `currentIndex` acts as a pointer to specific snapshots.
-2. `SnapshotManager` is handled by `ModelManager`.
-3. `UndoCommand` moves `currentIndex` back by 1 and returns a copy of the `AddressBook` saved in `snapshots` at that index.
-4. If some commands were undone and a command is made, i.e. `currentIndex` is not pointing to the end of `snapshots`, then the `AddressBook` copies are removed from `snapshots` beyond `currentIndex`.
-5. `RedoCommand` moves `currentIndex` forward by 1 and returns a copy of the `AddressBook` similar to `UndoCommand`.
+1. Whenever a command is executed, `SnapshotManager` saves a snapshot of the current `AddressBook` and the relevant command text in separate `List` objects. `currentIndex` tracks the current position in the snapshot history.
+2. `SnapshotManager` is managed by `ModelManager`, which provides access to the snapshot history for `undo` and `redo` operations.
+3. When `UndoCommand` is executed, it uses `ModelManager` to move `currentIndex` back by one position and retrieve a copy of the corresponding `AddressBook` snapshot. The relevant command text is then included in the resulting CommandResult.
+4. If a new command is executed after some changes have been undone, `currentIndex` is no longer at the end of the snapshot history. In this case, the snapshots beyond `currentIndex` are removed, discarding changes that could previously have been redone.
+5. When `RedoCommand` is executed, it uses `ModelManager` to move `currentIndex` forward by one position and retrieve a copy of the corresponding `AddressBook` snapshot, restoring a previously undone change. The relevant command text is then included in the resulting CommandResult.
+
+This is illustrated in the following diagrams:
+
+When the program begins:
+
+![UndoRedoInitial.png](images/UndoRedoInitial.png)
+
+After a command:
+![UndoRedoAddOnce.png](images/UndoRedoAddOnce.png)
+
+After another command:
+![UndoRedoAddTwice.png](images/UndoRedoAddTwice.png)
+
+After `undo`:
+![UndoRedoUndoOnce.png](images/UndoRedoUndoOnce.png)
+
+After `redo`:
+![UndoRedoRedoOnce.png](images/UndoRedoRedoOnce.png)
+
+If from `undo`, a command that changes the AddressBook is executed:
+![UndoRedoChangedAddressBook.png](images/UndoRedoChangedAddressBook.png)
+Notice how the `Current Snapshot` is `ab3` rather than `ab2`. 
+
+If from `undo`, a command that doesn't change the AddressBook is executed:
+![UndoRedoList.png](images/UndoRedoList.png)
 
 ### Historical records and statistics
 
