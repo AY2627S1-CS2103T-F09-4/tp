@@ -13,16 +13,17 @@ import seedu.address.storage.SnapshotManager;
  */
 public class RedoCommand extends Command {
     public static final String COMMAND_WORD = "redo";
-    public static final String MESSAGE_SUCCESS = "Last command redone.";
+    public static final String MESSAGE_SUCCESS = "Last command redone: ";
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        String feedbackToUser;
         if (SnapshotManager.canRedo()) {
-            model.redo();
+            feedbackToUser = model.redo();
         } else {
             throw new CommandException(Messages.MESSAGE_UNABLE_TO_REDO);
         }
-        return new CommandResult(MESSAGE_SUCCESS, false, false, false, true);
+        return new CommandResult(MESSAGE_SUCCESS + feedbackToUser, false, false, false, true);
     }
 }

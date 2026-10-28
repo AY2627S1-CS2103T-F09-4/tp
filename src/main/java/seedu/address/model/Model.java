@@ -143,11 +143,11 @@ public interface Model {
     }
 
     /** Snapshots the current address book contents. */
-    void save();
+    void save(String feedbackToUser);
 
     /** Replaces address book data with the data in the previous snapshot. */
-    void undo();
+    String undo();
 
     /** Replaces address book data with the data in the previous snapshot. */
-    void redo();
+    String redo();
 }

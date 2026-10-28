@@ -12,17 +12,20 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.storage.SnapshotManager;
+import seedu.address.testutil.PersonBuilder;
 
 public class RedoCommandTest {
 
     private Model model;
     private RedoCommand redoCommand;
+    private ListCommand listCommand;
 
     @BeforeEach
     public void setUp() {
         SnapshotManager.reset();
         model = new ModelManager();
         redoCommand = new RedoCommand();
+        listCommand = new ListCommand();
     }
 
     @Test
@@ -44,7 +47,8 @@ public class RedoCommandTest {
     @Test
     public void execute_redoAvailable_returnsSuccess() throws Exception {
         // Create a second snapshot.
-        model.save();
+        model.addPerson(new PersonBuilder().withName("John test").build());
+        model.save("Add");
 
         // Undo to make redo available.
         model.undo();
@@ -52,9 +56,24 @@ public class RedoCommandTest {
         CommandResult result = redoCommand.execute(model);
 
         assertEquals(
-                RedoCommand.MESSAGE_SUCCESS,
+                RedoCommand.MESSAGE_SUCCESS + "Add",
                 result.getFeedbackToUser());
         assertFalse(result.isShowHelp());
         assertFalse(result.isExit());
+
+        model.undo();
+        String feedbackToUser = model.redo();
+        assertEquals("Add", feedbackToUser);
+    }
+
+    @Test
+    public void execute_redoAfterNotChangingAddressBook_returnsSuccess() throws Exception {
+        model.addPerson(new PersonBuilder().withName("John test").build());
+        model.save("Add");
+        model.undo();
+        listCommand.execute(model);
+        model.redo();
+        assertEquals(1, model.getAddressBook().getPersonList().size());
+
     }
 }

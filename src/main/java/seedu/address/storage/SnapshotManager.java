@@ -9,8 +9,10 @@ import seedu.address.model.AddressBook;
 public class SnapshotManager {
     private static final List<AddressBook> snapshots =
             new ArrayList<>();
+    private static final List<String> snapshotCommands = new ArrayList<>();
 
     private static int currentIndex = -1;
+    private static String currentCommand;
 
     /**
      * Saves the current address book as a snapshot in {@code @snapshots} , and clears the rest of the snapshots
@@ -18,14 +20,21 @@ public class SnapshotManager {
      *
      * @param addressBook the address book to be saved.
      */
-    public void saveSnapshot(AddressBook addressBook) {
+    public void saveSnapshot(AddressBook addressBook, String feedbackToUser) {
         // Discards snapshots that belong to the old history branch after an undo.
-        while (snapshots.size() > currentIndex + 1) {
-            snapshots.remove(snapshots.size() - 1);
+        if (currentIndex == -1) {
+            snapshots.add(addressBook.copy());
+            snapshotCommands.add(feedbackToUser);
+            currentIndex = snapshots.size() - 1;
+        } else if (!snapshots.get(currentIndex).equals(addressBook.copy())) {
+            while (snapshots.size() > currentIndex + 1) {
+                snapshots.remove(snapshots.size() - 1);
+                snapshotCommands.remove(snapshotCommands.size() - 1);
+            }
+            snapshots.add(addressBook.copy());
+            snapshotCommands.add(feedbackToUser);
+            currentIndex = snapshots.size() - 1;
         }
-
-        snapshots.add(addressBook.copy());
-        currentIndex = snapshots.size() - 1;
     }
 
     /**
@@ -38,8 +47,16 @@ public class SnapshotManager {
             return null;
         }
 
+        currentCommand = snapshotCommands.get(currentIndex);
         currentIndex--;
         return snapshots.get(currentIndex).copy();
+    }
+
+    public String getCommandMessage() {
+        if (currentIndex < 0) {
+            return null;
+        }
+        return currentCommand;
     }
 
     /**
@@ -53,6 +70,7 @@ public class SnapshotManager {
         }
 
         currentIndex++;
+        currentCommand = snapshotCommands.get(currentIndex);
         return snapshots.get(currentIndex).copy();
     }
 
@@ -71,6 +89,9 @@ public class SnapshotManager {
         currentIndex = -1;
         while (!snapshots.isEmpty()) {
             snapshots.removeLast();
+        }
+        while (!snapshotCommands.isEmpty()) {
+            snapshotCommands.removeLast();
         }
     }
 }
