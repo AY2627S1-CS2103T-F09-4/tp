@@ -9,11 +9,18 @@ Class "<<interface>>\nReadOnlyAddressBook" as ReadOnlyAddressBook
 Class "<<interface>>\nReadOnlyUserPrefs" as ReadOnlyUserPrefs
 Class "<<interface>>\nModel" as Model
 Class AddressBook
-Class ModelManager
+
 Class UserPrefs
+together {
+Class AssessmentRecord
+Class ModelManager
+}
+Class LessonRecord
 
 Class UniquePersonList
-Class Person
+Class Person {
+    - id : String
+}
 Class Address
 Class Email
 Class Name
@@ -24,9 +31,13 @@ Class PhotoPath
 Class Subject
 Class TaskList
 Class Task
-Class String
 
-Class ParentContact
+Class ParentContact {
+    - id : String
+    - linkedStudentId : String
+    - linkedStudentName : String
+    - requirements : List<String>
+}
 Class Reminder
 Class ReminderList
 Class Schedule
@@ -43,6 +54,7 @@ Package Storage as StoragePackage <<Rectangle>>{
  }
 
 Class HiddenOutside #FFFFFF
+skinparam classAttributeFontColor #FFFFFF
 HiddenOutside ..> Model
 
 AddressBook .up.|> ReadOnlyAddressBook
@@ -58,6 +70,8 @@ AddressBook *--> "1" UniquePersonList
 AddressBook --> "~*" ParentContact
 AddressBook *--> "1" Schedule
 AddressBook *--> "1" ReminderList
+AddressBook --> "*" LessonRecord
+AddressBook --> "*" AssessmentRecord
 UniquePersonList --> "~* all" Person
 Person *--> Name
 Person *--> Phone
@@ -75,9 +89,6 @@ ParentContact *--> Name
 ParentContact *--> Phone
 ParentContact *--> Email
 ParentContact *--> PhotoPath
-ParentContact *--> "id" String
-ParentContact *--> "linkedStudentId" String
-ParentContact *--> "~* requirements" String
 
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
@@ -86,11 +97,11 @@ Name -[hidden]right-> Phone
 Phone -[hidden]right-> Address
 Address -[hidden]right-> Email
 
-ModelManager --> "~* filtered" Person
-ModelManager --> "~* filtered" ParentContact
+ModelManager --> "~* filtered list of" Person
+ModelManager --> "~* filtered list of" ParentContact
 
 ModelManager --> "1" SnapshotManager
-SnapshotManager --> "1..* snapshots of" AddressBook
+SnapshotManager --> "1..* snapshots of >" AddressBook
 
 Schedule --> "*" ScheduledSession
 
@@ -99,4 +110,7 @@ ScheduledSession --> "1" TimeSlot
 ScheduledSession --> "1 day" DayOfWeek
 
 ReminderList --> "*" Reminder
+
+show ParentContact fields
+show Person fields
 @enduml
