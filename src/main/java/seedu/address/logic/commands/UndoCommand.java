@@ -13,16 +13,17 @@ import seedu.address.storage.SnapshotManager;
  */
 public class UndoCommand extends Command {
     public static final String COMMAND_WORD = "undo";
-    public static final String MESSAGE_SUCCESS = "Last command undone.";
+    public static final String MESSAGE_SUCCESS = "Last command undone: ";
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        String feedbackToUser;
         if (SnapshotManager.canUndo()) {
-            model.undo();
+            feedbackToUser = model.undo();
         } else {
             throw new CommandException(Messages.MESSAGE_UNABLE_TO_UNDO);
         }
-        return new CommandResult(MESSAGE_SUCCESS, false, false, true, false);
+        return new CommandResult(MESSAGE_SUCCESS + feedbackToUser, false, false, true, false);
     }
 }

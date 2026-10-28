@@ -114,9 +114,9 @@ public class ModelManagerTest {
     @Test
     public void undoRedo_reminder_restoresReminderState() {
         Reminder reminder = modelManager.addReminder("First", null);
-        modelManager.save();
+        modelManager.save("");
         modelManager.deleteReminder(1);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
         assertEquals(List.of(reminder), modelManager.getReminderList());
@@ -127,10 +127,10 @@ public class ModelManagerTest {
     @Test
     public void undoRedo_scheduledSession_restoresSchedule() {
         modelManager.addPerson(ALICE);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
         assertEquals(List.of(), modelManager.getScheduleList());
@@ -167,10 +167,10 @@ public class ModelManagerTest {
     public void undo_afterDeletingSession_restoresSession() {
         modelManager.addPerson(ALICE);
         modelManager.addScheduledSession(ALICE_MONDAY_MORNING);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.deleteScheduledSession(ALICE_MONDAY_MORNING);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
         assertEquals(List.of(ALICE_MONDAY_MORNING), modelManager.getScheduleList());
@@ -182,10 +182,10 @@ public class ModelManagerTest {
     @Test
     public void save_validAddressBook_savesSnapshot() {
         modelManager.addPerson(ALICE);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.addPerson(BENSON);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
 
@@ -196,10 +196,10 @@ public class ModelManagerTest {
     @Test
     public void undo_previousSnapshotExists_restoresPreviousState() {
         modelManager.addPerson(ALICE);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.addPerson(BENSON);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
 
@@ -210,10 +210,10 @@ public class ModelManagerTest {
     @Test
     public void redo_previousUndoExists_restoresNextState() {
         modelManager.addPerson(ALICE);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.addPerson(BENSON);
-        modelManager.save();
+        modelManager.save("");
 
         modelManager.undo();
         modelManager.redo();

@@ -28,7 +28,7 @@ class SnapshotManagerTest {
         snapshotManager = new SnapshotManager();
         SnapshotManager.reset();
         populate(initialAddressBook);
-        snapshotManager.saveSnapshot(initialAddressBook);
+        snapshotManager.saveSnapshot(initialAddressBook, "");
     }
 
     @Test
@@ -49,7 +49,7 @@ class SnapshotManagerTest {
         // For this basic test, we can use a different initial state instead.
         AddressBook emptyAddressBook = new AddressBook();
 
-        snapshotManager.saveSnapshot(emptyAddressBook);
+        snapshotManager.saveSnapshot(emptyAddressBook, "");
 
         AddressBook result = snapshotManager.undo();
 
@@ -60,7 +60,7 @@ class SnapshotManagerTest {
     @Test
     void undo_thenRedo_returnsLaterSnapshot() {
         AddressBook emptyAddressBook = new AddressBook();
-        snapshotManager.saveSnapshot(emptyAddressBook);
+        snapshotManager.saveSnapshot(emptyAddressBook, "");
 
         AddressBook undone = snapshotManager.undo();
         assertEquals(initialAddressBook, undone);
@@ -74,12 +74,12 @@ class SnapshotManagerTest {
     @Test
     void undo_thenSaveSnapshot_clearsRedoHistory() {
         AddressBook emptyAddressBook = new AddressBook();
-        snapshotManager.saveSnapshot(emptyAddressBook);
+        snapshotManager.saveSnapshot(emptyAddressBook, "");
 
         snapshotManager.undo();
 
         // Create a new branch of history.
-        snapshotManager.saveSnapshot(new AddressBook());
+        snapshotManager.saveSnapshot(new AddressBook(), "");
 
         assertFalse(snapshotManager.canRedo());
     }
@@ -89,7 +89,7 @@ class SnapshotManagerTest {
         assertFalse(snapshotManager.canUndo());
         assertFalse(snapshotManager.canRedo());
 
-        snapshotManager.saveSnapshot(new AddressBook());
+        snapshotManager.saveSnapshot(new AddressBook(), "");
 
         assertTrue(snapshotManager.canUndo());
         assertFalse(snapshotManager.canRedo());
