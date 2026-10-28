@@ -139,6 +139,24 @@ public class ParserUtil {
     }
 
     /**
+     * Parses a {@code String gradeLevel} into a {@code GradeLevel}.
+     * Leading and trailing whitespaces will be trimmed.
+     * Allows empty strings to remove the {@code GradeLevel}.
+     *
+     * @throws ParseException if the given {@code gradeLevel} is invalid.
+     */
+    public static GradeLevel parseOptionalGradeLevel(String gradeLevel) throws ParseException {
+        if (gradeLevel.isEmpty()) {
+            return GradeLevel.NONE;
+        }
+        String trimmedGradeLevel = gradeLevel.trim();
+        if (!GradeLevel.isValidGradeLevel(trimmedGradeLevel)) {
+            throw new ParseException(GradeLevel.MESSAGE_CONSTRAINTS);
+        }
+        return new GradeLevel(trimmedGradeLevel);
+    }
+
+    /**
      * Parses a {@code String tag} into a {@code Tag}.
      * Leading and trailing whitespaces will be trimmed.
      *

@@ -22,8 +22,8 @@ import seedu.address.logic.commands.DeleteParentPhotoCommand;
 import seedu.address.logic.commands.DeletePhotoCommand;
 import seedu.address.logic.commands.DeleteReminderCommand;
 import seedu.address.logic.commands.DeleteTaskCommand;
-import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditParentCommand;
+import seedu.address.logic.commands.EditStudentCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
@@ -97,7 +97,7 @@ public class AddressBookParser {
             case MarkTaskCommand.COMMAND_WORD -> new MarkTaskCommandParser().parse(arguments);
             case ScheduleStudentCommand.COMMAND_WORD -> new ScheduleStudentCommandParser().parse(arguments);
             case UnscheduleStudentCommand.COMMAND_WORD -> new UnscheduleStudentCommandParser().parse(arguments);
-            case EditCommand.COMMAND_WORD -> new EditCommandParser().parse(arguments);
+            case EditStudentCommand.COMMAND_WORD -> new EditStudentCommandParser().parse(arguments);
             case DeleteCommand.COMMAND_WORD -> new DeleteCommandParser().parse(arguments);
             case DeletePhotoCommand.COMMAND_WORD -> new DeletePhotoCommandParser().parse(arguments);
             case DeleteReminderCommand.COMMAND_WORD -> new DeleteReminderCommandParser().parse(arguments);

@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.logic.commands.EditStudentCommand.EditPersonDescriptor;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.GradeLevel;
@@ -90,6 +90,14 @@ public class EditPersonDescriptorBuilder {
      */
     public EditPersonDescriptorBuilder withGradeLevel(String gradeLevel) {
         descriptor.setGradeLevel(new GradeLevel(gradeLevel));
+        return this;
+    }
+
+    /**
+     * Sets the {@code GradeLevel} of the {@code EditPersonDescriptor} that we are building.
+     */
+    public EditPersonDescriptorBuilder withNoGradeLevel() {
+        descriptor.setGradeLevel(GradeLevel.NONE);
         return this;
     }
 

@@ -115,7 +115,7 @@ public class StatisticsIntegrationTest {
         String studentId = model.getPersonList().getFirst().getStudentId();
         logic.execute(LESSON);
         logic.execute(ASSESSMENT);
-        logic.execute("edit 1 n/New Name p/91234567 s/English");
+        logic.execute("edit-student 1 n/New Name p/91234567 s/English");
         assertEquals(studentId, model.getPersonList().getFirst().getStudentId());
         logic.execute("add-task 1 task/Homework");
         assertEquals(studentId, model.getPersonList().getFirst().getStudentId());

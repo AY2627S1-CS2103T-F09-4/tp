@@ -97,7 +97,7 @@ public class AttendanceIntegrationTest {
     @Test
     public void correctionsAndStudentEdits_doNotRewriteCapturedDetailsOrLoseLink() throws Exception {
         mark(1, "2026-10-19", "completed");
-        logic.execute("edit 1 n/New Name s/English");
+        logic.execute("edit-student 1 n/New Name s/English");
         assertEquals(sessionId, model.getScheduleList().getFirst().getSessionId());
         mark(1, "2026-10-19", "absent");
         mark(1, "2026-10-19", "completed");
