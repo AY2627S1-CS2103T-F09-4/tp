@@ -3,9 +3,11 @@ package seedu.address.logic.commands;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
@@ -28,6 +30,21 @@ public class HistoryCommand extends Command {
         this.assessment = assessment;
     }
 
+    /** Formats command-specific syntax and an example for parser and execution errors. */
+    public static String usage(String operation) {
+        if (operation.startsWith("list-")) {
+            return "Usage: " + operation + "\nExample: " + operation;
+        }
+        if (operation.startsWith("delete-")) {
+            String source = operation.equals("delete-lesson") ? "list-lessons" : "list-assessments";
+            return "Usage: " + operation + " RECORD_NUMBER (from " + source + ")\nExample: " + operation + " 1";
+        }
+        String target = operation.startsWith("record-") ? "INDEX" : "RECORD_NUMBER";
+        return "Usage: " + operation + " " + target + " date/YYYY-MM-DD "
+                + "subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX\nExample: " + operation
+                + " 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions score/18 max/25";
+    }
+
     @Override
     public boolean isReadOnly() {
         return operation.startsWith("list-");
@@ -46,7 +63,13 @@ public class HistoryCommand extends Command {
                 throw new IllegalArgumentException("Historical record dates cannot be in the future.");
             }
             String feedback;
-            if (operation.equals("record-assessment")) {
+            if (operation.equals("delete-lesson")) {
+                LessonRecord old = resolveRecord(lessons, target, "lesson", "list-lessons");
+                lessons.remove(old);
+                feedback = "Deleted lesson #" + target.getOneBased() + ": "
+                        + studentLabel(model, old.studentId(), old.studentName()) + " | " + old.date()
+                        + " " + old.start() + "-" + old.end();
+            } else if (operation.equals("record-assessment")) {
                 Person student = resolveStudent(model, target);
                 String changedId = UUID.randomUUID().toString();
                 assessments.add(assessment.record(changedId, student.getStudentId(), student.getName().fullName));
@@ -67,8 +90,8 @@ public class HistoryCommand extends Command {
             }
             model.setHistory(lessons, assessments);
             return new CommandResult(feedback);
-        } catch (IllegalArgumentException e) {
-            throw new CommandException(e.getMessage(), e);
+        } catch (IllegalArgumentException | CommandException e) {
+            throw new CommandException(e.getMessage() + "\n" + usage(operation), e);
         }
     }
 
@@ -89,15 +112,21 @@ public class HistoryCommand extends Command {
     }
 
     private String list(Model model, List<LessonRecord> lessons, List<AssessmentRecord> assessments) {
-        StringBuilder result = new StringBuilder(operation + " (all dates):");
+        String heading = operation.equals("list-lessons") ? "Recorded lessons" : "Assessments";
+        StringBuilder result = new StringBuilder(heading + " (all dates):");
         if (operation.equals("list-lessons")) {
-            for (int i = 0; i < lessons.size(); i++) {
-                LessonRecord r = lessons.get(i);
-                result.append("\n").append(i + 1).append(". ")
+            List<Integer> indices = IntStream.range(0, lessons.size()).boxed()
+                    .sorted(Comparator.comparing((Integer i) -> lessons.get(i).date())
+                            .thenComparing(i -> lessons.get(i).start())).toList();
+            int rowNumber = 1;
+            for (int index : indices) {
+                LessonRecord r = lessons.get(index);
+                result.append("\n").append(rowNumber++).append(". ")
                         .append(studentLabel(model, r.studentId(), r.studentName())).append(" | ")
                         .append(r.date()).append(" ").append(r.start()).append("-").append(r.end())
                         .append(" | ").append(r.subject()).append(" | ")
-                        .append(r.outcome().name().toLowerCase(Locale.ROOT));
+                        .append(r.outcome().name().toLowerCase(Locale.ROOT))
+                        .append(" | Lesson #").append(index + 1);
             }
             if (lessons.isEmpty()) {
                 result.append(" none");

@@ -1,9 +1,13 @@
 package seedu.address.logic.commands;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import seedu.address.model.Model;
 import seedu.address.model.schedule.ScheduledSession;
 
-/** Lists all recurring sessions with the displayed numbers used to mark attendance. */
+/** Lists chronological rows with separate session numbers used to mark attendance. */
 public class ListScheduleCommand extends Command {
     public static final String COMMAND_WORD = "list-schedule";
 
@@ -15,12 +19,18 @@ public class ListScheduleCommand extends Command {
     @Override
     public CommandResult execute(Model model) {
         StringBuilder result = new StringBuilder("Weekly schedule:");
-        int number = 1;
-        for (ScheduledSession session : model.getAddressBook().getScheduleList()) {
-            result.append("\n").append(number++).append(". ")
+        List<ScheduledSession> sessions = model.getAddressBook().getScheduleList();
+        List<Integer> indices = IntStream.range(0, sessions.size()).boxed()
+                .sorted(Comparator.comparing((Integer i) -> sessions.get(i).getDay())
+                        .thenComparing(i -> sessions.get(i).getTimeSlot().start)).toList();
+        int rowNumber = 1;
+        for (int index : indices) {
+            ScheduledSession session = sessions.get(index);
+            result.append("\n").append(rowNumber++).append(". ")
                     .append(session.getStudent().getName()).append(" | ")
                     .append(session.getStudent().getSubject()).append(" | ").append(session.getDay())
-                    .append(" | ").append(session.getTimeSlot());
+                    .append(" | ").append(session.getTimeSlot())
+                    .append(" | Session #").append(index + 1);
         }
         if (model.getAddressBook().getScheduleList().isEmpty()) {
             result.append(" none");

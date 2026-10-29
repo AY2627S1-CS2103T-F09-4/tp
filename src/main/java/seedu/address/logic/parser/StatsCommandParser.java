@@ -18,13 +18,26 @@ public class StatsCommandParser implements Parser<StatsCommand> {
 
     @Override
     public StatsCommand parse(String args) throws ParseException {
+        try {
+            return parseReport(args);
+        } catch (ParseException | IllegalArgumentException | DateTimeException e) {
+            throw new ParseException(e.getMessage() + "\n" + StatsCommand.usage(studentReport), e);
+        }
+    }
+
+    private StatsCommand parseReport(String args) throws ParseException {
         ArgumentMultimap values = HistoryCommandParser.arguments(args, "from", "to");
+        if (studentReport && values.getPreamble().isEmpty()) {
+            throw new ParseException("A student index is required.");
+        }
         Index student = studentReport ? ParserUtil.parseIndex(values.getPreamble()) : null;
         boolean hasFrom = values.getValue(new Prefix("from/")).isPresent();
         boolean hasTo = values.getValue(new Prefix("to/")).isPresent();
-        if ((!studentReport && !values.getPreamble().isEmpty()) || hasFrom != hasTo) {
-            throw new ParseException("Usage: stats [from/YYYY-MM-DD to/YYYY-MM-DD] or "
-                    + "stats-student INDEX [from/YYYY-MM-DD to/YYYY-MM-DD]. Supply both dates together.");
+        if (!studentReport && !values.getPreamble().isEmpty()) {
+            throw new ParseException("stats does not take a student index or other unprefixed arguments.");
+        }
+        if (hasFrom != hasTo) {
+            throw new ParseException("Supply both from/ and to/ dates together.");
         }
         try {
             LocalDate from = hasFrom ? HistoryValidation.date(values.getValue(new Prefix("from/")).orElseThrow())

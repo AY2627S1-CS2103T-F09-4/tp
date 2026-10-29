@@ -192,6 +192,29 @@ public class StatisticsIntegrationTest {
         assertTrue(feedback("stats-student 1").contains("Attendance rate: N/A"));
     }
 
+    @Test
+    public void historyHeadings_areReadableForEmptyAndPopulatedLists() throws Exception {
+        assertEquals("Assessments (all dates): none", feedback("list-assessments"));
+        assertEquals("Recorded lessons (all dates): none", feedback("list-lessons"));
+        logic.execute(ASSESSMENT);
+        logic.execute(LESSON);
+        assertTrue(feedback("list-assessments").startsWith("Assessments (all dates):\n1. "));
+        assertTrue(feedback("list-lessons").startsWith("Recorded lessons (all dates):\n1. "));
+    }
+
+    @Test
+    public void executionValidationErrors_includeSyntaxAndExampleWithoutChangingData() throws Exception {
+        AddressBook before = new AddressBook(model.getAddressBook());
+        for (String input : new String[] {"stats-student 3", ASSESSMENT.replace("assessment 1", "assessment 3"),
+            ASSESSMENT.replace("2026-10-21", "2026-10-22"), "delete-assessment 1"}) {
+            CommandException error = assertThrows(CommandException.class, () -> logic.execute(input));
+            String command = input.split(" ")[0];
+            assertTrue(error.getMessage().contains("Usage: " + command));
+            assertTrue(error.getMessage().contains("Example: " + command));
+            assertEquals(before, model.getAddressBook());
+        }
+    }
+
     private String feedback(String command) throws Exception {
         return logic.execute(command).getFeedbackToUser();
     }
