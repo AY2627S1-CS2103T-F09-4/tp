@@ -4,16 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -30,12 +34,13 @@ public class MainWindowShortcutTest {
     @BeforeAll
     static void initialiseJavaFx() throws Exception {
         FxTestSupport.initialiseJavaFx();
-        FxTestSupport.runOnFxThread(() -> javafx.application.Platform.setImplicitExit(false));
+        FxTestSupport.runOnFxThread(() -> Platform.setImplicitExit(false));
     }
 
     @Test
     public void escapeThenEnter_inCommandBox_closesWindow() throws Exception {
-        checkShownWindow(stage -> {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
             Node commandBox = stage.getScene().lookup("#commandTextField");
             pressKey(commandBox, KeyCode.ESCAPE);
             assertTrue(fileMenuOf(stage).isShowing());
@@ -48,7 +53,8 @@ public class MainWindowShortcutTest {
 
     @Test
     public void escape_inResultDisplay_opensFileMenu() throws Exception {
-        checkShownWindow(stage -> {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
             pressKey(stage.getScene().lookup("#resultDisplay"), KeyCode.ESCAPE);
             assertTrue(fileMenuOf(stage).isShowing());
         });
@@ -56,7 +62,8 @@ public class MainWindowShortcutTest {
 
     @Test
     public void escapeTwice_closesFileMenuWithoutClosingWindow() throws Exception {
-        checkShownWindow(stage -> {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
             Node commandBox = stage.getScene().lookup("#commandTextField");
             pressKey(commandBox, KeyCode.ESCAPE);
             pressKey(commandBox, KeyCode.ESCAPE);
@@ -67,7 +74,8 @@ public class MainWindowShortcutTest {
 
     @Test
     public void escape_whileMenuBarIsActive_leavesMenuWithoutClosingWindow() throws Exception {
-        checkShownWindow(stage -> {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
             Node commandBox = stage.getScene().lookup("#commandTextField");
             pressKey(commandBox, KeyCode.F10);
             pressKey(commandBox, KeyCode.ESCAPE);
@@ -76,25 +84,94 @@ public class MainWindowShortcutTest {
         });
     }
 
+    @Test
+    public void escape_afterScrollingSchedule_opensFileMenu() throws Exception {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
+            TabPane tabs = (TabPane) stage.getScene().lookup("#recordTabs");
+            tabs.getSelectionModel().select(2);
+            Node schedule = stage.getScene().lookup("#scheduleScroll");
+            schedule.requestFocus();
+            pressKey(schedule, KeyCode.RIGHT);
+            pressKey(schedule, KeyCode.LEFT);
+
+            pressKey(schedule, KeyCode.ESCAPE);
+            assertTrue(fileMenuOf(stage).isShowing());
+        });
+    }
+
+    @Test
+    public void escapeAndF1_fromEveryFocusableControlOnEveryTab_openFileMenuAndHelp() throws Exception {
+        checkShownWindow(window -> {
+            Stage stage = window.getPrimaryStage();
+            HelpWindow helpWindow = UiTestUtil.fieldOf(window, "helpWindow");
+            TabPane tabs = (TabPane) stage.getScene().lookup("#recordTabs");
+            for (int tab = 0; tab < tabs.getTabs().size(); tab++) {
+                tabs.getSelectionModel().select(tab);
+                stage.getScene().getRoot().applyCss();
+                stage.getScene().getRoot().layout();
+                for (Node control : focusableControlsIn(stage.getScene().getRoot())) {
+                    control.requestFocus();
+                    Node focused = stage.getScene().getFocusOwner();
+                    String place = tabs.getTabs().get(tab).getText() + " tab, " + focused.getId();
+
+                    pressKey(focused, KeyCode.ESCAPE);
+                    assertTrue(fileMenuOf(stage).isShowing(), "Esc did not open the File menu in " + place);
+                    pressKey(focused, KeyCode.ESCAPE);
+                    assertFalse(fileMenuOf(stage).isShowing(), "Esc did not close the File menu in " + place);
+
+                    pressKey(focused, KeyCode.F1);
+                    assertTrue(helpWindow.isShowing(), "F1 did not open the user guide in " + place);
+                    helpWindow.hide();
+                }
+            }
+        });
+    }
+
     private static Menu fileMenuOf(Stage stage) {
         return ((MenuBar) stage.getScene().lookup("#menuBar")).getMenus().get(0);
     }
 
+    /** Returns every visible, enabled control under {@code root} that the user can Tab to. */
+    private static List<Node> focusableControlsIn(Parent root) {
+        List<Node> controls = new ArrayList<>();
+        for (Node child : root.getChildrenUnmodifiable()) {
+            if (!child.isVisible() || child.isDisabled()) {
+                continue;
+            }
+            if (child.isFocusTraversable()) {
+                controls.add(child);
+            }
+            if (child instanceof Parent parent) {
+                controls.addAll(focusableControlsIn(parent));
+            }
+        }
+        return controls;
+    }
+
+    /** A check on a shown main window, which may look into the window's private parts. */
+    private interface WindowCheck {
+        void check(MainWindow window) throws ReflectiveOperationException;
+    }
+
     /**
-     * Shows a main window with the command box focused, runs {@code check} on its stage, then closes it.
+     * Shows a main window with the command box focused, runs {@code check} on it, then closes it.
      */
-    private void checkShownWindow(Consumer<Stage> check) throws Exception {
+    private void checkShownWindow(WindowCheck check) throws Exception {
         FxTestSupport.runOnFxThread(() -> {
             StorageManager storage = new StorageManager(
                     new JsonAddressBookStorage(folder.resolve("book.json")),
                     new JsonUserPrefsStorage(folder.resolve("prefs.json")));
             Stage stage = new Stage();
-            new MainWindow(stage, new LogicManager(new ModelManager(), storage), folder.resolve("book.json"))
-                    .fillInnerParts();
+            MainWindow window = new MainWindow(stage, new LogicManager(new ModelManager(), storage),
+                    folder.resolve("book.json"));
+            window.fillInnerParts();
             stage.show();
             stage.getScene().lookup("#commandTextField").requestFocus();
             try {
-                check.accept(stage);
+                check.check(window);
+            } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
             } finally {
                 stage.close();
             }
