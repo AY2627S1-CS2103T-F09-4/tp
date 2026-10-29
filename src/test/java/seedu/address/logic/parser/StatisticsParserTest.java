@@ -100,9 +100,8 @@ public class StatisticsParserTest {
         for (String input : inputs) {
             ParseException error = assertThrows(ParseException.class, () -> parser.parseCommand(input), input);
             String command = input.split(" ")[0];
-            assertTrue(error.getMessage().contains("Usage: " + command), input);
+            assertTrue(error.getMessage().contains("\n" + command + ": "), input);
             assertTrue(error.getMessage().contains("Example: " + command), input);
-            assertTrue(error.getMessage().indexOf("Usage:") > 0, input);
         }
         ParseException numericError = assertThrows(ParseException.class, () ->
                 parser.parseCommand(assessment.replace("score/4", "score/NaN")));

@@ -1,5 +1,7 @@
 package seedu.address.ui;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -87,34 +89,20 @@ public class SchedulePanel extends UiPart<Region> {
      * Other keys, such as Tab, are left alone so focus can still move on.
      */
     void handleScrollKey(KeyEvent event) {
-        Bounds bounds = scheduleScroll.getViewportBounds();
+        requireNonNull(event);
+        double screenHeight = scheduleScroll.getViewportBounds().getHeight();
         switch (event.getCode()) {
-            case LEFT:
-                scrollBy(-grid.hourWidth(), 0);
-                break;
-            case RIGHT:
-                scrollBy(grid.hourWidth(), 0);
-                break;
-            case UP:
-                scrollBy(0, -grid.rowHeight());
-                break;
-            case DOWN:
-                scrollBy(0, grid.rowHeight());
-                break;
-            case PAGE_UP:
-                scrollBy(0, -bounds.getHeight());
-                break;
-            case PAGE_DOWN:
-                scrollBy(0, bounds.getHeight());
-                break;
-            case HOME:
-                scheduleScroll.setHvalue(scheduleScroll.getHmin());
-                break;
-            case END:
-                scheduleScroll.setHvalue(scheduleScroll.getHmax());
-                break;
-            default:
+            case LEFT -> scrollBy(-grid.hourWidth(), 0);
+            case RIGHT -> scrollBy(grid.hourWidth(), 0);
+            case UP -> scrollBy(0, -grid.rowHeight());
+            case DOWN -> scrollBy(0, grid.rowHeight());
+            case PAGE_UP -> scrollBy(0, -screenHeight);
+            case PAGE_DOWN -> scrollBy(0, screenHeight);
+            case HOME -> scheduleScroll.setHvalue(scheduleScroll.getHmin());
+            case END -> scheduleScroll.setHvalue(scheduleScroll.getHmax());
+            default -> {
                 return;
+            }
         }
         logger.fine("Scrolled the schedule with " + event.getCode());
         event.consume();
@@ -131,8 +119,12 @@ public class SchedulePanel extends UiPart<Region> {
         if (scrollableHeight > 0) {
             scheduleScroll.setVvalue(clamp(scheduleScroll.getVvalue() + dy / scrollableHeight));
         }
-        assert scheduleScroll.getHvalue() >= 0 && scheduleScroll.getHvalue() <= 1;
-        assert scheduleScroll.getVvalue() >= 0 && scheduleScroll.getVvalue() <= 1;
+        assert isWithinScrollRange(scheduleScroll.getHvalue()) : "Horizontal scroll left the timetable";
+        assert isWithinScrollRange(scheduleScroll.getVvalue()) : "Vertical scroll left the timetable";
+    }
+
+    private static boolean isWithinScrollRange(double value) {
+        return value >= 0 && value <= 1;
     }
 
     private static double clamp(double value) {

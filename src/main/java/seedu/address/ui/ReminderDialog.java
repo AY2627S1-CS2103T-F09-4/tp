@@ -1,5 +1,7 @@
 package seedu.address.ui;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Clock;
 import java.util.List;
 import java.util.logging.Logger;
@@ -83,6 +85,7 @@ class ReminderDialog {
      * scrolls beyond that, so every reminder can be reached without a mouse.
      */
     private static ScrollPane createScrollableContent(String text) {
+        requireNonNull(text);
         Label label = new Label(text);
         label.getStyleClass().add("reminder-text");
         label.setWrapText(true);

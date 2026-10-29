@@ -15,6 +15,9 @@ public record CommandSummary(String commandWord, String format, String descripti
     public static final String MESSAGE_CONSTRAINTS =
             "Command word must be a single word, and description must not be blank.";
 
+    /** A command word is one or more characters with no whitespace, e.g. "add-student". */
+    public static final String COMMAND_WORD_REGEX = "\\S+";
+
     /**
      * Every field must be present and not null.
      *
@@ -24,7 +27,7 @@ public record CommandSummary(String commandWord, String format, String descripti
         requireNonNull(commandWord);
         requireNonNull(format);
         requireNonNull(description);
-        checkArgument(commandWord.matches("\\S+"), MESSAGE_CONSTRAINTS);
+        checkArgument(commandWord.matches(COMMAND_WORD_REGEX), MESSAGE_CONSTRAINTS);
         checkArgument(!description.isBlank(), MESSAGE_CONSTRAINTS);
     }
 }
