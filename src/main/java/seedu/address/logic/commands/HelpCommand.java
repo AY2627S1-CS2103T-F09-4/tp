@@ -7,7 +7,7 @@ import java.util.List;
 import seedu.address.model.Model;
 
 /**
- * Formats full help instructions for every command for display.
+ * Shows every command, with its format and description, in the Help tab.
  */
 public class HelpCommand extends Command {
 

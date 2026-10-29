@@ -83,7 +83,7 @@ public class StatisticsReportTest {
     }
 
     @Test
-    public void sameDateAssessments_keepRecordedOrder() {
+    public void student_sameDateAssessments_keepRecordedOrder() {
         // IDs are random UUIDs, so give the first-recorded mark the larger ID to prove ID order is not used.
         AssessmentRecord first = new AssessmentRecord("00000000-0000-0000-0000-000000000002",
                 alice.getStudentId(), "Alice", start, "Math", "Quiz", "First", new BigDecimal("50"),

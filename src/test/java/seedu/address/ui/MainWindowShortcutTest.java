@@ -52,27 +52,6 @@ public class MainWindowShortcutTest {
     }
 
     @Test
-    public void escape_inResultDisplay_opensFileMenu() throws Exception {
-        checkShownWindow(window -> {
-            Stage stage = window.getPrimaryStage();
-            pressKey(stage.getScene().lookup("#resultDisplay"), KeyCode.ESCAPE);
-            assertTrue(fileMenuOf(stage).isShowing());
-        });
-    }
-
-    @Test
-    public void escapeTwice_closesFileMenuWithoutClosingWindow() throws Exception {
-        checkShownWindow(window -> {
-            Stage stage = window.getPrimaryStage();
-            Node commandBox = stage.getScene().lookup("#commandTextField");
-            pressKey(commandBox, KeyCode.ESCAPE);
-            pressKey(commandBox, KeyCode.ESCAPE);
-            assertFalse(fileMenuOf(stage).isShowing());
-            assertTrue(stage.isShowing());
-        });
-    }
-
-    @Test
     public void escape_whileMenuBarIsActive_leavesMenuWithoutClosingWindow() throws Exception {
         checkShownWindow(window -> {
             Stage stage = window.getPrimaryStage();
@@ -81,22 +60,6 @@ public class MainWindowShortcutTest {
             pressKey(commandBox, KeyCode.ESCAPE);
             assertFalse(fileMenuOf(stage).isShowing());
             assertTrue(stage.isShowing());
-        });
-    }
-
-    @Test
-    public void escape_afterScrollingSchedule_opensFileMenu() throws Exception {
-        checkShownWindow(window -> {
-            Stage stage = window.getPrimaryStage();
-            TabPane tabs = (TabPane) stage.getScene().lookup("#recordTabs");
-            tabs.getSelectionModel().select(2);
-            Node schedule = stage.getScene().lookup("#scheduleScroll");
-            schedule.requestFocus();
-            pressKey(schedule, KeyCode.RIGHT);
-            pressKey(schedule, KeyCode.LEFT);
-
-            pressKey(schedule, KeyCode.ESCAPE);
-            assertTrue(fileMenuOf(stage).isShowing());
         });
     }
 
@@ -119,6 +82,7 @@ public class MainWindowShortcutTest {
                     assertTrue(fileMenuOf(stage).isShowing(), "Esc did not open the File menu in " + place);
                     pressKey(focused, KeyCode.ESCAPE);
                     assertFalse(fileMenuOf(stage).isShowing(), "Esc did not close the File menu in " + place);
+                    assertTrue(stage.isShowing(), "Esc closed the window in " + place);
 
                     pressKey(focused, KeyCode.F1);
                     assertTrue(helpWindow.isShowing(), "F1 did not open the user guide in " + place);

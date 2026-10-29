@@ -25,7 +25,8 @@ public class AddTaskCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Adds a task to the student identified by the index number used in the displayed student list.\n"
-            + "Parameters: INDEX task/TASK_DESCRIPTION (at most " + Task.MAX_DESCRIPTION_LENGTH + " characters)\n"
+            + "Parameters: INDEX task/TASK_DESCRIPTION "
+            + "(at most " + Task.MAX_DESCRIPTION_LENGTH + " characters)\n"
             + "A student can have at most " + TaskList.MAX_TASKS + " tasks.\n"
             + "Example: " + COMMAND_WORD + " 1 task/do homework";
 
@@ -59,10 +60,12 @@ public class AddTaskCommand extends Command {
 
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
         if (personToUpdate.getTaskList().isFull()) {
-            logger.info("Rejected add-task: " + personToUpdate.getName() + " already has the most tasks allowed");
+            logger.info("Rejected add-task: " + personToUpdate.getName()
+                    + " already has the most tasks allowed");
             throw new CommandException(MESSAGE_TOO_MANY_TASKS);
         }
-        assert personToUpdate.getTaskList().size() < TaskList.MAX_TASKS : "A full task list was about to grow";
+        assert personToUpdate.getTaskList().size() < TaskList.MAX_TASKS
+                : "A full task list was about to grow";
 
         Person updatedPerson = new Person(personToUpdate.getName(), personToUpdate.getPhone(),
                 personToUpdate.getEmail(), personToUpdate.getAddress(), personToUpdate.getSubject(),

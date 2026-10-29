@@ -15,7 +15,8 @@ import seedu.address.commons.core.index.Index;
 public class TaskList {
 
     /**
-     * The most tasks a student may be given, so that a student card, which grows to show every task, stays short.
+     * The most tasks a student may be given, so that a student card,
+     * which grows to show every task, stays short.
      * Only adding a task is checked, so task lists saved before this limit existed still load.
      */
     public static final int MAX_TASKS = 5;

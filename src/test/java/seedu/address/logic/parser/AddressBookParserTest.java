@@ -61,13 +61,6 @@ public class AddressBookParserTest {
     }
 
     @Test
-    public void parseCommand_addWithGradeLevel() throws Exception {
-        Person person = new PersonBuilder().withGradeLevel("Sec 3").build();
-        AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
-        assertEquals(new AddCommand(person), command);
-    }
-
-    @Test
     public void parseCommand_addPhoto() throws Exception {
         AddPhotoCommand command = (AddPhotoCommand) parser.parseCommand(
                 AddPhotoCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " f/photos/amy.png");

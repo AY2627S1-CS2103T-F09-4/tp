@@ -308,7 +308,9 @@ class PersonCardTest {
 
     @Test void constructor_mostTasksAllowedWrapping_cardShowsEveryTaskWithoutScrolling() throws Exception {
         String widestTask = "W".repeat(Task.MAX_DESCRIPTION_LENGTH);
-        String[] tasks = IntStream.range(0, TaskList.MAX_TASKS).mapToObj(i -> widestTask).toArray(String[]::new);
+        String[] tasks = IntStream.range(0, TaskList.MAX_TASKS)
+                .mapToObj(i -> widestTask)
+                .toArray(String[]::new);
         runOnFxThread(() -> {
             PersonCard card = new PersonCard(new PersonBuilder().withTasks(tasks).build(), 1, "");
             StackPane holder = new StackPane(card.getRoot());

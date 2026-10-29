@@ -38,17 +38,18 @@ public class GradeLevelTest {
     }
 
     @Test
-    public void none_isNotPresent() {
+    public void isPresent() {
         assertFalse(GradeLevel.NONE.isPresent());
         assertEquals("", GradeLevel.NONE.value);
         assertTrue(new GradeLevel("P6").isPresent());
     }
 
     @Test
-    public void copy_doesNotEqualOriginal() {
-        GradeLevel first = new GradeLevel("1");
-        GradeLevel second = first.copy();
-        assertNotSame(first, second);
+    public void copy_returnsEqualSeparateObject() {
+        GradeLevel original = new GradeLevel("Sec 3");
+        GradeLevel copy = original.copy();
+        assertEquals(original, copy);
+        assertNotSame(original, copy);
     }
 
     @Test
