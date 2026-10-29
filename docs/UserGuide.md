@@ -160,12 +160,14 @@ Example: `search Mathematics`
 #### Adding a parent: `add-parent`
 Adds a parent and can optionally link the parent to a student.
 
-Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT_1>, r/<REQUIREMENT_2>, ...]`
+Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
 
+* Name and phone are compulsory; email, student link, and requirements are optional.
 * `PHONE` may contain 3 to 15 digits and may start with `+`.
 * `EMAIL` is optional but must be valid when supplied.
-* `link/` identifies a student in the displayed student list.
-* Requirements are optional and may be repeated.
+* `link/STUDENT_INDEX` identifies a student in the displayed student list. A student can have at most one parent.
+* Supply each requirement with its own `r/` prefix, without commas between entries.
+* You can add or change the link and requirements later with `edit-parent`.
 
 Example: `add-parent n/Mrs Tan p/98765432 e/tan@example.com link/1 r/No food during session`
 
@@ -177,9 +179,25 @@ Format: `list-parents`
 #### Editing a parent: `edit-parent`
 Edits an existing parent.
 
-Format: `edit-parent INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>]`
+Format: `edit-parent INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
 
 `INDEX` must be a positive integer referring to the displayed parent list. At least one optional field must be supplied.
+
+* Omitted fields keep their existing values.
+* `link/STUDENT_INDEX` adds or replaces the link using the displayed student list. A student can have at most one parent.
+* Empty `link/` removes the student link.
+* One or more `r/REQUIREMENT` entries replace the entire requirements list. To delete selected requirements, supply only those you want to keep.
+* A single empty `r/` clears all requirements. Do not combine empty and nonempty requirement entries.
+* `n/`, `p/`, `e/`, and `link/` may each appear at most once. Email must be valid when supplied.
+* A parent's photo is preserved when editing these details.
+
+Example: `edit-parent 1 link/2 r/No food r/Send weekly updates`
+
+Example (delete one requirement): if parent 1 has `No food`, `Call before lessons`, and `Send weekly updates`, use `edit-parent 1 r/No food r/Send weekly updates` to remove `Call before lessons`.
+
+Example (clear the link and all requirements): `edit-parent 1 link/ r/`
+
+If an edit is invalid, the error message explains the reason and shows the command format. No fields are changed when validation fails. For example, `edit-parent 1 link/0` reports that the student index must be a positive integer, followed by the usage instructions. Use `list-parents` or `list-students` to check the relevant displayed indices.
 
 #### Deleting a parent: `delete-parent`
 Deletes the parent at the displayed index.
@@ -480,7 +498,7 @@ table td code {
 |---|---|
 | `add-parent` | `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...` |
 | `list-parents` | `list-parents` |
-| `edit-parent` | `edit-parent INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>]` |
+| `edit-parent` | `edit-parent INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...` |
 | `delete-parent` | `delete-parent INDEX` |
 
 ### Photos
