@@ -61,6 +61,7 @@ public class ParentContactCard extends UiPart<Region> {
         ParentAttributesTextIndexFinder finder =
                 new ParentAttributesTextIndexFinder(contact, this.keyword);
 
+        assert displayedIndex > 0 : "Displayed index must be positive";
         id.setText(displayedIndex + ". ");
         setPhoto(contact);
 
@@ -73,7 +74,7 @@ public class ParentContactCard extends UiPart<Region> {
     }
 
     private void setAttributes(ParentContact contact, Logic logic, ParentAttributesTextIndexFinder finder) {
-
+        requireNonNull(logic);
         setHighlightedText(name, contact.getName().fullName, finder.getNameIndex(), false);
         setHighlightedText(phone, contact.getPhone().value, finder.getPhoneIndex(), false);
         setHighlightedTextForEmail(contact, finder);
@@ -109,10 +110,13 @@ public class ParentContactCard extends UiPart<Region> {
     }
 
     private static String setLinkedStudent(ParentContact contact, Logic logic) {
+        requireNonNull(contact);
+        requireNonNull(logic);
         String linkedStudentText = "Linked student: N/A";
         if (contact.getLinkedStudentId() == null) {
             return linkedStudentText;
         }
+        assert logic.getPersonList() != null : "Parent list must not be null";
         for (Person student : logic.getPersonList()) {
             String studentId = student.getStudentId();
             if (studentId.equals(contact.getLinkedStudentId())) {
@@ -170,6 +174,7 @@ public class ParentContactCard extends UiPart<Region> {
             return textFlow;
         }
 
+        assert ranges != null : "Match ranges must not be null";
         for (MatchRange range : ranges) {
             int start = range.getStart();
             int end = range.getEnd();

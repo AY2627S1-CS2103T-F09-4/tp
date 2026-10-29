@@ -8,9 +8,9 @@ import seedu.address.model.person.ParentContact;
  * Finds a given keyword within a {@code Person}'s attributes.
  */
 public class ParentAttributesTextIndexFinder {
-    private ParentContact contact;
-    private TextIndexFinder textIndexFinder;
-    private String keyword;
+    private final ParentContact contact;
+    private final TextIndexFinder textIndexFinder;
+    private final String keyword;
 
     /**
      * Creates a ParentAttributesTextIndexFinder.
@@ -19,6 +19,7 @@ public class ParentAttributesTextIndexFinder {
      * @param keyword a keyword to search within a {@ParentContact}'s attributes
      */
     public ParentAttributesTextIndexFinder(ParentContact parent, String keyword) {
+        assert parent != null : "Parents must not be null";
         this.contact = parent;
         this.textIndexFinder = new TextIndexFinder();
         this.keyword = keyword;

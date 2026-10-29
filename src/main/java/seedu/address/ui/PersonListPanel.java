@@ -35,6 +35,7 @@ public class PersonListPanel extends UiPart<Region> {
      */
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+        logger.fine("PersonListPanel loading with keyword:" + keyword);
         personListView.refresh();
     }
 

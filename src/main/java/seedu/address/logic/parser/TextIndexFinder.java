@@ -41,6 +41,14 @@ public class TextIndexFinder {
         return matches;
     }
 
+    /**
+     * Searches a text for a keyword and returns the start and end indexes of the keyword with padding, if present.
+     *
+     * @param text    the text to be searched.
+     * @param keyword the keyword to search for in the text.
+     * @param padding the offset to be applied to the indexes.
+     * @return A list of start and end indexes of all keywords found within the text.
+     */
     public List<MatchRange> findPaddedMatchRanges(String text, String keyword, int padding) {
         return getMatches(text, keyword, padding);
     }
