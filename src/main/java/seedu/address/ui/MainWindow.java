@@ -1,5 +1,7 @@
 package seedu.address.ui;
 
+import static java.util.Objects.requireNonNull;
+
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -30,6 +32,7 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
+    private static final KeyCombination ESCAPE_KEY = KeyCombination.valueOf("Esc");
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
@@ -110,11 +113,24 @@ public class MainWindow extends UiPart<Stage> {
 
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
-        // Esc is not swallowed by text boxes, so it skips the workaround in setAccelerator.
-        // That workaround runs before the menu bar sees the key,
-        // which would stop Esc from closing a menu the user is already in.
-        getRoot().getScene().getAccelerators().put(KeyCombination.valueOf("Esc"), fileMenu::show);
+        // The filter sits on the window's content rather than the window, so the menu bar sees Esc first
+        // and can still use it to close a menu the user is already in.
+        getRoot().getScene().getRoot().addEventFilter(KeyEvent.KEY_PRESSED, this::handleEscape);
         fileMenu.setOnShown(event -> selectExit());
+    }
+
+    /**
+     * Opens the File menu when Esc is pressed, wherever the focus is. Lists and text boxes use Esc
+     * themselves, so this is checked before the key reaches them.
+     */
+    void handleEscape(KeyEvent event) {
+        requireNonNull(event);
+        if (!ESCAPE_KEY.match(event) || fileMenu.isShowing()) {
+            return;
+        }
+        logger.fine("Esc pressed in " + event.getTarget() + ", opening the File menu");
+        event.consume();
+        fileMenu.show();
     }
 
     /**
