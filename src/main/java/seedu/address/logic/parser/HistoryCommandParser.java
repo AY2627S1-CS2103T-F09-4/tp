@@ -20,6 +20,12 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("(?:^|\\s)([A-Za-z][A-Za-z-]*)/");
     private final String operation;
 
+    private final String recordAssessmentExample = "record-assessment 1 date/2026-12-12 subject/math "
+            + "category/functions title/quiz score/20 max/30";
+    private final String editAssessmentExample = "edit-assessment 1 date/2026-12-11 subject/science "
+            + "category/physics title/finals score/0 max/100";
+    private final String deleteAssessmentExample = "delete-assessment 1";
+
     public HistoryCommandParser(String operation) {
         this.operation = operation;
     }
@@ -37,6 +43,10 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
             String[] fields = isDelete ? new String[0]
                     : new String[]{"date", "subject", "category", "title", "score", "max"};
             ArgumentMultimap values = arguments(args, fields);
+            if (values.getPreamble().isEmpty()) {
+                throw new ParseException(String.format("Invalid " + operation + ": \n%1$s",
+                        usage() + "\nExample: " + getExample()));
+            }
             Index target = ParserUtil.parseIndex(values.getPreamble());
             if (isDelete) {
                 return new HistoryCommand(operation, target, null);
@@ -65,6 +75,19 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
         String target = operation.startsWith("record-") ? "INDEX" : "RECORD_NUMBER";
         return "Usage: " + operation + " " + target + " date/YYYY-MM-DD "
                 + "subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX";
+    }
+
+    private String getExample() {
+        if (operation.startsWith("delete-")) {
+            return deleteAssessmentExample;
+        }
+        if (operation.startsWith("edit-")) {
+            return editAssessmentExample;
+        }
+        if (operation.startsWith("record-")) {
+            return recordAssessmentExample;
+        }
+        return null;
     }
 
     private static String parseSubject(String value) {

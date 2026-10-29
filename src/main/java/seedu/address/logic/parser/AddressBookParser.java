@@ -102,7 +102,12 @@ public class AddressBookParser {
             case DeletePhotoCommand.COMMAND_WORD -> new DeletePhotoCommandParser().parse(arguments);
             case DeleteReminderCommand.COMMAND_WORD -> new DeleteReminderCommandParser().parse(arguments);
             case DeleteTaskCommand.COMMAND_WORD -> new DeleteTaskCommandParser().parse(arguments);
-            case ClearCommand.COMMAND_WORD -> new ClearCommand();
+            case ClearCommand.COMMAND_WORD -> {
+                if (!arguments.isBlank()) {
+                    throw new ParseException("Usage: " + ClearCommand.COMMAND_WORD);
+                }
+                yield new ClearCommand();
+            }
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
             case ListCommand.COMMAND_WORD -> new ListCommand();
             case ListRemindersCommand.COMMAND_WORD -> new ListRemindersCommandParser().parse(arguments);
