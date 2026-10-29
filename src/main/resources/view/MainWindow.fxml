@@ -26,11 +26,11 @@
 
       <VBox>
         <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
-          <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+          <Menu fx:id="fileMenu" mnemonicParsing="true" text="_File">
+            <MenuItem fx:id="exitMenuItem" mnemonicParsing="true" onAction="#handleExit" text="_Exit" />
           </Menu>
-          <Menu mnemonicParsing="false" text="F1 User Guide">
-            <MenuItem fx:id="helpMenuItem" mnemonicParsing="false" onAction="#handleHelp" text="User Guide" />
+          <Menu mnemonicParsing="true" text="F1 _User Guide">
+            <MenuItem fx:id="helpMenuItem" mnemonicParsing="true" onAction="#handleHelp" text="Open _User Guide" />
           </Menu>
         </MenuBar>
 
@@ -41,7 +41,7 @@
         </StackPane>
 
         <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="pane-with-border"
-                   minHeight="100" prefHeight="100" maxHeight="100">
+                   minHeight="190" prefHeight="190" maxHeight="190">
           <padding>
             <Insets top="5" right="10" bottom="5" left="10" />
           </padding>

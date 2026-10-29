@@ -334,10 +334,46 @@
     -fx-background: #1d1d1d;
 }
 
+/*
+ * Keyboard focus: a light blue ring marks whichever part of the window will receive key presses, because
+ * keyboard-only users have no mouse pointer to show where they are. The ring is an inner shadow, so it is
+ * drawn over the control's own content and gaining or losing focus never changes the layout.
+ */
+.root,
+.context-menu {
+    -tutoria-focus-color: #7cc4ff;
+}
+
+.text-area:focused,
+.list-view:focused,
+.tab-pane:focused,
+.button:focused,
 .reminder-scroll-pane:focused,
 .schedule-scroll-pane:focused {
-    -fx-border-color: white;
-    -fx-border-width: 1;
+    -fx-effect: innershadow(three-pass-box, -tutoria-focus-color, 6, 0.9, 0, 0);
+}
+
+/* The command box has a transparent background, so it gets a solid border instead of an inner shadow. */
+#commandTextField:focused {
+    -fx-border-color: -tutoria-focus-color;
+    -fx-border-width: 2;
+    -fx-border-insets: -1;
+}
+
+/*
+ * Menus reached with F10, Alt or an Alt shortcut are filled with the same light blue. A drop-down menu opens in
+ * its own window, so the colour is also defined on .context-menu above.
+ */
+.menu-bar .menu:hover,
+.menu-bar .menu:showing,
+.context-menu .menu-item:focused {
+    -fx-background-color: -tutoria-focus-color;
+}
+
+.menu-bar .menu:hover .label,
+.menu-bar .menu:showing .label,
+.context-menu .menu-item:focused .label {
+    -fx-text-fill: #1d1d1d;
 }
 
 .reminder-text {
