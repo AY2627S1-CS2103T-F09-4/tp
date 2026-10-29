@@ -93,7 +93,7 @@ public class ScheduleTest {
         schedule.add(BENSON_MONDAY_OVERLAP);
         schedule.add(ALICE_WEDNESDAY);
 
-        schedule.removeIf(s -> s.getStudent().equals(ALICE));
+        schedule.removeIf(s -> s.getStudents().getFirst().equals(ALICE));
 
         assertEquals(List.of(BENSON_MONDAY_OVERLAP), schedule.asUnmodifiableObservableList());
         assertThrows(NullPointerException.class, () -> schedule.removeIf(null));

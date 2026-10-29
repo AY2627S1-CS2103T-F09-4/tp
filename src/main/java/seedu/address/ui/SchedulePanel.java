@@ -93,7 +93,7 @@ public class SchedulePanel extends UiPart<Region> {
 
         legendPane.getChildren().clear();
         persons.stream()
-                .filter(p -> sessions.stream().anyMatch(s -> s.getStudent().equals(p)))
+                .filter(p -> sessions.stream().anyMatch(s -> s.hasStudent(p)))
                 .forEach(p -> legendPane.getChildren().add(createLegendEntry(p)));
     }
 

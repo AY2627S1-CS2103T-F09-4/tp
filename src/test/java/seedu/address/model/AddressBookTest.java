@@ -139,8 +139,8 @@ public class AddressBookTest {
         book.setPerson(ALICE, editedAlice);
 
         assertEquals(List.of(
-                ALICE_MONDAY_MORNING.withStudent(editedAlice),
-                ALICE_WEDNESDAY.withStudent(editedAlice),
+                ALICE_MONDAY_MORNING.withStudentReplaced(ALICE, editedAlice),
+                ALICE_WEDNESDAY.withStudentReplaced(ALICE, editedAlice),
                 BENSON_MONDAY_OVERLAP), book.getScheduleList());
     }
 
@@ -161,8 +161,8 @@ public class AddressBookTest {
 
         assertEquals(book, copy);
         for (ScheduledSession session : copy.getScheduleList()) {
-            assertTrue(copy.getPersonList().stream().anyMatch(p -> p == session.getStudent()));
-            assertTrue(book.getPersonList().stream().noneMatch(p -> p == session.getStudent()));
+            assertTrue(copy.getPersonList().stream().anyMatch(p -> p == session.getStudents().getFirst()));
+            assertTrue(book.getPersonList().stream().noneMatch(p -> p == session.getStudents().getFirst()));
         }
     }
 

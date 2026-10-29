@@ -6,6 +6,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_FROM;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TO;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.UnscheduleStudentCommand;
@@ -36,18 +37,19 @@ public class UnscheduleStudentCommandParser implements Parser<UnscheduleStudentC
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_DAY, PREFIX_FROM, PREFIX_TO);
 
-        Index index;
+        List<Index> indexes;
         try {
-            index = ParserUtil.parseIndex(argMultimap.getPreamble());
+            indexes = ParserUtil.parseIndexes(argMultimap.getPreamble());
         } catch (ParseException pe) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnscheduleStudentCommand.MESSAGE_USAGE), pe);
         }
+        ParserUtil.verifyNoDuplicateIndexes(indexes);
 
         DayOfWeek day = ParserUtil.parseDay(argMultimap.getValue(PREFIX_DAY).get());
         TimeSlot timeSlot = ParserUtil.parseTimeSlot(
                 argMultimap.getValue(PREFIX_FROM).get(), argMultimap.getValue(PREFIX_TO).get());
 
-        return new UnscheduleStudentCommand(index, day, timeSlot);
+        return new UnscheduleStudentCommand(indexes, day, timeSlot);
     }
 }

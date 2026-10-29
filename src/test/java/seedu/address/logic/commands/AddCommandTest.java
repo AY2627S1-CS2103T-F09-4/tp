@@ -170,6 +170,11 @@ public class AddCommandTest {
         }
 
         @Override
+        public void setScheduledSession(ScheduledSession target, ScheduledSession editedSession) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public ObservableList<ScheduledSession> getScheduleList() {
             throw new AssertionError("This method should not be called.");
         }

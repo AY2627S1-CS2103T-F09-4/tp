@@ -8,9 +8,11 @@ import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
+import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +33,45 @@ public class ScheduleStudentCommandTest {
 
     @Test
     public void constructor_nullFields_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new ScheduleStudentCommand(null, DayOfWeek.MONDAY, MORNING));
+        assertThrows(NullPointerException.class, () ->
+                new ScheduleStudentCommand((Index) null, DayOfWeek.MONDAY, MORNING));
+        assertThrows(NullPointerException.class, () ->
+                new ScheduleStudentCommand((List<Index>) null, DayOfWeek.MONDAY, MORNING));
         assertThrows(NullPointerException.class, () -> new ScheduleStudentCommand(INDEX_FIRST_PERSON, null, MORNING));
         assertThrows(NullPointerException.class, () ->
                 new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY, null));
+    }
+
+    @Test
+    public void constructor_noIndexes_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new ScheduleStudentCommand(List.of(), DayOfWeek.MONDAY, MORNING));
+    }
+
+    @Test
+    public void execute_multipleIndexes_addsOneGroupSession() throws Exception {
+        Person first = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person second = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        Person third = model.getFilteredPersonList().get(INDEX_THIRD_PERSON.getZeroBased());
+        ScheduleStudentCommand command = new ScheduleStudentCommand(
+                List.of(INDEX_THIRD_PERSON, INDEX_FIRST_PERSON, INDEX_SECOND_PERSON), DayOfWeek.MONDAY, MORNING);
+
+        String expectedMessage = "Scheduled " + third.getName() + ", " + first.getName() + ", " + second.getName()
+                + " on Monday from 10-00 to 12-00";
+
+        assertEquals(expectedMessage, command.execute(model).getFeedbackToUser());
+        assertEquals(1, model.getScheduleList().size());
+        assertEquals(List.of(third, first, second), model.getScheduleList().getFirst().getStudents());
+    }
+
+    @Test
+    public void execute_oneInvalidIndexAmongMany_schedulesNobody() {
+        Index outOfBoundsIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
+        ScheduleStudentCommand command = new ScheduleStudentCommand(
+                List.of(INDEX_FIRST_PERSON, outOfBoundsIndex), DayOfWeek.MONDAY, MORNING);
+
+        assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        assertTrue(model.getScheduleList().isEmpty());
     }
 
     @Test
@@ -97,13 +134,17 @@ public class ScheduleStudentCommandTest {
         assertFalse(first.equals(new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.TUESDAY, MORNING)));
         assertFalse(first.equals(new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY,
                 TimeSlot.of("10-00", "13-00"))));
+        assertTrue(first.equals(new ScheduleStudentCommand(List.of(INDEX_FIRST_PERSON), DayOfWeek.MONDAY,
+                MORNING)));
+        assertFalse(first.equals(new ScheduleStudentCommand(List.of(INDEX_FIRST_PERSON, INDEX_SECOND_PERSON),
+                DayOfWeek.MONDAY, MORNING)));
     }
 
     @Test
     public void toStringMethod() {
         ScheduleStudentCommand command = new ScheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY, MORNING);
-        String expected = ScheduleStudentCommand.class.getCanonicalName() + "{targetIndex=" + INDEX_FIRST_PERSON
-                + ", day=MONDAY, timeSlot=10-00 to 12-00}";
+        String expected = ScheduleStudentCommand.class.getCanonicalName() + "{targetIndexes=["
+                + INDEX_FIRST_PERSON + "], day=MONDAY, timeSlot=10-00 to 12-00}";
 
         assertEquals(expected, command.toString());
     }

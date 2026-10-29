@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -32,6 +34,7 @@ import seedu.address.model.task.TaskStatus;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_DUPLICATE_INDEX = "Each student index can only be given once.";
     public static final String MESSAGE_INVALID_DAY =
             "Day must be a day of the week, e.g. monday or mon (case-insensitive).";
 
@@ -46,6 +49,37 @@ public class ParserUtil {
             throw new ParseException(MESSAGE_INVALID_INDEX);
         }
         return Index.fromOneBased(Integer.parseInt(trimmedIndex));
+    }
+
+    /**
+     * Parses {@code oneBasedIndexes}, a whitespace-separated list such as {@code "1 2 3"}, into a list of
+     * {@code Index}es in the order given.
+     *
+     * @throws ParseException if the list is empty or any index is invalid (not a non-zero unsigned integer).
+     */
+    public static List<Index> parseIndexes(String oneBasedIndexes) throws ParseException {
+        requireNonNull(oneBasedIndexes);
+        String trimmedIndexes = oneBasedIndexes.trim();
+        if (trimmedIndexes.isEmpty()) {
+            throw new ParseException(MESSAGE_INVALID_INDEX);
+        }
+        List<Index> indexes = new ArrayList<>();
+        for (String oneBasedIndex : trimmedIndexes.split("\\s+")) {
+            indexes.add(parseIndex(oneBasedIndex));
+        }
+        return indexes;
+    }
+
+    /**
+     * Checks that no index appears more than once in {@code indexes}.
+     *
+     * @throws ParseException if an index is repeated.
+     */
+    public static void verifyNoDuplicateIndexes(List<Index> indexes) throws ParseException {
+        requireNonNull(indexes);
+        if (new HashSet<>(indexes).size() != indexes.size()) {
+            throw new ParseException(MESSAGE_DUPLICATE_INDEX);
+        }
     }
 
     /**

@@ -2,9 +2,11 @@ package seedu.address.logic.commands;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -15,7 +17,10 @@ import seedu.address.model.schedule.ScheduledSession;
 import seedu.address.model.statistics.LessonRecord;
 import seedu.address.model.statistics.LessonRecord.Outcome;
 
-/** Records an explicit outcome for one dated occurrence of a recurring session. */
+/**
+ * Records an explicit outcome for one dated occurrence of a recurring session.
+ * For a group session, the same outcome is recorded for every student in it.
+ */
 public class MarkAttendanceCommand extends Command {
     public static final String COMMAND_WORD = "mark-attendance";
     public static final String MESSAGE_USAGE = COMMAND_WORD
@@ -34,11 +39,11 @@ public class MarkAttendanceCommand extends Command {
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
+        Objects.requireNonNull(model);
         if (sessionIndex.getZeroBased() >= model.getAddressBook().getScheduleList().size()) {
             throw new CommandException("Invalid session number. Run list-schedule and choose a number from that list.");
         }
         ScheduledSession session = model.getAddressBook().getScheduleList().get(sessionIndex.getZeroBased());
-        String sessionId = session.getSessionId();
         if (date.isAfter(LocalDate.now(model.getClock()))) {
             throw new CommandException("Attendance cannot be recorded for a future date.");
         }
@@ -47,24 +52,45 @@ public class MarkAttendanceCommand extends Command {
         }
         ReadOnlyAddressBook book = model.getAddressBook();
         ArrayList<LessonRecord> lessons = new ArrayList<>(book.getLessonRecords());
-        LessonRecord old = lessons.stream().filter(r -> sessionId.equals(r.sourceSessionId()) && date.equals(r.date()))
-                .findFirst().orElse(null);
-        LessonRecord updated;
-        if (old == null) {
-            Person student = session.getStudent();
-            updated = new LessonRecord(UUID.randomUUID().toString(), student.getStudentId(), student.getName().fullName,
-                    student.getSubject().value, date, session.getTimeSlot().start, session.getTimeSlot().end,
-                    outcome, sessionId);
-            lessons.add(updated);
-        } else {
-            updated = new LessonRecord(old.id(), old.studentId(), old.studentName(), old.subject(), old.date(),
-                    old.start(), old.end(), outcome, old.sourceSessionId());
-            lessons.set(lessons.indexOf(old), updated);
+        // Every student in a group session gets the same outcome, recorded as their own lesson.
+        List<LessonRecord> updatedLessons = new ArrayList<>();
+        for (Person student : session.getStudents()) {
+            updatedLessons.add(recordFor(student, session, lessons));
         }
         model.setHistory(lessons, book.getAssessmentRecords());
-        return new CommandResult("Attendance recorded for " + session.getStudent().getName() + " on " + date
-                + " " + updated.start() + "-" + updated.end() + ": " + outcome.name().toLowerCase(Locale.ROOT)
-                + " (lesson #" + (lessons.indexOf(updated) + 1) + ").");
+
+        LessonRecord first = updatedLessons.getFirst();
+        String lessonNumbers = updatedLessons.stream()
+                .map(lesson -> "#" + (lessons.indexOf(lesson) + 1))
+                .collect(Collectors.joining(", "));
+        return new CommandResult("Attendance recorded for " + ScheduleStudentCommand.formatNames(session.getStudents())
+                + " on " + date + " " + first.start() + "-" + first.end() + ": "
+                + outcome.name().toLowerCase(Locale.ROOT)
+                + " (" + (updatedLessons.size() == 1 ? "lesson " : "lessons ") + lessonNumbers + ").");
+    }
+
+    /**
+     * Creates or updates, in {@code lessons}, the lesson of {@code student} for this command's date in
+     * {@code session}, and returns that lesson.
+     */
+    private LessonRecord recordFor(Person student, ScheduledSession session, List<LessonRecord> lessons) {
+        String sessionId = session.getSessionId();
+        LessonRecord old = lessons.stream()
+                .filter(r -> sessionId.equals(r.sourceSessionId()) && student.getStudentId().equals(r.studentId())
+                        && date.equals(r.date()))
+                .findFirst()
+                .orElse(null);
+        if (old == null) {
+            LessonRecord created = new LessonRecord(UUID.randomUUID().toString(), student.getStudentId(),
+                    student.getName().fullName, student.getSubject().value, date, session.getTimeSlot().start,
+                    session.getTimeSlot().end, outcome, sessionId);
+            lessons.add(created);
+            return created;
+        }
+        LessonRecord updated = new LessonRecord(old.id(), old.studentId(), old.studentName(), old.subject(),
+                old.date(), old.start(), old.end(), outcome, old.sourceSessionId());
+        lessons.set(lessons.indexOf(old), updated);
+        return updated;
     }
 
     @Override

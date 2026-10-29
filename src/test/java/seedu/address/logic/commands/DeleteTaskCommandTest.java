@@ -92,7 +92,7 @@ public class DeleteTaskCommandTest {
 
         Person after = model.getFilteredPersonList().get(0);
         assertEquals(1, model.getScheduleList().size());
-        assertEquals(after, model.getScheduleList().get(0).getStudent());
+        assertEquals(after, model.getScheduleList().get(0).getStudents().getFirst());
     }
 
     @Test

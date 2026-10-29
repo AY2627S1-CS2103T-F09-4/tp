@@ -299,11 +299,20 @@ available through lists and business totals. Historical lists show all entries a
 
 ### Attendance linked to recurring sessions
 
-`ScheduledSession.sessionId` is a persistent UUID for one weekly template belonging to one student. Fresh sessions
-receive fresh IDs, including duplicate slots; `withStudent` retains the ID, so student edits and deep snapshot copies
-preserve it. Equality and hashing include this identity plus session details. `isSameSlot` explicitly compares details
-for the existing `unschedule-student` workflow: the command resolves and removes the first actual matching session.
-`Schedule` rejects duplicate identities but allows overlapping or identical slots with distinct IDs.
+`ScheduledSession.sessionId` is a persistent UUID for one weekly template. A template holds a non-empty, ordered,
+unmodifiable list of students with no student twice, so a group lesson is one session rather than one session per
+student. Fresh sessions receive fresh IDs, including duplicate slots; `withStudents` and `withStudentReplaced` retain
+the ID, so student edits and deep snapshot copies preserve it. Equality and hashing include this identity plus session
+details. `isSameSlot` explicitly compares details (students, day and time), and `isAt` compares only day and time.
+`Schedule` rejects duplicate identities but allows overlapping or identical slots with distinct IDs; `setSession`
+replaces a session in place so its session number does not change.
+
+`schedule-student` and `unschedule-student` accept one or more space-separated indexes, parsed by
+`ParserUtil.parseIndexes` and checked by `verifyNoDuplicateIndexes`. Several indexes create one group session; the
+command resolves every index before changing anything. `unschedule-student` removes each student from the first session
+at exactly that day and time that still contains them, keeping the others, and deletes a session once it is empty.
+It works out all changes before applying any, so one unscheduled student fails the whole command. Deleting a student
+removes them from every group in the same way.
 
 `list-schedule` is a read-only command returning all sessions with one-based numbers through `CommandResult`, independent of
 student filters. `MainWindow.selectTabForCommand` handles it before generic list routing, selecting the existing
@@ -318,16 +327,19 @@ the resolved session UUID internally. It checks
 the requested weekday and future-date boundary using the model's injectable clock. Since weekly templates have no
 effective start/end dates, any matching weekday on or before today can be recorded; today's time need not have passed.
 
-`LessonRecord.sourceSessionId` is optional. First marking snapshots the student UUID/name, current subject and times
-into a new dated lesson. Subsequent marking finds the same `(sourceSessionId, date)` and updates only its outcome,
-preserving the historical UUID and captured details. `AddressBook.setHistory`
-rejects duplicate linked occurrences and student mismatches against active templates, while allowing retained links
-to removed templates. `mark-attendance` is the sole command for creating or updating dated lessons;
+`LessonRecord.sourceSessionId` is optional. Marking a session records the same outcome for every student in it, as one
+lesson per student. First marking snapshots each student's UUID/name, current subject and times into a new dated
+lesson. Subsequent marking finds the same `(sourceSessionId, studentId, date)` and updates only its outcome,
+preserving the historical UUID and captured details. `AddressBook.setHistory` rejects duplicate linked occurrences of
+that triple. It does not check that a linked lesson's student is still in the session, because a student who leaves a
+group keeps their earlier lessons for it; links to removed templates are likewise retained. `mark-attendance` is the sole command for creating or updating dated lessons;
 `list-lessons` provides read-only history. Legacy manual records remain unlinked and are never inferred or merged
 automatically. There are no commands for editing lesson details or deleting individual lessons.
 
-JSON adapters store `sessionId` and `sourceSessionId`. Missing session IDs migrate to UUIDs on loading and persist on
-the next save; missing source links remain null. Malformed IDs, duplicate template IDs and duplicate linked occurrences
+JSON adapters store `sessionId` and `sourceSessionId`, and each session stores its students as `studentIndexes`.
+Files written before group sessions use a single `studentIndex`, which still loads as a one-student session and is
+saved as `studentIndexes` next time. Missing session IDs migrate to UUIDs on loading and persist on the next save;
+missing source links remain null. Empty, out-of-range or repeated student indexes fail loading. Malformed IDs, duplicate template IDs and duplicate linked occurrences
 fail loading. Copy/reset and undo/redo retain both identities. Unscheduling or deleting a student keeps dated history;
 rescheduling an identical slot creates a new template. Existing statistics calculate from lesson records unchanged:
 unmarked occurrences create no records, counts or implicit absences.

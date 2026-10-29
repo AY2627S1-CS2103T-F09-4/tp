@@ -184,6 +184,12 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public void setScheduledSession(ScheduledSession target, ScheduledSession editedSession) {
+        requireAllNonNull(target, editedSession);
+        addressBook.setScheduledSession(target, editedSession);
+    }
+
+    @Override
     public ObservableList<ScheduledSession> getScheduleList() {
         return addressBook.getScheduleList();
     }

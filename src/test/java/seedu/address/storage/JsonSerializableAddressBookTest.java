@@ -189,7 +189,7 @@ public class JsonSerializableAddressBookTest {
         AddressBook restored = new JsonSerializableAddressBook(original).toModelType();
 
         for (ScheduledSession session : restored.getScheduleList()) {
-            assertTrue(restored.getPersonList().stream().anyMatch(p -> p == session.getStudent()));
+            assertTrue(restored.getPersonList().stream().anyMatch(p -> p == session.getStudents().getFirst()));
         }
     }
 

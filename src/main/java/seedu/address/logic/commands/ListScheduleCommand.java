@@ -1,5 +1,7 @@
 package seedu.address.logic.commands;
 
+import java.util.stream.Collectors;
+
 import seedu.address.model.Model;
 import seedu.address.model.schedule.ScheduledSession;
 
@@ -17,9 +19,13 @@ public class ListScheduleCommand extends Command {
         StringBuilder result = new StringBuilder("Weekly schedule:");
         int number = 1;
         for (ScheduledSession session : model.getAddressBook().getScheduleList()) {
+            String subjects = session.getStudents().stream()
+                    .map(student -> student.getSubject().toString())
+                    .distinct()
+                    .collect(Collectors.joining(", "));
             result.append("\n").append(number++).append(". ")
-                    .append(session.getStudent().getName()).append(" | ")
-                    .append(session.getStudent().getSubject()).append(" | ").append(session.getDay())
+                    .append(ScheduleStudentCommand.formatNames(session.getStudents())).append(" | ")
+                    .append(subjects).append(" | ").append(session.getDay())
                     .append(" | ").append(session.getTimeSlot());
         }
         if (model.getAddressBook().getScheduleList().isEmpty()) {

@@ -7,6 +7,7 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +60,19 @@ public class UnscheduleStudentCommandParserTest {
         assertParseFailure(parser, " a day/monday from/10-00 to/12-00", INVALID_FORMAT);
         assertParseFailure(parser, " 0 day/monday from/10-00 to/12-00", INVALID_FORMAT);
         assertParseFailure(parser, " -1 day/monday from/10-00 to/12-00", INVALID_FORMAT);
-        assertParseFailure(parser, " 1 2 day/monday from/10-00 to/12-00", INVALID_FORMAT);
+        assertParseFailure(parser, " 1 a day/monday from/10-00 to/12-00", INVALID_FORMAT);
+    }
+
+    @Test
+    public void parse_multipleIndexes_success() {
+        assertParseSuccess(parser, " 2 1 day/monday from/10-00 to/12-00",
+                new UnscheduleStudentCommand(List.of(INDEX_SECOND_PERSON, INDEX_FIRST_PERSON), DayOfWeek.MONDAY,
+                        TimeSlot.of("10-00", "12-00")));
+    }
+
+    @Test
+    public void parse_duplicateIndexes_failure() {
+        assertParseFailure(parser, " 2 2 day/monday from/10-00 to/12-00", ParserUtil.MESSAGE_DUPLICATE_INDEX);
     }
 
     @Test

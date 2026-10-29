@@ -280,13 +280,18 @@ Format: `delete-reminder ID`
 ### Scheduling and attendance
 
 #### Scheduling a weekly lesson: `schedule-student`
-Schedules a recurring weekly lesson.
+Schedules a recurring weekly lesson for one student, or a group lesson for several students.
 
-Format: `schedule-student INDEX day/DAY from/HH-mm to/HH-mm`
+Format: `schedule-student INDEX [MORE_INDEXES]... day/DAY from/HH-mm to/HH-mm`
 
-`INDEX` refers to the displayed student list. `DAY` is a weekday, times use 24-hour `HH-mm` format, and the end time must be later than the start time.
+* `INDEX` refers to the displayed student list. Separate several indexes with spaces to put all of those students in **one** group session.
+* Each index can only be given once. If any index is invalid, nobody is scheduled.
+* `DAY` is a weekday, times use 24-hour `HH-mm` format, and the end time must be later than the start time.
+* A group session appears as one card in the Schedule tab and as one numbered entry in `list-schedule`.
 
-Example: `schedule-student 1 day/Monday from/16-00 to/18-00`
+Examples:
+* `schedule-student 1 day/Monday from/16-00 to/18-00`
+* `schedule-student 1 2 3 day/Monday from/10-00 to/12-00` schedules students 1, 2 and 3 together in one session.
 
 #### Listing scheduled lessons: `list-schedule`
 Lists recurring sessions and their session numbers.
@@ -296,11 +301,16 @@ Format: `list-schedule`
 The session numbers shown by this command are the numbers required by `mark-attendance`. They are separate from student indexes.
 
 #### Removing a scheduled lesson: `unschedule-student`
-Removes a matching recurring lesson.
+Removes students from a matching recurring lesson.
 
-Format: `unschedule-student INDEX day/DAY from/HH-mm to/HH-mm`
+Format: `unschedule-student INDEX [MORE_INDEXES]... day/DAY from/HH-mm to/HH-mm`
 
-The first matching weekly session is removed. Previously recorded lessons are not deleted.
+* Each student is removed from their first weekly session at exactly that day and time.
+* In a group session, the other students stay scheduled and the session keeps its session number. The session is removed once its last student is removed.
+* If any of the students is not scheduled at that time, nobody is removed.
+* Previously recorded lessons are not deleted.
+
+Example: `unschedule-student 2 day/Monday from/10-00 to/12-00` removes student 2 from the Monday group lesson.
 
 #### Recording attendance: `mark-attendance`
 Records the outcome of a scheduled session for a date.
@@ -310,6 +320,7 @@ Format: `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent
 * Obtain `SESSION_NUMBER` from `list-schedule`.
 * The date must match the session weekday and cannot be later than today.
 * Repeating the command for the same session and date updates the outcome.
+* For a group session, the status is recorded for every student in the group, as a separate lesson for each student.
 * Available statuses are `completed`, `absent`, `cancelled`, and `unrecorded`.
 
 Example: `mark-attendance 1 date/2026-10-19 status/completed`
@@ -512,9 +523,9 @@ table td code {
 
 | Command | Format / example |
 |---|---|
-| `schedule-student` | `schedule-student INDEX day/DAY from/HH-mm to/HH-mm` |
+| `schedule-student` | `schedule-student INDEX [MORE_INDEXES]... day/DAY from/HH-mm to/HH-mm` |
 | `list-schedule` | `list-schedule` |
-| `unschedule-student` | `unschedule-student INDEX day/DAY from/HH-mm to/HH-mm` |
+| `unschedule-student` | `unschedule-student INDEX [MORE_INDEXES]... day/DAY from/HH-mm to/HH-mm` |
 | `mark-attendance` | `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed\|absent\|cancelled\|unrecorded)` |
 
 ### Assessments and statistics

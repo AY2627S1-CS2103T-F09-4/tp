@@ -98,7 +98,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         Person identifiedPerson = editedPerson.withStudentId(target.getStudentId());
         persons.setPerson(target, identifiedPerson);
         List<ScheduledSession> updated = schedule.asUnmodifiableObservableList().stream()
-                .map(s -> s.getStudent().equals(target) ? s.withStudent(identifiedPerson) : s)
+                .map(s -> s.withStudentReplaced(target, identifiedPerson))
                 .toList();
         schedule.setSessions(updated);
     }
@@ -106,10 +106,15 @@ public class AddressBook implements ReadOnlyAddressBook {
     /**
      * Removes {@code key} from this {@code AddressBook}.
      * {@code key} must exist in the address book.
+     * {@code key} is also removed from every group session, and sessions left with no students are deleted.
      */
     public void removePerson(Person key) {
         persons.remove(key);
-        schedule.removeIf(s -> s.getStudent().equals(key));
+        List<ScheduledSession> updated = schedule.asUnmodifiableObservableList().stream()
+                .filter(s -> !s.hasStudent(key) || s.getStudents().size() > 1)
+                .map(s -> s.hasStudent(key) ? s.withStudents(s.getStudentsWithout(key)) : s)
+                .toList();
+        schedule.setSessions(updated);
     }
 
     //// schedule-level operations
@@ -140,6 +145,16 @@ public class AddressBook implements ReadOnlyAddressBook {
         if (!schedule.remove(session)) {
             throw new IllegalArgumentException("Session is not in the schedule.");
         }
+    }
+
+    /**
+     * Replaces {@code target} in the schedule with {@code editedSession}, which must have the same session ID.
+     * {@code target} must be in the schedule.
+     */
+    public void setScheduledSession(ScheduledSession target, ScheduledSession editedSession) {
+        requireNonNull(target);
+        requireNonNull(editedSession);
+        schedule.setSession(target, editedSession);
     }
 
     /**
@@ -213,11 +228,13 @@ public class AddressBook implements ReadOnlyAddressBook {
             copy.addParentContact(parent.copy());
         }
         for (ScheduledSession session : schedule.asUnmodifiableObservableList()) {
-            Person studentCopy = copy.persons.asUnmodifiableObservableList().stream()
-                    .filter(p -> p.equals(session.getStudent()))
-                    .findFirst()
-                    .orElseThrow();
-            copy.addScheduledSession(session.withStudent(studentCopy));
+            List<Person> studentCopies = session.getStudents().stream()
+                    .map(student -> copy.persons.asUnmodifiableObservableList().stream()
+                            .filter(p -> p.equals(student))
+                            .findFirst()
+                            .orElseThrow())
+                    .toList();
+            copy.addScheduledSession(session.withStudents(studentCopies));
         }
         for (Reminder reminder : reminders.getReminders()) {
             copy.addReminder(reminder.copy());
@@ -280,14 +297,13 @@ public class AddressBook implements ReadOnlyAddressBook {
                 || newAssessments.stream().map(AssessmentRecord::id).distinct().count() != newAssessments.size()) {
             throw new IllegalArgumentException("Historical record IDs must be unique within each collection.");
         }
+        // A group session links one lesson per student, so a linked occurrence is identified by session, student
+        // and date. Membership is not re-checked here: a student who left a group keeps their earlier lessons.
         List<LessonRecord> linked = newLessons.stream().filter(r -> r.sourceSessionId() != null).toList();
-        if (linked.stream().map(r -> r.sourceSessionId() + "/" + r.date()).distinct().count() != linked.size()) {
-            throw new IllegalArgumentException("Only one linked lesson is allowed per scheduled session and date.");
-        }
-        if (linked.stream().anyMatch(r -> getScheduleList().stream().anyMatch(s ->
-                s.getSessionId().equals(r.sourceSessionId())
-                    && !s.getStudent().getStudentId().equals(r.studentId())))) {
-            throw new IllegalArgumentException("Linked lesson must belong to the scheduled session's student.");
+        if (linked.stream().map(r -> r.sourceSessionId() + "/" + r.studentId() + "/" + r.date()).distinct().count()
+                != linked.size()) {
+            throw new IllegalArgumentException(
+                    "Only one linked lesson is allowed per student, scheduled session and date.");
         }
         this.lessons = newLessons;
         this.assessments = newAssessments;

@@ -123,6 +123,12 @@ public interface Model {
      */
     void deleteScheduledSession(ScheduledSession session);
 
+    /**
+     * Replaces {@code target} in the schedule with {@code editedSession}, keeping its session number.
+     * {@code target} must be in the schedule, and both sessions must have the same session ID.
+     */
+    void setScheduledSession(ScheduledSession target, ScheduledSession editedSession);
+
     /** Returns an unmodifiable view of the scheduled sessions. */
     ObservableList<ScheduledSession> getScheduleList();
 

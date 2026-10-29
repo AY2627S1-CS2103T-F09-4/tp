@@ -9,8 +9,10 @@ import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
+import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_PERSON;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
+import static seedu.address.testutil.TypicalPersons.CARL;
 import static seedu.address.testutil.TypicalSchedule.ALICE_MONDAY_MORNING;
 import static seedu.address.testutil.TypicalSchedule.ALICE_WEDNESDAY;
 import static seedu.address.testutil.TypicalSchedule.BENSON_MONDAY_OVERLAP;
@@ -39,7 +41,9 @@ public class UnscheduleStudentCommandTest {
     @Test
     public void constructor_nullFields_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () ->
-                new UnscheduleStudentCommand(null, DayOfWeek.MONDAY, MORNING));
+                new UnscheduleStudentCommand((Index) null, DayOfWeek.MONDAY, MORNING));
+        assertThrows(NullPointerException.class, () ->
+                new UnscheduleStudentCommand((List<Index>) null, DayOfWeek.MONDAY, MORNING));
         assertThrows(NullPointerException.class, () ->
                 new UnscheduleStudentCommand(INDEX_FIRST_PERSON, null, MORNING));
         assertThrows(NullPointerException.class, () ->
@@ -56,6 +60,46 @@ public class UnscheduleStudentCommandTest {
 
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
         assertEquals(List.of(ALICE_WEDNESDAY, BENSON_MONDAY_OVERLAP), model.getScheduleList());
+    }
+
+    @Test
+    public void execute_memberOfGroupSession_removesOnlyThatStudentAndKeepsSessionNumber() throws Exception {
+        ScheduledSession group = new ScheduledSession(List.of(ALICE, BENSON, CARL), DayOfWeek.FRIDAY, MORNING);
+        model.addScheduledSession(group);
+        int groupPosition = model.getScheduleList().indexOf(group);
+
+        String feedback = new UnscheduleStudentCommand(INDEX_SECOND_PERSON, DayOfWeek.FRIDAY, MORNING)
+                .execute(model).getFeedbackToUser();
+
+        assertEquals("Unscheduled " + BENSON.getName() + " on Friday from 10-00 to 12-00", feedback);
+        ScheduledSession remaining = model.getScheduleList().get(groupPosition);
+        assertEquals(group.getSessionId(), remaining.getSessionId());
+        assertEquals(List.of(ALICE, CARL), remaining.getStudents());
+    }
+
+    @Test
+    public void execute_allMembersOfGroupSession_removesSession() throws Exception {
+        ScheduledSession group = new ScheduledSession(List.of(ALICE, BENSON), DayOfWeek.FRIDAY, MORNING);
+        model.addScheduledSession(group);
+
+        new UnscheduleStudentCommand(List.of(INDEX_SECOND_PERSON, INDEX_FIRST_PERSON), DayOfWeek.FRIDAY, MORNING)
+                .execute(model);
+
+        assertFalse(model.getScheduleList().stream().anyMatch(s -> s.getSessionId().equals(group.getSessionId())));
+        assertEquals(List.of(ALICE_MONDAY_MORNING, ALICE_WEDNESDAY, BENSON_MONDAY_OVERLAP), model.getScheduleList());
+    }
+
+    @Test
+    public void execute_oneStudentNotScheduled_removesNobody() {
+        model.addScheduledSession(new ScheduledSession(List.of(ALICE, BENSON), DayOfWeek.FRIDAY, MORNING));
+        List<ScheduledSession> before = List.copyOf(model.getScheduleList());
+
+        UnscheduleStudentCommand command = new UnscheduleStudentCommand(
+                List.of(INDEX_FIRST_PERSON, INDEX_THIRD_PERSON), DayOfWeek.FRIDAY, MORNING);
+
+        assertCommandFailure(command, model, String.format(UnscheduleStudentCommand.MESSAGE_SESSION_NOT_FOUND,
+                CARL.getName(), "Friday", "10-00", "12-00"));
+        assertEquals(before, model.getScheduleList());
     }
 
     @Test
@@ -152,8 +196,8 @@ public class UnscheduleStudentCommandTest {
     @Test
     public void toStringMethod() {
         UnscheduleStudentCommand command = new UnscheduleStudentCommand(INDEX_FIRST_PERSON, DayOfWeek.MONDAY, MORNING);
-        String expected = UnscheduleStudentCommand.class.getCanonicalName() + "{targetIndex=" + INDEX_FIRST_PERSON
-                + ", day=MONDAY, timeSlot=10-00 to 12-00}";
+        String expected = UnscheduleStudentCommand.class.getCanonicalName() + "{targetIndexes=["
+                + INDEX_FIRST_PERSON + "], day=MONDAY, timeSlot=10-00 to 12-00}";
 
         assertEquals(expected, command.toString());
     }

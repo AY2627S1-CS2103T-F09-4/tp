@@ -66,7 +66,7 @@ public class AttendanceIntegrationTest {
         String result = mark(1, "2026-10-19", "completed");
         LessonRecord record = model.getAddressBook().getLessonRecords().getFirst();
         assertEquals(sessionId, record.sourceSessionId());
-        assertEquals(session.getStudent().getStudentId(), record.studentId());
+        assertEquals(session.getStudents().getFirst().getStudentId(), record.studentId());
         assertEquals("Mathematics", record.subject());
         assertEquals(session.getTimeSlot().start, record.start());
         assertEquals(session.getTimeSlot().end, record.end());
@@ -267,6 +267,39 @@ public class AttendanceIntegrationTest {
         logic.execute("redo");
         assertEquals(Outcome.ABSENT, model.getAddressBook().getLessonRecords().getFirst().outcome());
         assertEquals(secondId, model.getAddressBook().getLessonRecords().getFirst().sourceSessionId());
+    }
+
+    @Test
+    public void groupSession_marksEveryStudent_andStudentsCanLeaveOrBeDeleted() throws Exception {
+        model.addPerson(new PersonBuilder().withName("Bob Choo").withPhone("22222222").build());
+        logic.execute("schedule-student 1 2 day/wednesday from/14-00 to/15-00");
+        assertEquals(2, model.getScheduleList().size());
+        assertEquals(2, model.getScheduleList().getLast().getStudents().size());
+        assertTrue(feedback("list-schedule").contains("2. Amy Bee, Bob Choo |"));
+
+        String result = mark(2, "2026-10-14", "completed");
+        assertTrue(result.contains("Amy Bee, Bob Choo on 2026-10-14 14:00-15:00: completed (lessons #1, #2)"),
+                result);
+        mark(2, "2026-10-14", "absent");
+        List<LessonRecord> lessons = model.getAddressBook().getLessonRecords();
+        assertEquals(2, lessons.size());
+        assertTrue(lessons.stream().allMatch(r -> r.outcome() == Outcome.ABSENT));
+        assertNotEquals(lessons.getFirst().studentId(), lessons.getLast().studentId());
+
+        logic.execute("unschedule-student 2 day/wednesday from/14-00 to/15-00");
+        assertEquals(1, model.getScheduleList().getLast().getStudents().size());
+        assertTrue(mark(2, "2026-10-21", "completed").contains("Amy Bee on 2026-10-21"));
+        assertEquals(3, model.getAddressBook().getLessonRecords().size());
+
+        logic.execute("undo");
+        logic.execute("undo");
+        assertEquals(2, model.getScheduleList().getLast().getStudents().size());
+        logic.execute("delete-student 2");
+        assertEquals(2, model.getScheduleList().size());
+        assertEquals("Amy Bee", model.getScheduleList().getLast().getStudents().getFirst().getName().fullName);
+        assertEquals(1, model.getScheduleList().getLast().getStudents().size());
+        assertEquals(2, model.getAddressBook().getLessonRecords().size());
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
     }
 
     private String mark(int number, String date, String status) throws Exception {

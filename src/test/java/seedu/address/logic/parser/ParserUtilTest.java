@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
+import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -47,6 +48,28 @@ public class ParserUtilTest {
     public void parseIndex_outOfRangeInput_throwsParseException() {
         assertThrows(ParseException.class, MESSAGE_INVALID_INDEX, ()
             -> ParserUtil.parseIndex(Long.toString(Integer.MAX_VALUE + 1)));
+    }
+
+    @Test
+    public void parseIndexes_validInput_returnsIndexesInOrder() throws Exception {
+        assertEquals(List.of(INDEX_SECOND_PERSON, INDEX_FIRST_PERSON), ParserUtil.parseIndexes(" 2 \t 1 "));
+        assertEquals(List.of(INDEX_FIRST_PERSON), ParserUtil.parseIndexes("1"));
+    }
+
+    @Test
+    public void parseIndexes_invalidInput_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_INDEX, () -> ParserUtil.parseIndexes(""));
+        assertThrows(ParseException.class, MESSAGE_INVALID_INDEX, () -> ParserUtil.parseIndexes("   "));
+        assertThrows(ParseException.class, MESSAGE_INVALID_INDEX, () -> ParserUtil.parseIndexes("1 a"));
+        assertThrows(ParseException.class, MESSAGE_INVALID_INDEX, () -> ParserUtil.parseIndexes("1 0"));
+    }
+
+    @Test
+    public void verifyNoDuplicateIndexes() throws Exception {
+        ParserUtil.verifyNoDuplicateIndexes(List.of(INDEX_FIRST_PERSON, INDEX_SECOND_PERSON));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_DUPLICATE_INDEX, () ->
+                ParserUtil.verifyNoDuplicateIndexes(List.of(INDEX_FIRST_PERSON, INDEX_SECOND_PERSON,
+                        INDEX_FIRST_PERSON)));
     }
 
     @Test

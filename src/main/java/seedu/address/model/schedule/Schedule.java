@@ -38,6 +38,25 @@ public class Schedule {
         return sessions.remove(session);
     }
 
+    /**
+     * Replaces {@code target} with {@code editedSession}, keeping its position in the schedule.
+     *
+     * @throws IllegalArgumentException if {@code target} is not in the schedule or the two sessions have different
+     *     identities.
+     */
+    public void setSession(ScheduledSession target, ScheduledSession editedSession) {
+        requireNonNull(target);
+        requireNonNull(editedSession);
+        int index = sessions.indexOf(target);
+        if (index < 0) {
+            throw new IllegalArgumentException("Session is not in the schedule.");
+        }
+        if (!target.getSessionId().equals(editedSession.getSessionId())) {
+            throw new IllegalArgumentException("An edited session must keep its session ID.");
+        }
+        sessions.set(index, editedSession);
+    }
+
     /** Removes all sessions matching {@code predicate}. */
     public void removeIf(Predicate<ScheduledSession> predicate) {
         requireNonNull(predicate);

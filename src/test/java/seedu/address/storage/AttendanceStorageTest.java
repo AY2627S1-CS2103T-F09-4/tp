@@ -76,7 +76,7 @@ public class AttendanceStorageTest {
     }
 
     @Test
-    public void invalidIdsAndWrongStudentLinks_failLoading() throws Exception {
+    public void invalidIds_failLoading() throws Exception {
         AddressBook book = bookWithHistory();
         String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(book));
         String id = book.getScheduleList().getFirst().getSessionId();
@@ -86,18 +86,63 @@ public class AttendanceStorageTest {
             assertNotEquals(json, bad);
             assertThrows(IllegalValueException.class, data::toModelType);
         }
-        LessonRecord old = book.getLessonRecords().getFirst();
-        LessonRecord wrong = new LessonRecord(old.id(), UUID.randomUUID().toString(), old.studentName(), old.subject(),
-                old.date(), old.start(), old.end(), old.outcome(), old.sourceSessionId());
-        assertThrows(IllegalArgumentException.class, () -> book.setHistory(List.of(wrong), List.of()));
-        String student = JsonUtil.toJsonString(new JsonAdaptedPerson(book.getPersonList().getFirst()));
-        String session = JsonUtil.toJsonString(new JsonAdaptedScheduledSession(book.getScheduleList().getFirst(),
-                book.getPersonList()));
-        String lesson = JsonUtil.toJsonString(new JsonAdaptedLessonRecord(wrong));
-        JsonSerializableAddressBook data = JsonUtil.fromJsonString("{\"persons\":[" + student
-                + "],\"schedule\":[" + session + "],\"lessonRecords\":[" + lesson + "]}",
-                JsonSerializableAddressBook.class);
-        assertThrows(IllegalValueException.class, data::toModelType);
+    }
+
+    @Test
+    public void studentWhoLeftGroupSession_keepsLinkedLessonsAcrossReload() throws Exception {
+        AddressBook book = new AddressBook();
+        Person amy = new PersonBuilder().build();
+        Person bob = new PersonBuilder().withName("Bob Choo").withPhone("22222222").build();
+        book.addPerson(amy);
+        book.addPerson(bob);
+        ScheduledSession group = new ScheduledSession(List.of(amy, bob), DayOfWeek.MONDAY,
+                TimeSlot.of("10-00", "11-00"));
+        book.addScheduledSession(group);
+        book.setHistory(List.of(linkedLesson(amy, group), linkedLesson(bob, group)), List.of());
+
+        book.setScheduledSession(group, group.withStudents(List.of(amy)));
+
+        AddressBook reloaded = roundTrip(book);
+        assertEquals(book, reloaded);
+        assertEquals(List.of(amy), reloaded.getScheduleList().getFirst().getStudents());
+        assertEquals(2, reloaded.getLessonRecords().size());
+    }
+
+    @Test
+    public void groupSession_roundTripsWithAllStudentsInOrder() throws Exception {
+        AddressBook book = new AddressBook();
+        Person amy = new PersonBuilder().build();
+        Person bob = new PersonBuilder().withName("Bob Choo").withPhone("22222222").build();
+        book.addPerson(amy);
+        book.addPerson(bob);
+        book.addScheduledSession(new ScheduledSession(List.of(bob, amy), DayOfWeek.MONDAY,
+                TimeSlot.of("10-00", "11-00")));
+
+        String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(book));
+        AddressBook reloaded = roundTrip(book);
+
+        assertTrue(json.contains("\"studentIndexes\" : [ 1, 0 ]"));
+        assertEquals(book, reloaded);
+        assertEquals(List.of(bob, amy), reloaded.getScheduleList().getFirst().getStudents());
+    }
+
+    @Test
+    public void duplicateLinkedLessonForSameStudentInGroup_rejected() {
+        AddressBook book = new AddressBook();
+        Person amy = new PersonBuilder().build();
+        Person bob = new PersonBuilder().withName("Bob Choo").withPhone("22222222").build();
+        ScheduledSession group = new ScheduledSession(List.of(amy, bob), DayOfWeek.MONDAY,
+                TimeSlot.of("10-00", "11-00"));
+
+        book.setHistory(List.of(linkedLesson(amy, group), linkedLesson(bob, group)), List.of());
+        assertThrows(IllegalArgumentException.class, () ->
+                book.setHistory(List.of(linkedLesson(amy, group), linkedLesson(amy, group)), List.of()));
+    }
+
+    private LessonRecord linkedLesson(Person student, ScheduledSession session) {
+        return new LessonRecord(UUID.randomUUID().toString(), student.getStudentId(), student.getName().fullName,
+                "Math", LocalDate.of(2026, 10, 19), LocalTime.of(10, 0), LocalTime.of(11, 0), Outcome.COMPLETED,
+                session.getSessionId());
     }
 
     @Test
@@ -107,7 +152,7 @@ public class AttendanceStorageTest {
         ScheduledSession second = new ScheduledSession(student, first.getDay(), first.getTimeSlot());
         assertNotEquals(first, second);
         assertTrue(first.isSameSlot(second));
-        assertEquals(first.getSessionId(), first.withStudent(student.copy()).getSessionId());
+        assertEquals(first.getSessionId(), first.withStudents(List.of(student.copy())).getSessionId());
         Schedule schedule = new Schedule();
         schedule.add(first);
         assertThrows(IllegalArgumentException.class, () -> schedule.add(first));

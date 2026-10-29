@@ -101,7 +101,7 @@ public class LogicManagerTest {
 
         logic.execute(ScheduleStudentCommand.COMMAND_WORD + slot);
         assertEquals(1, logic.getScheduleList().size());
-        assertEquals(AMY, logic.getScheduleList().get(0).getStudent());
+        assertEquals(AMY, logic.getScheduleList().get(0).getStudents().getFirst());
 
         logic.execute(UnscheduleStudentCommand.COMMAND_WORD + slot);
         assertEquals(0, logic.getScheduleList().size());

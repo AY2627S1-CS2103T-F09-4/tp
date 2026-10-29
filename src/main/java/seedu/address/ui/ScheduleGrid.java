@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -192,9 +193,13 @@ class ScheduleGrid extends Pane {
             clusterEnd = Math.max(clusterEnd, end);
             dayLanes[dayIndex] = Math.max(dayLanes[dayIndex], laneEnds.size());
 
-            Person student = session.getStudent();
-            ScheduleSessionCard card = new ScheduleSessionCard(session, colourOf.apply(student),
-                    titleOf.apply(student), numberOf.applyAsInt(session));
+            // A group card takes the colour of its first student and lists every student's title.
+            Person firstStudent = session.getStudents().getFirst();
+            String title = session.getStudents().stream()
+                    .map(titleOf)
+                    .collect(Collectors.joining(", "));
+            ScheduleSessionCard card = new ScheduleSessionCard(session, colourOf.apply(firstStudent),
+                    title, numberOf.applyAsInt(session));
             placements.add(new Placement(card, dayIndex, start, end, lane));
             getChildren().add(card);
         }
