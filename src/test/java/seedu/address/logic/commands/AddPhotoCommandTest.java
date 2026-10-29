@@ -41,10 +41,10 @@ public class AddPhotoCommandTest {
     @Test
     public void execute_validIndexUnfilteredList_success() throws IOException {
         Path photoPath = createImageFile("amy.png", "png");
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, photoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, photoPath);
 
         Person personToUpdate = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        Person updatedPerson = createPersonWithPhoto(personToUpdate, photoPath);
+        Person updatedPerson = createPersonWithPhoto(personToUpdate, addPhotoCommand.getManagedPhotoPath());
         String expectedMessage = String.format(AddPhotoCommand.MESSAGE_ADD_PHOTO_SUCCESS,
                 Messages.format(updatedPerson));
 
@@ -58,10 +58,10 @@ public class AddPhotoCommandTest {
     public void execute_validIndexFilteredList_success() throws IOException {
         Path photoPath = createImageFile("amy.jpg", "jpg");
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, photoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, photoPath);
 
         Person personToUpdate = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        Person updatedPerson = createPersonWithPhoto(personToUpdate, photoPath);
+        Person updatedPerson = createPersonWithPhoto(personToUpdate, addPhotoCommand.getManagedPhotoPath());
         String expectedMessage = String.format(AddPhotoCommand.MESSAGE_ADD_PHOTO_SUCCESS,
                 Messages.format(updatedPerson));
 
@@ -79,8 +79,8 @@ public class AddPhotoCommandTest {
         Person personWithOldPhoto = createPersonWithPhoto(originalPerson, oldPhotoPath);
         model.setPerson(originalPerson, personWithOldPhoto);
 
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, newPhotoPath);
-        Person updatedPerson = createPersonWithPhoto(personWithOldPhoto, newPhotoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, newPhotoPath);
+        Person updatedPerson = createPersonWithPhoto(personWithOldPhoto, addPhotoCommand.getManagedPhotoPath());
         String expectedMessage = String.format(AddPhotoCommand.MESSAGE_ADD_PHOTO_SUCCESS,
                 Messages.format(updatedPerson));
 
@@ -96,7 +96,7 @@ public class AddPhotoCommandTest {
         Person personWithTasks = new PersonBuilder(originalPerson).withTasks("do homework")
                 .withTask("revise notes", TaskStatus.DONE).build();
         model.setPerson(originalPerson, personWithTasks);
-        AddPhotoCommand command = new AddPhotoCommand(INDEX_FIRST_PERSON, createImageFile("tasks.png", "png"));
+        AddPhotoCommand command = createCommand(INDEX_FIRST_PERSON, createImageFile("tasks.png", "png"));
 
         command.execute(model);
 
@@ -105,10 +105,25 @@ public class AddPhotoCommandTest {
     }
 
     @Test
+    public void execute_originalPhotoMoved_importedPhotoRemainsAvailable() throws IOException, CommandException {
+        Path originalPhoto = createImageFile("movable.png", "png");
+        AddPhotoCommand command = createCommand(INDEX_FIRST_PERSON, originalPhoto);
+
+        command.execute(model);
+        Path importedPhoto = Path.of(model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased())
+                .getPhotoPath().value);
+        Files.move(originalPhoto, testFolder.resolve("moved.png"));
+
+        assertFalse(Files.exists(originalPhoto));
+        assertTrue(Files.isRegularFile(importedPhoto));
+        assertTrue(ImageIO.read(importedPhoto.toFile()) != null);
+    }
+
+    @Test
     public void execute_invalidPersonIndex_failure() throws IOException {
         Path photoPath = createImageFile("amy.png", "png");
         Index outOfBoundIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(outOfBoundIndex, photoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(outOfBoundIndex, photoPath);
 
         assertCommandFailure(addPhotoCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
@@ -116,7 +131,7 @@ public class AddPhotoCommandTest {
     @Test
     public void execute_missingFile_failure() {
         Path missingPhotoPath = testFolder.resolve("missing.png");
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, missingPhotoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, missingPhotoPath);
 
         assertCommandFailure(addPhotoCommand, model,
                 String.format(AddPhotoCommand.MESSAGE_PHOTO_FILE_MISSING, missingPhotoPath));
@@ -125,7 +140,7 @@ public class AddPhotoCommandTest {
     @Test
     public void execute_unsupportedFileExtension_failure() throws IOException {
         Path textFilePath = createPhotoFile("amy.gif", 10);
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, textFilePath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, textFilePath);
 
         assertCommandFailure(addPhotoCommand, model,
                 String.format(AddPhotoCommand.MESSAGE_PHOTO_FILE_UNSUPPORTED, textFilePath));
@@ -134,7 +149,7 @@ public class AddPhotoCommandTest {
     @Test
     public void execute_invalidImageFile_failure() throws IOException {
         Path invalidPhotoPath = createPhotoFile("amy.png", 10);
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, invalidPhotoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, invalidPhotoPath);
 
         assertCommandFailure(addPhotoCommand, model,
                 String.format(AddPhotoCommand.MESSAGE_PHOTO_FILE_INVALID, invalidPhotoPath));
@@ -143,7 +158,7 @@ public class AddPhotoCommandTest {
     @Test
     public void execute_fileTooLarge_failure() throws IOException {
         Path largePhotoPath = createPhotoFile("large.jpeg", 5 * 1024 * 1024 + 1);
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, largePhotoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, largePhotoPath);
 
         assertCommandFailure(addPhotoCommand, model,
                 String.format(AddPhotoCommand.MESSAGE_PHOTO_FILE_TOO_LARGE, largePhotoPath));
@@ -153,10 +168,10 @@ public class AddPhotoCommandTest {
     public void equals() throws IOException {
         Path firstPhotoPath = createImageFile("amy.png", "png");
         Path secondPhotoPath = createImageFile("bob.png", "png");
-        AddPhotoCommand addFirstPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, firstPhotoPath);
-        AddPhotoCommand addFirstPhotoCommandCopy = new AddPhotoCommand(INDEX_FIRST_PERSON, firstPhotoPath);
-        AddPhotoCommand addSecondPhotoCommand = new AddPhotoCommand(INDEX_SECOND_PERSON, firstPhotoPath);
-        AddPhotoCommand addDifferentPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, secondPhotoPath);
+        AddPhotoCommand addFirstPhotoCommand = createCommand(INDEX_FIRST_PERSON, firstPhotoPath);
+        AddPhotoCommand addFirstPhotoCommandCopy = createCommand(INDEX_FIRST_PERSON, firstPhotoPath);
+        AddPhotoCommand addSecondPhotoCommand = createCommand(INDEX_SECOND_PERSON, firstPhotoPath);
+        AddPhotoCommand addDifferentPhotoCommand = createCommand(INDEX_FIRST_PERSON, secondPhotoPath);
 
         assertTrue(addFirstPhotoCommand.equals(addFirstPhotoCommand));
         assertTrue(addFirstPhotoCommand.equals(addFirstPhotoCommandCopy));
@@ -169,7 +184,7 @@ public class AddPhotoCommandTest {
     @Test
     public void toStringMethod() throws IOException {
         Path photoPath = createImageFile("amy.png", "png");
-        AddPhotoCommand addPhotoCommand = new AddPhotoCommand(INDEX_FIRST_PERSON, photoPath);
+        AddPhotoCommand addPhotoCommand = createCommand(INDEX_FIRST_PERSON, photoPath);
         String expected = AddPhotoCommand.class.getCanonicalName() + "{targetIndex=" + INDEX_FIRST_PERSON
                 + ", photoFilePath=" + photoPath + "}";
         assertEquals(expected, addPhotoCommand.toString());
@@ -179,6 +194,10 @@ public class AddPhotoCommandTest {
         Path photoPath = testFolder.resolve(fileName);
         Files.write(photoPath, new byte[sizeInBytes]);
         return photoPath;
+    }
+
+    private AddPhotoCommand createCommand(Index index, Path source) {
+        return new AddPhotoCommand(index, source, testFolder.resolve("managed-photos"));
     }
 
     private Path createImageFile(String fileName, String formatName) throws IOException {

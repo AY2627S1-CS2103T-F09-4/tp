@@ -27,6 +27,13 @@ public class AddPhotoCommandParserTest {
     }
 
     @Test
+    public void parse_absolutePath_returnsAddPhotoCommand() {
+        Path photoPath = Path.of("C:/Users/John Doe/Pictures/amy.png");
+        assertParseSuccess(parser, "1 " + PREFIX_FILE_PATH + photoPath,
+                new AddPhotoCommand(INDEX_FIRST_PERSON, photoPath));
+    }
+
+    @Test
     public void parse_missingParts_failure() {
         assertParseFailure(parser, "1", MESSAGE_INVALID_FORMAT);
         assertParseFailure(parser, PREFIX_FILE_PATH + "photos/amy.png", MESSAGE_INVALID_FORMAT);
@@ -35,7 +42,9 @@ public class AddPhotoCommandParserTest {
 
     @Test
     public void parse_invalidIndex_failure() {
-        assertParseFailure(parser, "0 " + PREFIX_FILE_PATH + "photos/amy.png", MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "0 " + PREFIX_FILE_PATH + "photos/amy.png", ParserUtil.MESSAGE_INVALID_INDEX);
+        assertParseFailure(parser, "-1 " + PREFIX_FILE_PATH + "photos/amy.png", ParserUtil.MESSAGE_INVALID_INDEX);
+        assertParseFailure(parser, "one " + PREFIX_FILE_PATH + "photos/amy.png", ParserUtil.MESSAGE_INVALID_INDEX);
     }
 
     @Test
