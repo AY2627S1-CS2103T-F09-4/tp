@@ -193,10 +193,15 @@ Adds or replaces a student's photo.
 
 Format: `add-photo INDEX f/<FILE_PATH>`
 
-* `INDEX` must refer to an existing student.
+* `INDEX` must be a positive integer referring to an existing student in the displayed student list.
+* `FILE_PATH` may be an absolute path or a relative path. A relative path is resolved from the folder where the app was launched (normally the folder containing the JAR file).
 * The file must exist, be readable, and be a valid JPG, JPEG, or PNG image no larger than 5 MB.
 * If a photo already exists, it is replaced.
-* Moving or deleting the original file may make the photo unavailable.
+* The app imports its own copy of the photo, so the original file can subsequently be moved or deleted.
+
+Relative path example: `add-photo 1 f/./photos/john_tan.png`
+
+Absolute path example (Windows): `add-photo 1 f/C:/Users/John/Pictures/john_tan.png`
 
 #### Deleting a student photo: `delete-photo`
 Deletes a student's photo.
