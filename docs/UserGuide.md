@@ -74,6 +74,10 @@ Tutoria helps tutors maintain student and parent records, manage tasks and remin
 * Extraneous parameters for commands that take no parameters, such as `help`, `list-students`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
+* Any `INDEX` refer to the index of the list of students or parents that is visible. Meaning if a command changes the 
+  visible contents of the list without changing the actual contents, such as `search`, any commands after that must use 
+  the new visible list's indexes.
+
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </div>
 
@@ -87,12 +91,25 @@ Format: `help`
 #### Undoing a command: `undo`
 Reverses the most recent command that changed data.
 
+* `undo` will ignore commands that did not change any data.
+
 Format: `undo`
+
+Examples:
+* `edit 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
+* `edit 1 n/John`,`list-students` and `undo` will change the first student's name to `John`, list all students, then `undo` changes `John` to what it was before.
 
 #### Redoing a command: `redo`
 Reapplies the most recent command reversed by `undo`.
 
+* `redo` will ignore commands that did not change any data.
+* if some commands were undone and new commands changes data, then the old changes that could have been restored with `redo` will be lost.
+
 Format: `redo`
+
+Examples:
+* `edit 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
+* `edit 1 n/John`, `undo`, `edit 1 n/Jane` and then `redo` will change the first student's name to `John`, `undo` reverses the name change, then the name changes to `Jane`, and `redo` will not work
 
 #### Exiting the program: `exit`
 Exits Tutoria.
@@ -134,26 +151,19 @@ Format: `delete-student INDEX`
 
 `INDEX` must be a positive integer referring to the currently displayed student list. If the list is filtered, the index refers to the filtered results.
 
-#### Locating students by name: `find`
-Finds students whose names contain any supplied keyword.
-
-Format: `find KEYWORD [MORE_KEYWORDS]`
-
-* The search is case-insensitive.
-* Keyword order does not matter.
-* Only student names are searched.
-* Students matching at least one keyword are returned.
-
-Example: `find alex david`
-
 #### Searching details: `search`
 Searches supported student and parent details and highlights matches.
 
-Format: `search KEYWORD [MORE_KEYWORDS]...`
+Format: `search KEYWORD`
 
-The search is case-insensitive and covers supported student and parent details. Unlike `find`, the complete search text is treated as the search keyword.
+* The search is case-insensitive and covers supported student and parent details. 
+* The complete search text is treated as the search keyword.
+* After a search, commands that rely on an `INDEX` will use the _list displayed by this command_.
 
-Example: `search Mathematics`
+Example: 
+`search Mathematics` will search for `Mathematics`.
+`search John Doe` will search for `John Doe`, not `John` and `Doe` separately.
+`search Mathematics` followed by `delete-student 1` will delete the _first student in the list shown by `search Mathematics`_, not the original list from `list-students`.
 
 ### Parent management
 
@@ -162,7 +172,7 @@ Adds a parent and can optionally link the parent to a student.
 
 Format: `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`
 
-* Name and phone are compulsory; email, student link, and requirements are optional.
+* Name and phone are compulsory. Email, student link, and requirements are optional.
 * `PHONE` may contain 3 to 15 digits and may start with `+`.
 * `EMAIL` is optional but must be valid when supplied.
 * `link/STUDENT_INDEX` identifies a student in the displayed student list. A student can have at most one parent.
@@ -233,7 +243,7 @@ Adds or replaces a parent's photo.
 
 Format: `add-parent-photo INDEX f/<FILE_PATH>`
 
-The file requirements described for `add-photo` apply, but the index refers to the displayed parent list.
+The file requirements described for `add-photo` apply, but the `INDEX` refers to the displayed parent list.
 
 #### Deleting a parent photo: `delete-parent-photo`
 Deletes a parent's photo.
@@ -269,6 +279,8 @@ Format: `delete-task INDEX tid/<TASK_ID>`
 
 `INDEX` identifies the student and `TASK_ID` identifies the task within that student's task list.
 
+Example: `delete-task 1 tid/2`
+
 ### Reminders
 
 #### Adding a reminder: `add-reminder`
@@ -292,6 +304,8 @@ Reminders are classified as `OVERDUE`, `DUE SOON`, `UPCOMING`, or `EVERY STARTUP
 
 #### Deleting a reminder: `delete-reminder`
 Deletes a reminder using its stable ID.
+
+* use list-`reminders` to see the each `reminder`'s stable `ID`s.
 
 Format: `delete-reminder ID`
 
@@ -332,6 +346,8 @@ Removes a matching recurring lesson.
 Format: `unschedule-student INDEX day/DAY from/HH-mm to/HH-mm`
 
 The first matching weekly session is removed. Previously recorded lessons are not deleted.
+
+Example: `unschedule-student 1 day/Monday from/13-30 to/14-30`
 
 #### Recording attendance: `mark-attendance`
 Records the outcome of a scheduled session for a date.
@@ -385,6 +401,8 @@ Format: `edit-assessment RECORD_NUMBER date/YYYY-MM-DD subject/SUBJECT category/
 
 `RECORD_NUMBER` comes from `list-assessments`. The command replaces the assessment's editable details.
 
+Example: `edit-assessment 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions score/18 max/25`
+
 #### Deleting an assessment: `delete-assessment`
 Deletes an assessment record.
 
@@ -398,6 +416,10 @@ Shows workload statistics.
 Format: `stats [from/YYYY-MM-DD to/YYYY-MM-DD]`
 
 If no range is supplied, the default is January 1 of the current year through today. If a range is supplied, both dates are required and inclusive. The report measures workload, not profit.
+
+Examples:
+`stats`
+`stats from/2026-01-01 to/2026-10-01`
 
 #### Viewing student progress: `stats-student`
 Shows attendance and assessment progress for a student.
