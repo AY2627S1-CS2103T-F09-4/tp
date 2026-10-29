@@ -18,6 +18,7 @@ import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
@@ -127,6 +128,43 @@ class ReminderDialogTest {
             Event.fireEvent(closeButton, keyEvent(KeyEvent.KEY_RELEASED, KeyCode.ENTER));
 
             assertFalse(dialog.isShowing());
+            owner.close();
+        });
+    }
+
+    @Test void manyReminders_contentScrollsAndIsKeyboardFocusable() throws Exception {
+        FxTestSupport.runOnFxThread(() -> {
+            Stage owner = new Stage();
+            owner.setScene(new Scene(new StackPane()));
+            owner.show();
+            List<Reminder> reminders = java.util.stream.IntStream.rangeClosed(1, 30)
+                    .mapToObj(id -> new Reminder(id, "Reminder " + id))
+                    .toList();
+            ReminderDialog dialog = new ReminderDialog(owner, reminders, CLOCK, () -> { });
+            dialog.showIfNeeded();
+
+            ScrollPane scroll = (ScrollPane) dialog.getAlert().getDialogPane().lookup("#reminderScroll");
+            assertTrue(scroll.isFocusTraversable());
+            assertEquals(ReminderDialog.MAX_VISIBLE_HEIGHT, scroll.getPrefViewportHeight(), 0.001);
+            assertTrue(scroll.getContent().prefHeight(-1) > scroll.getPrefViewportHeight());
+
+            dialog.getAlert().close();
+            owner.close();
+        });
+    }
+
+    @Test void fewReminders_contentIsNotPaddedToMaximumHeight() throws Exception {
+        FxTestSupport.runOnFxThread(() -> {
+            Stage owner = new Stage();
+            owner.setScene(new Scene(new StackPane()));
+            owner.show();
+            ReminderDialog dialog = new ReminderDialog(owner, List.of(new Reminder(1, "First")), CLOCK, () -> { });
+            dialog.showIfNeeded();
+
+            ScrollPane scroll = (ScrollPane) dialog.getAlert().getDialogPane().lookup("#reminderScroll");
+            assertTrue(scroll.getPrefViewportHeight() < ReminderDialog.MAX_VISIBLE_HEIGHT);
+
+            dialog.getAlert().close();
             owner.close();
         });
     }

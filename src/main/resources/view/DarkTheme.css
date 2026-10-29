@@ -328,6 +328,25 @@
     -fx-text-fill: white;
 }
 
+.reminder-scroll-pane,
+.reminder-scroll-pane > .viewport {
+    -fx-background-color: #1d1d1d;
+    -fx-background: #1d1d1d;
+}
+
+.reminder-scroll-pane:focused,
+.schedule-scroll-pane:focused {
+    -fx-border-color: white;
+    -fx-border-width: 1;
+}
+
+.reminder-text {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 4 8 4 8;
+}
+
 .dialog-pane:header *.header-panel {
     -fx-background-color: derive(#1d1d1d, 25%);
 }
