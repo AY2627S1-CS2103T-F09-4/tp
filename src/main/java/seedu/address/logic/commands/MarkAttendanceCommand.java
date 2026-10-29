@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,10 +54,13 @@ public class MarkAttendanceCommand extends Command {
         }
         ReadOnlyAddressBook book = model.getAddressBook();
         ArrayList<LessonRecord> lessons = new ArrayList<>(book.getLessonRecords());
+        Set<String> scheduledSessionIds = book.getScheduleList().stream()
+                .map(ScheduledSession::getSessionId)
+                .collect(Collectors.toSet());
         // Every student in a group session gets the same outcome, recorded as their own lesson.
         List<LessonRecord> updatedLessons = new ArrayList<>();
         for (Person student : session.getStudents()) {
-            updatedLessons.add(recordFor(student, session, lessons));
+            updatedLessons.add(recordFor(student, session, lessons, scheduledSessionIds));
         }
         model.setHistory(lessons, book.getAssessmentRecords());
 
@@ -72,13 +77,21 @@ public class MarkAttendanceCommand extends Command {
     /**
      * Creates or updates, in {@code lessons}, the lesson of {@code student} for this command's date in
      * {@code session}, and returns that lesson.
+     *
+     * @param student The student whose lesson is recorded.
+     * @param session The session being marked; it must contain {@code student}.
+     * @param lessons All lessons, changed in place.
+     * @param scheduledSessionIds IDs of every session currently in the schedule.
      */
-    private LessonRecord recordFor(Person student, ScheduledSession session, List<LessonRecord> lessons) {
+    private LessonRecord recordFor(Person student, ScheduledSession session, List<LessonRecord> lessons,
+            Set<String> scheduledSessionIds) {
+        assert session.hasStudent(student) : "attendance is only recorded for students in the session";
         String sessionId = session.getSessionId();
         LessonRecord old = lessons.stream()
                 .filter(r -> sessionId.equals(r.sourceSessionId()) && student.getStudentId().equals(r.studentId())
                         && date.equals(r.date()))
                 .findFirst()
+                .or(() -> findLessonOfRemovedSession(student, session, lessons, scheduledSessionIds))
                 .orElse(null);
         if (old == null) {
             LessonRecord created = new LessonRecord(UUID.randomUUID().toString(), student.getStudentId(),
@@ -87,10 +100,27 @@ public class MarkAttendanceCommand extends Command {
             lessons.add(created);
             return created;
         }
+        // Linking to the current session means later markings of this date find the lesson directly.
         LessonRecord updated = new LessonRecord(old.id(), old.studentId(), old.studentName(), old.subject(),
-                old.date(), old.start(), old.end(), outcome, old.sourceSessionId());
+                old.date(), old.start(), old.end(), outcome, sessionId);
         lessons.set(lessons.indexOf(old), updated);
         return updated;
+    }
+
+    /**
+     * Returns the lesson of {@code student} on this command's date, at the same times as {@code session}, that was
+     * recorded from a session which is no longer scheduled. This is the same lesson marked again after the session
+     * was unscheduled and rescheduled at the same time, so it is updated rather than duplicated. Lessons that were
+     * never linked to a session are not matched.
+     */
+    private Optional<LessonRecord> findLessonOfRemovedSession(Person student, ScheduledSession session,
+            List<LessonRecord> lessons, Set<String> scheduledSessionIds) {
+        return lessons.stream()
+                .filter(r -> r.sourceSessionId() != null && !scheduledSessionIds.contains(r.sourceSessionId()))
+                .filter(r -> student.getStudentId().equals(r.studentId()) && date.equals(r.date()))
+                .filter(r -> session.getTimeSlot().start.equals(r.start())
+                        && session.getTimeSlot().end.equals(r.end()))
+                .findFirst();
     }
 
     @Override

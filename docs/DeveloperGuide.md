@@ -332,9 +332,18 @@ lesson per student. First marking snapshots each student's UUID/name, current su
 lesson. Subsequent marking finds the same `(sourceSessionId, studentId, date)` and updates only its outcome,
 preserving the historical UUID and captured details. `AddressBook.setHistory` rejects duplicate linked occurrences of
 that triple. It does not check that a linked lesson's student is still in the session, because a student who leaves a
-group keeps their earlier lessons for it; links to removed templates are likewise retained. `mark-attendance` is the sole command for creating or updating dated lessons;
-`list-lessons` provides read-only history. Legacy manual records remain unlinked and are never inferred or merged
-automatically. There are no commands for editing lesson details or deleting individual lessons.
+group keeps their earlier lessons for it; links to removed templates are likewise retained.
+
+If no lesson matches that triple, marking falls back to a lesson of the same student, date, start and end whose
+`sourceSessionId` refers to a template that is no longer scheduled. This covers unscheduling and then rescheduling
+the same slot, which creates a new template ID: the old lesson is updated and relinked to the new template instead of
+being duplicated. Lessons linked to a template that is still scheduled are never matched this way, so duplicate slots
+remain distinct, and legacy manual records remain unlinked and are never inferred or merged automatically.
+
+`mark-attendance` is the sole command for creating or updating dated lessons. `delete-lesson RECORD_NUMBER` removes
+one lesson, numbered as in `list-lessons`; it is handled by `HistoryCommand` like `delete-assessment`, replaces the
+history through `Model.setHistory` so undo/redo restores it, and leaves templates untouched. There is no command for
+editing lesson details.
 
 JSON adapters store `sessionId` and `sourceSessionId`, and each session stores its students as `studentIndexes`.
 Files written before group sessions use a single `studentIndex`, which still loads as a one-student session and is

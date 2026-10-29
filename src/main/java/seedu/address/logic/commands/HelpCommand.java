@@ -63,6 +63,8 @@ public class HelpCommand extends Command {
                     "Records the outcome of a session on a given date."),
             new CommandSummary("list-lessons", "",
                     "Lists all recorded lessons."),
+            new CommandSummary("delete-lesson", "RECORD_NUMBER",
+                    "Deletes a lesson record."),
             new CommandSummary("record-assessment",
                     "INDEX date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX",
                     "Records an assessment result for a student."),

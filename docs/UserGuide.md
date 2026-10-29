@@ -320,6 +320,7 @@ Format: `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent
 * Obtain `SESSION_NUMBER` from `list-schedule`.
 * The date must match the session weekday and cannot be later than today.
 * Repeating the command for the same session and date updates the outcome.
+* If you unschedule a session and schedule the same student again at the same day and times, marking a date that was already recorded updates that lesson instead of creating a duplicate.
 * For a group session, the status is recorded for every student in the group, as a separate lesson for each student.
 * Available statuses are `completed`, `absent`, `cancelled`, and `unrecorded`.
 
@@ -378,7 +379,20 @@ Lists all recorded lessons.
 
 Format: `list-lessons`
 
-This lists recorded lessons, not merely scheduled sessions. The list includes lessons from all students and is independent of student search filters.
+This lists recorded lessons, not merely scheduled sessions. The list includes lessons from all students and is independent of student search filters. The lesson number shown is used by `delete-lesson`.
+
+#### Deleting a lesson: `delete-lesson`
+Deletes a recorded lesson.
+
+Format: `delete-lesson RECORD_NUMBER`
+
+* `RECORD_NUMBER` comes from `list-lessons` and is not a student index or session number.
+* Only that lesson is deleted. The weekly session and the student's other lessons are kept, and statistics no longer count the deleted lesson.
+* Lessons of deleted students can also be deleted, for example to clear history you no longer need.
+* Running `mark-attendance` again for the same session and date records a fresh lesson.
+* `undo` restores a deleted lesson.
+
+Example: `delete-lesson 3` deletes the third lesson shown by `list-lessons`.
 
 ### Data management
 
@@ -418,6 +432,9 @@ This removes students, parents, tasks, reminders, schedules, and historical reco
 
 **Q**: How do I record attendance?<br>
 **A**: Run `list-schedule` to find the session number, then use `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/STATUS`.
+
+**Q**: How do I remove a lesson I no longer need?<br>
+**A**: Run `list-lessons` to find the lesson number, then use `delete-lesson RECORD_NUMBER`. To change only its status, run `mark-attendance` again for the same session and date instead.
 
 **Q**: How do I correct an assessment?<br>
 **A**: Run `list-assessments`, then use `edit-assessment RECORD_NUMBER ...` with the corrected details. Use `delete-assessment RECORD_NUMBER` to remove it.
@@ -539,6 +556,7 @@ table td code {
 | `stats` | `stats [from/YYYY-MM-DD to/YYYY-MM-DD]` |
 | `stats-student` | `stats-student INDEX [from/YYYY-MM-DD to/YYYY-MM-DD]` |
 | `list-lessons` | `list-lessons` |
+| `delete-lesson` | `delete-lesson RECORD_NUMBER` |
 
 ### Data management
 

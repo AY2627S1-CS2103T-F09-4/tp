@@ -1,6 +1,7 @@
 package seedu.address.logic.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,7 +31,7 @@ public class StatisticsParserTest {
 
     @Test
     public void manualLessonCommands_areUnknown() {
-        for (String command : new String[]{"record-lesson", "edit-lesson", "delete-lesson"}) {
+        for (String command : new String[]{"record-lesson", "edit-lesson"}) {
             for (String arguments : new String[]{"", " 1", " 1 date/2026-10-19 status/completed"}) {
                 ParseException error = assertThrows(
                         ParseException.class, () -> parser.parseCommand(command + arguments));
@@ -59,6 +60,9 @@ public class StatisticsParserTest {
         parser.parseCommand("edit-assessment " + id
                 + " date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10");
         parser.parseCommand("delete-assessment " + id);
+        assertFalse(parser.parseCommand("delete-lesson " + id).isReadOnly());
+        assertThrows(ParseException.class, () -> parser.parseCommand("delete-lesson " + id + " extra"));
+        assertThrows(ParseException.class, () -> parser.parseCommand("delete-lesson " + id + " date/2026-10-19"));
         for (String input : new String[]{"list-lessons", "list-assessments"}) {
             Command command = parser.parseCommand(input);
             assertTrue(command.isReadOnly());
@@ -71,7 +75,7 @@ public class StatisticsParserTest {
 
     @Test
     public void numberedCommands_rejectNonpositiveNonnumericOverflowAndUuidTargets() {
-        String[] suffixes = {"delete-assessment %s",
+        String[] suffixes = {"delete-assessment %s", "delete-lesson %s",
             "edit-assessment %s date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10",
             "mark-attendance %s date/2026-10-19 status/completed"};
         for (String suffix : suffixes) {

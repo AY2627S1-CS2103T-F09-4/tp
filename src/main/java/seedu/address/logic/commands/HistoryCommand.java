@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.logging.Logger;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -17,6 +19,8 @@ import seedu.address.model.statistics.LessonRecord;
 
 /** Uses displayed record numbers while retaining stable identities inside historical entries. */
 public class HistoryCommand extends Command {
+    private static final Logger logger = LogsCenter.getLogger(HistoryCommand.class);
+
     private final String operation;
     private final Index target;
     private final AssessmentDetails assessment;
@@ -46,7 +50,14 @@ public class HistoryCommand extends Command {
                 throw new IllegalArgumentException("Historical record dates cannot be in the future.");
             }
             String feedback;
-            if (operation.equals("record-assessment")) {
+            if (operation.equals("delete-lesson")) {
+                LessonRecord old = resolveRecord(lessons, target, "lesson", "list-lessons");
+                lessons.remove(old);
+                logger.info("Deleted lesson " + old.id());
+                feedback = "Deleted lesson #" + target.getOneBased() + ": "
+                        + studentLabel(model, old.studentId(), old.studentName()) + " | " + old.date() + " "
+                        + old.start() + "-" + old.end() + " | " + old.outcome().name().toLowerCase(Locale.ROOT);
+            } else if (operation.equals("record-assessment")) {
                 Person student = resolveStudent(model, target);
                 String changedId = UUID.randomUUID().toString();
                 assessments.add(assessment.record(changedId, student.getStudentId(), student.getName().fullName));

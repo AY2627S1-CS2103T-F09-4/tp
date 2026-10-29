@@ -57,7 +57,8 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
 
     private String usage() {
         if (operation.startsWith("delete-")) {
-            return "Usage: " + operation + " RECORD_NUMBER (from list-assessments)";
+            String listCommand = operation.equals("delete-lesson") ? "list-lessons" : "list-assessments";
+            return "Usage: " + operation + " RECORD_NUMBER (from " + listCommand + ")";
         }
         if (operation.startsWith("list-")) {
             return "Usage: " + operation;
