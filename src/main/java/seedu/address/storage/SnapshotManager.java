@@ -7,29 +7,31 @@ import seedu.address.model.AddressBook;
 
 /** handles snapshotting multiple address books after commands for undoing and redoing */
 public class SnapshotManager {
-    private static final List<AddressBook> snapshots =
-            new ArrayList<>();
+    private static final List<AddressBook> snapshots = new ArrayList<>();
     private static final List<String> snapshotCommands = new ArrayList<>();
 
     private static int currentIndex = -1;
     private static String currentCommand;
 
     /**
-     * Saves the current address book as a snapshot in {@code @snapshots} , and clears the rest of the snapshots
-     * since they can't be redone.
+     * Saves the current address book as a snapshot in {@code @snapshots}
+     * and the command that produced it in {@code @snapshotCommands}.
+     * Increments {@code currentIndex}.
+     * If called when {@code currentIndex} is not pointing to the end of {@code snapshots},
+     * all snapshots after the current one is deleted.
      *
      * @param addressBook the address book to be saved.
+     * @param feedbackToUser the command to be saved.
      */
     public void saveSnapshot(AddressBook addressBook, String feedbackToUser) {
-        // Discards snapshots that belong to the old history branch after an undo.
         if (currentIndex == -1) {
             snapshots.add(addressBook.copy());
             snapshotCommands.add(feedbackToUser);
             currentIndex = snapshots.size() - 1;
         } else if (!snapshots.get(currentIndex).equals(addressBook.copy())) {
             while (snapshots.size() > currentIndex + 1) {
-                snapshots.remove(snapshots.size() - 1);
-                snapshotCommands.remove(snapshotCommands.size() - 1);
+                snapshots.removeLast();
+                snapshotCommands.removeLast();
             }
             snapshots.add(addressBook.copy());
             snapshotCommands.add(feedbackToUser);
@@ -52,6 +54,11 @@ public class SnapshotManager {
         return snapshots.get(currentIndex).copy();
     }
 
+    /**
+     * Retrieves the command associated with the current snapshot
+     *
+     * @return the command that resulted in the current snapshot
+     */
     public String getCommandMessage() {
         if (currentIndex < 0) {
             return null;

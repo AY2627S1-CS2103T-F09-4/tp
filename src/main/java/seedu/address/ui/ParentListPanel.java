@@ -1,22 +1,23 @@
 package seedu.address.ui;
 
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Region;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.Logic;
 import seedu.address.model.person.ParentContact;
 
 /** Displays parent contacts in the Contacts tab. */
 public class ParentListPanel extends UiPart<Region> {
     private static final String FXML = "PersonListPanel.fxml";
-
+    private final Logger logger = LogsCenter.getLogger(PersonListPanel.class);
     private final Logic logic;
     private final Consumer<String> selectStudent;
-
     private String keyword;
 
     @FXML
@@ -43,6 +44,7 @@ public class ParentListPanel extends UiPart<Region> {
      */
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+        logger.fine("ParentListPanel loading with keyword:" + keyword);
         personListView.refresh();
     }
 

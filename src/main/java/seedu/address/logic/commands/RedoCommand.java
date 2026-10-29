@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.logic.commands.exceptions.RedoException;
 import seedu.address.model.Model;
 import seedu.address.storage.SnapshotManager;
 
@@ -22,7 +23,7 @@ public class RedoCommand extends Command {
         if (SnapshotManager.canRedo()) {
             feedbackToUser = model.redo();
         } else {
-            throw new CommandException(Messages.MESSAGE_UNABLE_TO_REDO);
+            throw new RedoException(Messages.MESSAGE_UNABLE_TO_REDO);
         }
         return new CommandResult(MESSAGE_SUCCESS + feedbackToUser, false, false, false, true);
     }

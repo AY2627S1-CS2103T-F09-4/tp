@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.logic.commands.exceptions.UndoException;
 import seedu.address.model.Model;
 import seedu.address.storage.SnapshotManager;
 
@@ -22,7 +23,7 @@ public class UndoCommand extends Command {
         if (SnapshotManager.canUndo()) {
             feedbackToUser = model.undo();
         } else {
-            throw new CommandException(Messages.MESSAGE_UNABLE_TO_UNDO);
+            throw new UndoException(Messages.MESSAGE_UNABLE_TO_UNDO);
         }
         return new CommandResult(MESSAGE_SUCCESS + feedbackToUser, false, false, true, false);
     }

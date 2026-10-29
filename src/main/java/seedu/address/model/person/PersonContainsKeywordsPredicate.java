@@ -1,5 +1,7 @@
 package seedu.address.model.person;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -17,7 +19,13 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
     private final Logger logger = LogsCenter.getLogger(LogicManager.class);
     private Person person;
 
+    /**
+     * Creates a {@code PersonContainsKeywordsPredicate} with keywords.
+     *
+     * @param keywords the keywords used for testing.
+     */
     public PersonContainsKeywordsPredicate(List<String> keywords) {
+        requireNonNull(keywords);
         this.keywords = keywords;
     }
 
@@ -43,7 +51,7 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
         boolean result = person.getTags().stream()
                 .anyMatch(tag -> containsIgnoreCase(tag.tagName, keyword));
         if (result) {
-            logger.info("Person " + person.getName().fullName + " matches " + keyword
+            logger.fine("Person " + person.getName().fullName + " matches " + keyword
                     + " in attribute: Tags");
         }
         return result;
@@ -55,7 +63,7 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
             result = result || containsIgnoreCase(task.toString(), keyword);
         }
         if (result) {
-            logger.info("Person " + person.getName().fullName + " matches " + keyword
+            logger.fine("Person " + person.getName().fullName + " matches " + keyword
                     + " in attribute: Tasks");
         }
         return result;
@@ -67,7 +75,7 @@ public class PersonContainsKeywordsPredicate implements Predicate<Person> {
         }
         boolean result = field.toLowerCase().contains(keyword.toLowerCase());
         if (result) {
-            logger.info("Person " + person.getName().fullName + " matches " + keyword
+            logger.fine("Person " + person.getName().fullName + " matches " + keyword
                     + " in attribute: " + field);
         }
         return result;

@@ -1,5 +1,7 @@
 package seedu.address.model.person;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -9,14 +11,20 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.LogicManager;
 
 /**
- * Tests that a {@code Person}'s {@code attributes} matches any of the keywords given.
+ * Tests that a {@code ParentContact}'s {@code attributes} matches any of the keywords given.
  */
 public class ParentContainsKeywordsPredicate implements Predicate<ParentContact> {
     private final List<String> keywords;
     private final Logger logger = LogsCenter.getLogger(LogicManager.class);
     private ParentContact parentContact;
 
+    /**
+     * Creates a {@code ParentContainsKeywordsPredicate} with keywords.
+     *
+     * @param keywords the keywords used for testing.
+     */
     public ParentContainsKeywordsPredicate(List<String> keywords) {
+        requireNonNull(keywords);
         this.keywords = keywords;
     }
 
@@ -41,7 +49,7 @@ public class ParentContainsKeywordsPredicate implements Predicate<ParentContact>
             result = result || containsIgnoreCase(requirement, keyword);
         }
         if (result) {
-            logger.info("Parent " + parentContact.getName().fullName + " matches " + keyword
+            logger.fine("Parent " + parentContact.getName().fullName + " matches " + keyword
                     + " in attribute: Requirements");
         }
 
@@ -54,7 +62,7 @@ public class ParentContainsKeywordsPredicate implements Predicate<ParentContact>
         }
         boolean result = field.toLowerCase().contains(keyword.toLowerCase());
         if (result) {
-            logger.info("Parent " + parentContact.getName().fullName + " matches " + keyword
+            logger.fine("Parent " + parentContact.getName().fullName + " matches " + keyword
                     + " in attribute: " + field);
         }
         return result;
