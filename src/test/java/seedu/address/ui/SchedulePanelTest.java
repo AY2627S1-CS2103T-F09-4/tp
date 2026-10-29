@@ -1,6 +1,7 @@
 package seedu.address.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.TypicalPersons.ALICE;
@@ -20,6 +21,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import seedu.address.model.person.Person;
@@ -148,6 +151,52 @@ public class SchedulePanelTest {
         assertNotNull(scene(panel));
         assertTrue(grid.prefWidth(-1) > 0);
         assertTrue(grid.prefHeight(-1) > 0);
+    }
+
+    @Test
+    public void arrowKeys_scrollTimetableAndAreConsumed() throws Exception {
+        SchedulePanel panel = createPanel(List.of(ALICE_MONDAY_MORNING), List.of(ALICE), List.of(ALICE));
+
+        FxTestSupport.runOnFxThread(() -> {
+            new Scene(panel.getRoot(), 600, 400);
+            panel.getRoot().applyCss();
+            panel.getRoot().layout();
+            ScrollPane scroll = scrollPane(panel);
+            assertTrue(scroll.isFocusTraversable());
+
+            KeyEvent right = keyPressed(KeyCode.RIGHT);
+            panel.handleScrollKey(right);
+            assertTrue(right.isConsumed());
+            assertTrue(scroll.getHvalue() > 0);
+
+            panel.handleScrollKey(keyPressed(KeyCode.DOWN));
+            assertTrue(scroll.getVvalue() > 0);
+
+            panel.handleScrollKey(keyPressed(KeyCode.END));
+            assertEquals(1, scroll.getHvalue(), 0.001);
+            panel.handleScrollKey(keyPressed(KeyCode.HOME));
+            assertEquals(0, scroll.getHvalue(), 0.001);
+
+            for (int i = 0; i < 50; i++) {
+                panel.handleScrollKey(keyPressed(KeyCode.PAGE_DOWN));
+            }
+            assertEquals(1, scroll.getVvalue(), 0.001);
+            return null;
+        });
+    }
+
+    @Test
+    public void tabKey_isNotConsumedSoFocusCanMoveOn() throws Exception {
+        SchedulePanel panel = createPanel(List.of(), List.of(ALICE), List.of(ALICE));
+        KeyEvent tab = keyPressed(KeyCode.TAB);
+
+        FxTestSupport.runOnFxThread(() -> panel.handleScrollKey(tab));
+
+        assertFalse(tab.isConsumed());
+    }
+
+    private static KeyEvent keyPressed(KeyCode code) {
+        return new KeyEvent(KeyEvent.KEY_PRESSED, "", "", code, false, false, false, false);
     }
 
     private static SchedulePanel createPanel(List<ScheduledSession> sessions, List<Person> persons,

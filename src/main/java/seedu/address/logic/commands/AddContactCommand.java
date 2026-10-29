@@ -18,7 +18,7 @@ public class AddContactCommand extends Command {
     public static final String COMMAND_WORD = "add-parent";
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Adds a parent to Tutoria. Parameters: n/NAME p/PHONE [e/EMAIL] "
-            + "[link/STUDENT_INDEX] [r/REQUIREMENT_1, r/REQUIREMENT_2, ...]\n"
+            + "[link/STUDENT_INDEX] [r/REQUIREMENT]...\n"
             + "Example: " + COMMAND_WORD
             + " n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session";
     public static final String MESSAGE_SUCCESS = "New parent added: %1$s";

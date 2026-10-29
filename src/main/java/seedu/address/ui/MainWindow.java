@@ -204,9 +204,9 @@ public class MainWindow extends UiPart<Stage> {
      * Switches to the tab that lists every command.
      */
     private void showCommandsTab() {
-        assert commandsTab != null : "Commands tab was not injected from MainWindow.fxml";
-        assert recordTabs.getTabs().contains(commandsTab) : "Commands tab must be one of the record tabs";
-        logger.fine("Showing the Commands tab.");
+        assert commandsTab != null : "Help tab was not injected from MainWindow.fxml";
+        assert recordTabs.getTabs().contains(commandsTab) : "Help tab must be one of the record tabs";
+        logger.fine("Showing the Help tab.");
         recordTabs.getSelectionModel().select(commandsTab);
     }
 

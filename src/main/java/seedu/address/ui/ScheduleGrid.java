@@ -23,9 +23,9 @@ import seedu.address.model.person.Person;
 import seedu.address.model.schedule.ScheduledSession;
 
 /**
- * A weekly timetable with one row per day and time running left to right. Each session is a card placed on a
- * 30-minute grid, rounded outwards so the card always covers the true time slot. Overlapping sessions on the
- * same day are stacked in extra lanes, which makes that day's row taller.
+ * A weekly timetable with one row per day and time running left to right. Each session is a card that starts
+ * and ends at its exact times. Overlapping sessions on the same day are stacked in extra lanes, which makes
+ * that day's row taller.
  * The viewport shows five days and {@code VISIBLE_HOURS} hours; the rest is reached by scrolling.
  * The day labels and time header stay pinned to the viewport edges.
  */
@@ -35,7 +35,6 @@ class ScheduleGrid extends Pane {
     private static final int AXIS_WIDTH = 60;
     private static final int MIN_HOUR_WIDTH = 120;
     private static final int MIN_ROW_HEIGHT = 90;
-    private static final int INTERVAL_MINUTES = 30;
     private static final int MINUTES_IN_HOUR = 60;
     // Keeps content slightly smaller than the viewport so scrollbars do not flicker on and off.
     private static final int FIT_MARGIN = 2;
@@ -79,12 +78,14 @@ class ScheduleGrid extends Pane {
         requestLayout();
     }
 
-    private double hourWidth() {
+    /** Returns the width of one hour on the timeline. */
+    double hourWidth() {
         double visibleHours = VISIBLE_END_HOUR - VISIBLE_START_HOUR;
         return Math.max(MIN_HOUR_WIDTH, Math.floor((viewportWidth - AXIS_WIDTH) / visibleHours) - FIT_MARGIN);
     }
 
-    private double rowHeight() {
+    /** Returns the height of one lane in a day row. */
+    double rowHeight() {
         return Math.max(MIN_ROW_HEIGHT, Math.floor((viewportHeight - HEADER_HEIGHT) / VISIBLE_DAYS) - FIT_MARGIN);
     }
 
@@ -109,8 +110,8 @@ class ScheduleGrid extends Pane {
         int minStart = VISIBLE_START_HOUR * MINUTES_IN_HOUR;
         int maxEnd = VISIBLE_END_HOUR * MINUTES_IN_HOUR;
         for (ScheduledSession session : sessions) {
-            minStart = Math.min(minStart, roundedStart(session));
-            maxEnd = Math.max(maxEnd, roundedEnd(session));
+            minStart = Math.min(minStart, startMinutes(session));
+            maxEnd = Math.max(maxEnd, endMinutes(session));
         }
         rangeStartHour = minStart / MINUTES_IN_HOUR;
         rangeEndHour = (maxEnd + MINUTES_IN_HOUR - 1) / MINUTES_IN_HOUR;
@@ -141,8 +142,8 @@ class ScheduleGrid extends Pane {
         for (DayOfWeek day : DayOfWeek.values()) {
             List<ScheduledSession> daySessions = sessions.stream()
                     .filter(s -> s.getDay() == day)
-                    .sorted(Comparator.comparingInt(ScheduleGrid::roundedStart)
-                            .thenComparingInt(ScheduleGrid::roundedEnd))
+                    .sorted(Comparator.comparingInt(ScheduleGrid::startMinutes)
+                            .thenComparingInt(ScheduleGrid::endMinutes))
                     .toList();
             placeDay(day.getValue() - 1, daySessions, colourOf, titleOf,
                     session -> sessionNumbers.get(session.getSessionId()));
@@ -154,16 +155,14 @@ class ScheduleGrid extends Pane {
         requestLayout();
     }
 
-    private static int roundedStart(ScheduledSession session) {
+    private static int startMinutes(ScheduledSession session) {
         LocalTime start = session.getTimeSlot().start;
-        int minutes = start.getHour() * 60 + start.getMinute();
-        return minutes - minutes % INTERVAL_MINUTES;
+        return start.getHour() * MINUTES_IN_HOUR + start.getMinute();
     }
 
-    private static int roundedEnd(ScheduledSession session) {
+    private static int endMinutes(ScheduledSession session) {
         LocalTime end = session.getTimeSlot().end;
-        int minutes = end.getHour() * 60 + end.getMinute();
-        return (minutes + INTERVAL_MINUTES - 1) / INTERVAL_MINUTES * INTERVAL_MINUTES;
+        return end.getHour() * MINUTES_IN_HOUR + end.getMinute();
     }
 
     /** Assigns each session in a day to a lane so that overlapping cards never share a lane. */
@@ -173,8 +172,8 @@ class ScheduleGrid extends Pane {
         int clusterEnd = -1;
 
         for (ScheduledSession session : daySessions) {
-            int start = roundedStart(session);
-            int end = roundedEnd(session);
+            int start = startMinutes(session);
+            int end = endMinutes(session);
             if (clusterEnd >= 0 && start >= clusterEnd) {
                 laneEnds = new ArrayList<>();
                 clusterEnd = -1;

@@ -11,7 +11,8 @@ import seedu.address.model.reminder.ReminderDisplay;
 /** Lists all tutor-level reminders in insertion order. */
 public class ListRemindersCommand extends Command {
     public static final String COMMAND_WORD = "list-reminders";
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Lists all reminders.";
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Lists all reminders.\n"
+            + "Example: " + COMMAND_WORD;
     public static final String MESSAGE_NO_REMINDERS = "No reminders have been set.";
     public static final String MESSAGE_HEADER = "Reminders:";
 

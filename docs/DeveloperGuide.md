@@ -95,17 +95,18 @@ The `UI` component,
 `SchedulePanel` shows the scheduled sessions as a weekly timetable with a legend below it. It redraws whenever the scheduled sessions, the students or the displayed student list change.
 
 * `ScheduleGrid` draws one row for each day of the week, with time running from left to right. Each session becomes a `ScheduleSessionCard` placed according to its day and time slot.
-* Cards snap to a 30-minute grid. A session whose times fall between grid lines is rounded outwards, so the card always covers the full session. Sessions that overlap on the same day are placed in separate lanes, which makes that day's row taller.
+* Each card starts and ends at the session's exact times, so a 12:10 end and a 12:20 end are drawn at different places. Sessions that overlap on the same day are placed in separate lanes, which makes that day's row taller.
+* The timetable can be focused with Tab. Left and right arrows then scroll by one hour, up and down arrows by one row, Page Up and Page Down by one screen, and Home and End jump to the earliest and latest hours.
 * Each student is given a colour based on their position in the student list, so all of a student's sessions share one colour. The legend lists the scheduled students and their colours.
 * Each card shows the student's index in the displayed student list, name, subject, grade level, address and time slot. If a student is not in the displayed list, for example after a `find` command, the card shows only the name.
 
-#### Commands tab
+#### Help tab
 
 `CommandListPanel` lists every command in the app, so users can look up a command without leaving the main window.
 
 * The list comes from `HelpCommand.COMMAND_SUMMARIES`. Each `CommandSummary` holds a command word, its parameter format and a short description. When adding a new command, add a `CommandSummary` for it there so that it shows up in the list.
 * The list is read-only. `CommandListPanel` wraps it in an unmodifiable `ObservableList` so the `ListView` cannot change it.
-* Executing `help` returns a `CommandResult` with `isShowHelp()` set, and `MainWindow` then switches to the Commands tab instead of opening a separate window.
+* Executing `help` returns a `CommandResult` with `isShowHelp()` set, and `MainWindow` then switches to the Help tab instead of opening a separate window.
 * The banner above the list points users to `F1` for the full user guide. `F1` is the accelerator of the **F1 User Guide** menu item, which opens `HelpWindow` with the user guide URL and a button to copy it. The panel does not open a browser itself, so it does not depend on `java.awt.Desktop` or the system clipboard.
 
 ### Logic component

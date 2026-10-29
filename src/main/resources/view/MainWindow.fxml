@@ -63,7 +63,7 @@
               <StackPane fx:id="schedulePanelPlaceholder" />
             </content>
           </Tab>
-          <Tab fx:id="commandsTab" text="Commands">
+          <Tab fx:id="commandsTab" text="Help">
             <content>
               <StackPane fx:id="commandListPanelPlaceholder" />
             </content>
