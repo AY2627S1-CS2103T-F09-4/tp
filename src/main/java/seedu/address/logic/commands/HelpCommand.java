@@ -82,8 +82,6 @@ public class HelpCommand extends Command {
                     "Lists all reminders."),
             new CommandSummary(DeleteReminderCommand.COMMAND_WORD, "ID",
                     "Deletes a reminder."),
-            new CommandSummary(FindCommand.COMMAND_WORD, "KEYWORD [MORE_KEYWORDS]...",
-                    "Finds students whose names contain any of the keywords."),
             new CommandSummary(SearchCommand.COMMAND_WORD, "KEYWORD [MORE_KEYWORDS]...",
                     "Searches all details of students and parents for the keywords."),
             new CommandSummary(DeleteCommand.COMMAND_WORD, "INDEX",
