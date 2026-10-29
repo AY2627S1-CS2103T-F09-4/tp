@@ -83,15 +83,19 @@ public class StatisticsReportTest {
     }
 
     @Test
-    public void sameDateAssessments_tieBreakByStableId() {
-        AssessmentRecord first = new AssessmentRecord("00000000-0000-0000-0000-000000000001",
-                alice.getStudentId(), "Alice", start, "Math", "Quiz", "First", BigDecimal.ZERO, BigDecimal.TEN);
-        AssessmentRecord last = new AssessmentRecord("00000000-0000-0000-0000-000000000002",
-                alice.getStudentId(), "Alice", start, "Math", "Quiz", "Last", BigDecimal.TEN, BigDecimal.TEN);
+    public void sameDateAssessments_keepRecordedOrder() {
+        // IDs are random UUIDs, so give the first-recorded mark the larger ID to prove ID order is not used.
+        AssessmentRecord first = new AssessmentRecord("00000000-0000-0000-0000-000000000002",
+                alice.getStudentId(), "Alice", start, "Math", "Quiz", "First", new BigDecimal("50"),
+                new BigDecimal("100"));
+        AssessmentRecord last = new AssessmentRecord("00000000-0000-0000-0000-000000000001",
+                alice.getStudentId(), "Alice", start, "Math", "Quiz", "Last", new BigDecimal("80"),
+                new BigDecimal("100"));
         AddressBook book = new AddressBook();
-        book.setHistory(List.of(), List.of(last, first));
-        assertTrue(StatisticsReport.student(book, alice, start, start)
-                .contains("Change math / quiz: 100.00 percentage points"));
+        book.setHistory(List.of(), List.of(first, last));
+        String report = StatisticsReport.student(book, alice, start, start);
+        assertTrue(report.indexOf("First") < report.indexOf("Last"));
+        assertTrue(report.contains("Change math / quiz: 30.00 percentage points"));
     }
 
     @Test
