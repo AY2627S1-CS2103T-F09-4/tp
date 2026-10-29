@@ -30,7 +30,7 @@ public class StatisticsParserTest {
 
     @Test
     public void manualLessonCommands_areUnknown() {
-        for (String command : new String[]{"record-lesson", "edit-lesson", "delete-lesson"}) {
+        for (String command : new String[]{"record-lesson", "edit-lesson"}) {
             for (String arguments : new String[]{"", " 1", " 1 date/2026-10-19 status/completed"}) {
                 ParseException error = assertThrows(
                         ParseException.class, () -> parser.parseCommand(command + arguments));
@@ -59,6 +59,7 @@ public class StatisticsParserTest {
         parser.parseCommand("edit-assessment " + id
                 + " date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10");
         parser.parseCommand("delete-assessment " + id);
+        parser.parseCommand("delete-lesson " + id);
         for (String input : new String[]{"list-lessons", "list-assessments"}) {
             Command command = parser.parseCommand(input);
             assertTrue(command.isReadOnly());
@@ -71,7 +72,7 @@ public class StatisticsParserTest {
 
     @Test
     public void numberedCommands_rejectNonpositiveNonnumericOverflowAndUuidTargets() {
-        String[] suffixes = {"delete-assessment %s",
+        String[] suffixes = {"delete-assessment %s", "delete-lesson %s",
             "edit-assessment %s date/2026-10-01 subject/Math category/Quiz title/Test score/0 max/10",
             "mark-attendance %s date/2026-10-19 status/completed"};
         for (String suffix : suffixes) {
@@ -81,5 +82,33 @@ public class StatisticsParserTest {
                 assertThrows(ParseException.class, () -> parser.parseCommand(input), input);
             }
         }
+    }
+
+    @Test
+    public void invalidHistoryAndStatistics_alwaysGiveReasonSyntaxAndExample() {
+        String assessment = "record-assessment 1 date/2026-10-01 subject/Math category/Quiz title/Test score/4 max/5";
+        String[] inputs = {"stats-student", "stats-student abc", "stats-student 0",
+            "stats-student 2147483648", "stats-student 1 from/2026-01-01",
+            "stats-student 1 from/2026-02-30 to/2026-03-01", "stats-student 1 unknown/test",
+            "stats-student 1 from/2026-01-01 from/2026-01-02 to/2026-02-01",
+            "stats 1", "stats from/2026-02-01 to/2026-01-01", "record-assessment",
+            assessment.replace("assessment 1", "assessment abc"), assessment.replace("score/4", "score/NaN"),
+            assessment.replace("score/4", "score/6"), assessment.replace("date/2026-10-01", "date/invalid"),
+            assessment.replace("title/Test", ""), assessment + " unknown/test", assessment + " max/10",
+            "delete-lesson", "delete-lesson abc", "delete-lesson 1 extra", "delete-lesson 1 date/2026-10-01",
+            "edit-assessment", "delete-assessment abc", "list-lessons 1", "list-assessments 1"};
+        for (String input : inputs) {
+            ParseException error = assertThrows(ParseException.class, () -> parser.parseCommand(input), input);
+            String command = input.split(" ")[0];
+            assertTrue(error.getMessage().contains("Usage: " + command), input);
+            assertTrue(error.getMessage().contains("Example: " + command), input);
+            assertTrue(error.getMessage().indexOf("Usage:") > 0, input);
+        }
+        ParseException numericError = assertThrows(ParseException.class, () ->
+                parser.parseCommand(assessment.replace("score/4", "score/NaN")));
+        assertTrue(numericError.getMessage().contains("score must be a number"));
+        ParseException missing = assertThrows(ParseException.class, () -> parser.parseCommand("stats-student"));
+        assertTrue(missing.getMessage().contains("A student index is required."));
+        assertTrue(missing.getMessage().contains("[from/YYYY-MM-DD to/YYYY-MM-DD]"));
     }
 }

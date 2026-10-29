@@ -12,17 +12,27 @@ import seedu.address.model.statistics.LessonRecord.Outcome;
 public class MarkAttendanceCommandParser implements Parser<MarkAttendanceCommand> {
     @Override
     public MarkAttendanceCommand parse(String args) throws ParseException {
-        ArgumentMultimap values = HistoryCommandParser.arguments(args, "date", "status");
         try {
-            Index sessionIndex = ParserUtil.parseIndex(values.getPreamble());
+            ArgumentMultimap values = HistoryCommandParser.arguments(args, "date", "status");
+            if (values.getPreamble().isEmpty()) {
+                throw new ParseException("A session number is required.");
+            }
+            Index sessionIndex;
+            try {
+                sessionIndex = ParserUtil.parseIndex(values.getPreamble());
+            } catch (ParseException e) {
+                throw new ParseException("Session number must be a positive integer.", e);
+            }
             String date = values.getValue(new Prefix("date/"))
                     .orElseThrow(() -> new IllegalArgumentException("Missing date/ argument."));
             String status = values.getValue(new Prefix("status/"))
                     .orElseThrow(() -> new IllegalArgumentException("Missing status/ argument."));
             return new MarkAttendanceCommand(sessionIndex, HistoryValidation.date(date), Outcome.parse(status));
-        } catch (IllegalArgumentException | DateTimeException e) {
-            throw new ParseException("Invalid attendance: " + e.getMessage() + "\nUsage: "
-                    + MarkAttendanceCommand.MESSAGE_USAGE, e);
+        } catch (DateTimeException e) {
+            throw new ParseException(MarkAttendanceCommand.withUsage(
+                    "date/ must contain a valid calendar date in YYYY-MM-DD format."), e);
+        } catch (ParseException | IllegalArgumentException e) {
+            throw new ParseException(MarkAttendanceCommand.withUsage(e.getMessage()), e);
         }
     }
 }

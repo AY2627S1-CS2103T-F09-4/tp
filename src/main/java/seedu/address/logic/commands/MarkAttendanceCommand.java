@@ -32,18 +32,27 @@ public class MarkAttendanceCommand extends Command {
         this.outcome = Objects.requireNonNull(outcome);
     }
 
+    /** Adds consistent guidance to a specific attendance validation failure. */
+    public static String withUsage(String reason) {
+        return "Invalid mark-attendance: " + reason + "\nUsage: " + MESSAGE_USAGE
+                + "\nUse Session #N from list-schedule, not the row number."
+                + "\nExample: mark-attendance 1 date/2026-10-19 status/completed";
+    }
+
     @Override
     public CommandResult execute(Model model) throws CommandException {
         if (sessionIndex.getZeroBased() >= model.getAddressBook().getScheduleList().size()) {
-            throw new CommandException("Invalid session number. Run list-schedule and choose a number from that list.");
+            throw new CommandException(withUsage("Invalid session number. "
+                    + "Run list-schedule and choose an existing Session #N."));
         }
         ScheduledSession session = model.getAddressBook().getScheduleList().get(sessionIndex.getZeroBased());
         String sessionId = session.getSessionId();
         if (date.isAfter(LocalDate.now(model.getClock()))) {
-            throw new CommandException("Attendance cannot be recorded for a future date.");
+            throw new CommandException(withUsage("Attendance cannot be recorded for a future date."));
         }
         if (date.getDayOfWeek() != session.getDay()) {
-            throw new CommandException("Date must fall on " + session.getDay() + " for this scheduled session.");
+            throw new CommandException(withUsage("Date must fall on " + session.getDay()
+                    + " for this scheduled session."));
         }
         ReadOnlyAddressBook book = model.getAddressBook();
         ArrayList<LessonRecord> lessons = new ArrayList<>(book.getLessonRecords());
@@ -55,10 +64,22 @@ public class MarkAttendanceCommand extends Command {
             updated = new LessonRecord(UUID.randomUUID().toString(), student.getStudentId(), student.getName().fullName,
                     student.getSubject().value, date, session.getTimeSlot().start, session.getTimeSlot().end,
                     outcome, sessionId);
-            lessons.add(updated);
         } else {
             updated = new LessonRecord(old.id(), old.studentId(), old.studentName(), old.subject(), old.date(),
                     old.start(), old.end(), outcome, old.sourceSessionId());
+        }
+        for (int i = 0; i < lessons.size(); i++) {
+            LessonRecord other = lessons.get(i);
+            if (old == null && other.studentId().equals(updated.studentId()) && other.date().equals(date)
+                    && updated.start().equals(other.start()) && updated.end().equals(other.end())) {
+                throw new CommandException(withUsage("Duplicate lesson #" + (i + 1) + " already exists on " + date
+                        + " " + other.start() + "-" + other.end() + " for this student. "
+                        + "Use list-lessons to review the existing record."));
+            }
+        }
+        if (old == null) {
+            lessons.add(updated);
+        } else {
             lessons.set(lessons.indexOf(old), updated);
         }
         model.setHistory(lessons, book.getAssessmentRecords());

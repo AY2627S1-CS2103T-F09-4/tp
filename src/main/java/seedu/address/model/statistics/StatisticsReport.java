@@ -77,7 +77,9 @@ public final class StatisticsReport {
         groups.forEach((subject, categories) -> categories.forEach((category, records) -> {
             String change = records.size() < 2 ? "N/A" : decimal(records.getLast().percentage()
                     .subtract(records.getFirst().percentage())) + " percentage points";
-            report.append("\nChange ").append(subject).append(" / ").append(category).append(": ").append(change);
+            AssessmentRecord first = records.getFirst();
+            report.append("\nChange ").append(first.subject()).append(" / ").append(first.category())
+                    .append(": ").append(change);
         }));
         return report.toString();
     }

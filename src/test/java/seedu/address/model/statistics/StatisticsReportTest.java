@@ -58,8 +58,8 @@ public class StatisticsReportTest {
         assertTrue(report.contains("2026-01-01 | math | quiz | First | 60.00%"));
         assertTrue(report.indexOf("First") < report.indexOf("Last"));
         assertTrue(report.contains("Change math / quiz: 20.00 percentage points"));
-        assertTrue(report.contains("Change math / exam: N/A"));
-        assertTrue(report.contains("Change english / quiz: N/A"));
+        assertTrue(report.contains("Change Math / Exam: N/A"));
+        assertTrue(report.contains("Change English / Quiz: N/A"));
         assertFalse(report.contains("Outside"));
     }
 
@@ -79,7 +79,7 @@ public class StatisticsReportTest {
         book.setHistory(List.of(), List.of(assessment(start, "Math", "Quiz", "First", "2", "3"),
                 assessment(end, "Math", "Quiz", "Last", "1", "3")));
         assertTrue(StatisticsReport.student(book, alice, start, end)
-                .contains("Change math / quiz: -33.33 percentage points"));
+                .contains("Change Math / Quiz: -33.33 percentage points"));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class StatisticsReportTest {
         book.setHistory(List.of(), List.of(first, last));
         String report = StatisticsReport.student(book, alice, start, start);
         assertTrue(report.indexOf("First") < report.indexOf("Last"));
-        assertTrue(report.contains("Change math / quiz: 30.00 percentage points"));
+        assertTrue(report.contains("Change Math / Quiz: 30.00 percentage points"));
     }
 
     @Test

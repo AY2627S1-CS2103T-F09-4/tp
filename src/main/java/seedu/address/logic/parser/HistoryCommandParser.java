@@ -20,12 +20,6 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("(?:^|\\s)([A-Za-z][A-Za-z-]*)/");
     private final String operation;
 
-    private final String recordAssessmentExample = "record-assessment 1 date/2026-12-12 subject/math "
-            + "category/functions title/quiz score/20 max/30";
-    private final String editAssessmentExample = "edit-assessment 1 date/2026-12-11 subject/science "
-            + "category/physics title/finals score/0 max/100";
-    private final String deleteAssessmentExample = "delete-assessment 1";
-
     public HistoryCommandParser(String operation) {
         this.operation = operation;
     }
@@ -44,50 +38,34 @@ public class HistoryCommandParser implements Parser<HistoryCommand> {
                     : new String[]{"date", "subject", "category", "title", "score", "max"};
             ArgumentMultimap values = arguments(args, fields);
             if (values.getPreamble().isEmpty()) {
-                throw new ParseException(String.format("Invalid " + operation + ": \n%1$s",
-                        usage() + "\nExample: " + getExample()));
+                throw new ParseException(isDelete ? "A record number is required." : "A student index is required.");
             }
             Index target = ParserUtil.parseIndex(values.getPreamble());
             if (isDelete) {
                 return new HistoryCommand(operation, target, null);
             }
             LocalDate date = HistoryValidation.date(required(values, "date"));
-            BigDecimal score = new BigDecimal(required(values, "score"));
-            BigDecimal maximum = new BigDecimal(required(values, "max"));
+            BigDecimal score = decimal(required(values, "score"), "score");
+            BigDecimal maximum = decimal(required(values, "max"), "max");
             if (maximum.signum() <= 0 || score.signum() < 0 || score.compareTo(maximum) > 0) {
                 throw new IllegalArgumentException("Marks must satisfy 0 <= score <= max and max > 0.");
             }
             AssessmentDetails assessment = new AssessmentDetails(date, parseSubject(required(values, "subject")),
                     required(values, "category"), required(values, "title"), score, maximum);
             return new HistoryCommand(operation, target, assessment);
-        } catch (IllegalArgumentException | DateTimeException e) {
-            throw new ParseException("Invalid " + operation + ": " + e.getMessage() + "\n" + usage(), e);
+        } catch (ParseException | IllegalArgumentException | DateTimeException e) {
+            throw new ParseException("Invalid " + operation + ": " + e.getMessage()
+                    + "\n" + HistoryCommand.usage(operation), e);
         }
     }
 
-    private String usage() {
-        if (operation.startsWith("delete-")) {
-            return "Usage: " + operation + " RECORD_NUMBER (from list-assessments)";
+    private static BigDecimal decimal(String value, String field) {
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(field + " must be a number; "
+                    + "marks must satisfy 0 <= score <= max and max > 0.", e);
         }
-        if (operation.startsWith("list-")) {
-            return "Usage: " + operation;
-        }
-        String target = operation.startsWith("record-") ? "INDEX" : "RECORD_NUMBER";
-        return "Usage: " + operation + " " + target + " date/YYYY-MM-DD "
-                + "subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX";
-    }
-
-    private String getExample() {
-        if (operation.startsWith("delete-")) {
-            return deleteAssessmentExample;
-        }
-        if (operation.startsWith("edit-")) {
-            return editAssessmentExample;
-        }
-        if (operation.startsWith("record-")) {
-            return recordAssessmentExample;
-        }
-        return null;
     }
 
     private static String parseSubject(String value) {

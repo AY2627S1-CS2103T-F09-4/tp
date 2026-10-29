@@ -311,7 +311,20 @@ Lists recurring sessions and their session numbers.
 
 Format: `list-schedule`
 
-The session numbers shown by this command are the numbers required by `mark-attendance`. They are separate from student indexes.
+Use the number labelled `Session #N` with `mark-attendance`, not the row number at the start of the line.
+Session numbers are separate from student indexes.
+
+Rows are sorted Monday through Sunday, then by start time, and numbered consecutively `1`, `2`, `3`, and so on.
+Each row ends with the original session number, for example:
+
+```text
+1. Amy Bee | Mathematics | MONDAY | 16-00 to 17-00 | Session #2
+2. Bob | English | TUESDAY | 09-00 to 10-00 | Session #1
+```
+
+The `Session #N` labels match the timetable cards and may appear out of order.
+Adding an earlier lesson does not renumber existing sessions. Removing a session can shift numbers, so check
+`list-schedule` again before recording attendance after a removal.
 
 #### Removing a scheduled lesson: `unschedule-student`
 Removes a matching recurring lesson.
@@ -329,6 +342,17 @@ Format: `mark-attendance SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent
 * The date must match the session weekday and cannot be later than today.
 * Repeating the command for the same session and date updates the outcome.
 * Available statuses are `completed`, `absent`, `cancelled`, and `unrecorded`.
+* A new record is rejected if the same student already has a lesson on that date with identical start and end
+  times, regardless of status or session number. This also applies after deleting and recreating a recurring session.
+* Partial overlaps, adjacent lessons, and lessons for different students are allowed. Repeating attendance for the
+  same session and date still updates its existing record, preserving its ID.
+* A rejected duplicate identifies the existing `Lesson #N`, date and times; no history is changed.
+* Invalid input shows the specific reason, command format, and an example. Missing or invalid session numbers,
+  unknown or repeated fields, invalid dates/statuses, future dates, and wrong weekdays receive the same guidance.
+
+For example, after recording Session #1 on a Monday from 10:00 to 11:00, removing and recreating that weekly session
+does not let you record that occurrence twice. Review the existing record with `list-lessons`. If it is incorrect,
+you can remove it with `delete-lesson` before recording attendance for the recreated session.
 
 Example: `mark-attendance 1 date/2026-10-19 status/completed`
 
@@ -342,6 +366,7 @@ Format: `record-assessment INDEX date/YYYY-MM-DD subject/SUBJECT category/CATEGO
 * The date cannot be in the future.
 * Subject, category, and title must not be blank.
 * `max` must be positive, and `score` must be between zero and `max`.
+* Invalid input shows the reason, command format, and an example. `INDEX` refers to the displayed student list.
 
 Example: `record-assessment 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions score/18 max/25`
 
@@ -351,6 +376,7 @@ Lists all recorded assessments.
 Format: `list-assessments`
 
 The assessment number shown by this command is used by `edit-assessment` and `delete-assessment`. The list is independent of student search filters.
+Its heading is `Assessments (all dates):`. Subject, category, and title retain their recorded capitalisation.
 
 #### Editing an assessment: `edit-assessment`
 Replaces an assessment record.
@@ -380,12 +406,43 @@ Format: `stats-student INDEX [from/YYYY-MM-DD to/YYYY-MM-DD]`
 
 `INDEX` refers to the displayed student list. Date ranges follow the same rules as `stats`: both dates must be supplied together and are inclusive.
 
+Example: `stats-student 1 from/2026-01-01 to/2026-10-01`
+
+Missing or invalid indices and invalid date ranges show a reason, the command format, and an example.
+Assessment progress groups subjects and categories without regard to case. Each `Change` line uses the spelling
+from the earliest assessment in its group; assessments on the same date keep their recorded order.
+
 #### Listing recorded lessons: `list-lessons`
 Lists all recorded lessons.
 
 Format: `list-lessons`
 
 This lists recorded lessons, not merely scheduled sessions. The list includes lessons from all students and is independent of student search filters.
+Its heading is `Recorded lessons (all dates):`. Rows are sorted by date, then start time, earliest first, and numbered
+consecutively. Lessons with the same date and start time keep their recorded order. Each row ends with a separate
+`Lesson #N` label. Use that lesson number with `delete-lesson`, not the row number at the start of the line.
+Lesson numbers are separate from student indexes and recurring session numbers.
+
+```text
+1. Amy Bee | 2026-10-19 10:00-11:00 | Mathematics | completed | Lesson #3
+2. Bob | 2026-10-20 09:00-10:00 | English | absent | Lesson #1
+```
+
+#### Deleting a recorded lesson: `delete-lesson`
+Removes one recorded lesson, including a record whose schedule or student has been removed.
+
+Format: `delete-lesson RECORD_NUMBER`
+
+* Obtain `RECORD_NUMBER` from the `Lesson #N` label in `list-lessons`. Remaining records are renumbered after deletion.
+* Only that recorded lesson is removed. Recurring schedules, other lessons, and assessments are kept.
+* Attendance and workload statistics recalculate from the remaining records. Use `undo` to restore the deletion.
+* To correct an attendance status for an existing schedule, rerun `mark-attendance` for that session and date.
+* To correct a wrong session or date, delete the incorrect record and mark attendance for the correct session/date.
+  Recording attendance again for a deleted occurrence creates a new record if its schedule still exists.
+* Removing a recurring schedule with `unschedule-student` keeps its recorded lessons; use this command to remove
+  incorrect history explicitly. Once the schedule is removed, its retained records cannot be updated with `mark-attendance`.
+
+Example: `delete-lesson 1`
 
 ### Data management
 
@@ -546,6 +603,7 @@ table td code {
 | `stats` | `stats [from/YYYY-MM-DD to/YYYY-MM-DD]` |
 | `stats-student` | `stats-student INDEX [from/YYYY-MM-DD to/YYYY-MM-DD]` |
 | `list-lessons` | `list-lessons` |
+| `delete-lesson` | `delete-lesson RECORD_NUMBER` |
 
 ### Data management
 
