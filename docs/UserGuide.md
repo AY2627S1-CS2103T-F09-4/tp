@@ -96,8 +96,8 @@ Reverses the most recent command that changed data.
 Format: `undo`
 
 Examples:
-* `edit 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
-* `edit 1 n/John`,`list-students` and `undo` will change the first student's name to `John`, list all students, then `undo` changes `John` to what it was before.
+* `edit-student 1 n/John` followed by `undo` will first change the first student's name to `John`, and `undo` changes it to what it was before.
+* `edit-student 1 n/John`,`list-students` and `undo` will change the first student's name to `John`, list all students, then `undo` changes `John` to what it was before.
 
 #### Redoing a command: `redo`
 Reapplies the most recent command reversed by `undo`.
@@ -108,8 +108,8 @@ Reapplies the most recent command reversed by `undo`.
 Format: `redo`
 
 Examples:
-* `edit 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
-* `edit 1 n/John`, `undo`, `edit 1 n/Jane` and then `redo` will change the first student's name to `John`, `undo` reverses the name change, then the name changes to `Jane`, and `redo` will not work
+* `edit-student 1 n/John`, `undo` and then `redo` will first change the first student's name to `John`, `undo` reverses the name change, and `redo` reverses the `undo` command, changing the name back to `John`.
+* `edit-student 1 n/John`, `undo`, `edit-student 1 n/Jane` and then `redo` will change the first student's name to `John`, `undo` reverses the name change, then the name changes to `Jane`, and `redo` will not work
 
 #### Exiting the program: `exit`
 Exits Tutoria.
@@ -121,7 +121,7 @@ Format: `exit`
 #### Adding a student: `add-student`
 Adds a student to Tutoria.
 
-Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG_1>, t/<TAG_2>, ...]`
+Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...`
 
 * `NAME` and `ADDRESS` must not be blank.
 * `PHONE` must contain 3 to 15 digits and may start with `+`.
@@ -138,11 +138,11 @@ Format: `list-students`
 #### Editing a student: `edit-student`
 Edits an existing student. At least one optional field must be supplied.
 
-Format: `edit INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG_1>, t/<TAG_2>, ...]`
+Format: `edit-student INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG>]...`
 
 * to remove the optional `<GRADE_LEVEL>`or `<TAG>`, use `g/` or `t/`.
 
-Example: `edit 1 p/91234567 s/Science`
+Example: `edit-student 1 p/91234567 s/Science`
 
 #### Deleting a student: `delete-student`
 Deletes the student at the displayed index.
@@ -488,10 +488,7 @@ This removes students, parents, tasks, reminders, schedules, and historical reco
 **A**: Yes. Tutoria saves data automatically after commands that modify saved data. There is no separate save command.
 
 **Q**: How do I know which index to use?<br>
-**A**: Run `list-students` or `list-parents` and use the index shown beside the relevant entry. Student indexes also follow the currently displayed results after `find` or `search`.
-
-**Q**: What is the difference between `find` and `search`?<br>
-**A**: `find` searches student names using full-word matching. `search` searches supported student and parent details and highlights matches.
+**A**: Run `list-students` or `list-parents` and use the index shown beside the relevant entry. Student indexes also follow the currently displayed results after `search`.
 
 **Q**: How do I undo or redo a change?<br>
 **A**: Enter `undo` to reverse the most recent change. Enter `redo` to reapply an undone change.
@@ -566,9 +563,8 @@ table td code {
 |---|---|
 | `add-student` | `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GRADE_LEVEL>] [t/<TAG>]...` |
 | `list-students` | `list-students` |
-| `edit` | `edit INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG>]...` |
+| `edit-student` | `edit-student INDEX [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [a/<ADDRESS>] [s/<SUBJECT>] [g/<GRADE_LEVEL>] [t/<TAG>]...` |
 | `delete-student` | `delete-student INDEX` |
-| `find` | `find KEYWORD [MORE_KEYWORDS]` |
 | `search` | `search KEYWORD [MORE_KEYWORDS]...` |
 
 ### Parent management
