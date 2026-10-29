@@ -32,17 +32,27 @@ public class HistoryCommand extends Command {
 
     /** Formats command-specific syntax and an example for parser and execution errors. */
     public static String usage(String operation) {
-        if (operation.startsWith("list-")) {
-            return "Usage: " + operation + "\nExample: " + operation;
-        }
-        if (operation.startsWith("delete-")) {
-            String source = operation.equals("delete-lesson") ? "list-lessons" : "list-assessments";
-            return "Usage: " + operation + " RECORD_NUMBER (from " + source + ")\nExample: " + operation + " 1";
-        }
-        String target = operation.startsWith("record-") ? "INDEX" : "RECORD_NUMBER";
-        return "Usage: " + operation + " " + target + " date/YYYY-MM-DD "
-                + "subject/SUBJECT category/CATEGORY title/TITLE score/SCORE max/MAX\nExample: " + operation
-                + " 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions score/18 max/25";
+        String example = "\nExample: " + operation;
+        String assessmentFields = " date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE "
+                + "score/SCORE max/MAX";
+        String assessmentExample = " 1 date/2026-10-01 subject/Mathematics category/Quiz title/Fractions "
+                + "score/18 max/25";
+        return switch (operation) {
+            case "list-lessons" -> operation + ": Lists all recorded lessons." + example;
+            case "list-assessments" -> operation + ": Lists all recorded assessments." + example;
+            case "delete-lesson" -> operation + ": Deletes a recorded lesson. "
+                    + "Parameters: RECORD_NUMBER (Lesson #N from list-lessons)" + example + " 1";
+            case "delete-assessment" -> operation + ": Deletes an assessment record. "
+                    + "Parameters: RECORD_NUMBER (from list-assessments)" + example + " 1";
+            case "record-assessment" -> operation + ": Records an assessment result for a student. "
+                    + "Parameters: INDEX" + assessmentFields + example + assessmentExample;
+            default -> {
+                assert operation.equals("edit-assessment") : "Unknown history operation: " + operation;
+                yield operation + ": Replaces an assessment record. "
+                        + "Parameters: RECORD_NUMBER (from list-assessments)" + assessmentFields + example
+                        + assessmentExample;
+            }
+        };
     }
 
     @Override

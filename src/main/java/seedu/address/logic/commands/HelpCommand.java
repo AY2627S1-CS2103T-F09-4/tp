@@ -13,10 +13,10 @@ public class HelpCommand extends Command {
 
     public static final String COMMAND_WORD = "help";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Shows program usage instructions.\n"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Shows all commands in the Help tab.\n"
             + "Example: " + COMMAND_WORD;
 
-    public static final String SHOWING_HELP_MESSAGE = "Showing all commands in the Commands tab.";
+    public static final String SHOWING_HELP_MESSAGE = "Showing all commands in the Help tab.";
 
     /** The format and function of every command, in the order they are shown to the user. */
     public static final List<CommandSummary> COMMAND_SUMMARIES = List.of(

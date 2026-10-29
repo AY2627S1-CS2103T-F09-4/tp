@@ -19,7 +19,9 @@ import seedu.address.model.statistics.LessonRecord.Outcome;
 public class MarkAttendanceCommand extends Command {
     public static final String COMMAND_WORD = "mark-attendance";
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + " SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent|cancelled|unrecorded)";
+            + ": Records the outcome of a scheduled session on a date. "
+            + "Parameters: SESSION_NUMBER date/YYYY-MM-DD status/(completed|absent|cancelled|unrecorded)\n"
+            + "Example: " + COMMAND_WORD + " 1 date/2026-10-19 status/completed";
 
     private final Index sessionIndex;
     private final LocalDate date;
@@ -34,9 +36,8 @@ public class MarkAttendanceCommand extends Command {
 
     /** Adds consistent guidance to a specific attendance validation failure. */
     public static String withUsage(String reason) {
-        return "Invalid mark-attendance: " + reason + "\nUsage: " + MESSAGE_USAGE
-                + "\nUse Session #N from list-schedule, not the row number."
-                + "\nExample: mark-attendance 1 date/2026-10-19 status/completed";
+        return "Invalid mark-attendance: " + reason + "\n" + MESSAGE_USAGE
+                + "\nUse Session #N from list-schedule, not the row number.";
     }
 
     @Override

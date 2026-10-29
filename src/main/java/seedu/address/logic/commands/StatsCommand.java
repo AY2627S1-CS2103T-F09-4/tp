@@ -23,8 +23,11 @@ public class StatsCommand extends Command {
     /** Formats the appropriate report syntax and date-range example. */
     public static String usage(boolean studentReport) {
         String command = studentReport ? "stats-student" : "stats";
-        return "Usage: " + command + (studentReport ? " INDEX" : "")
-                + " [from/YYYY-MM-DD to/YYYY-MM-DD]\nSupply both dates together, or omit both.\nExample: "
+        String description = studentReport
+                ? ": Shows attendance and assessment progress for a student. "
+                : ": Shows workload statistics. ";
+        return command + description + "Parameters: " + (studentReport ? "INDEX " : "")
+                + "[from/YYYY-MM-DD to/YYYY-MM-DD]\nSupply both dates together, or omit both.\nExample: "
                 + command + (studentReport ? " 1" : "") + " from/2026-01-01 to/2026-10-01";
     }
 

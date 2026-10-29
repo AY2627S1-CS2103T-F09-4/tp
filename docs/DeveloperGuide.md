@@ -100,13 +100,13 @@ The `UI` component,
 * Each student is given a colour based on their position in the student list, so all of a student's sessions share one colour. The legend lists the scheduled students and their colours.
 * Each card shows the student's index in the displayed student list, name, subject, grade level, address and time slot. If a student is not in the displayed list, for example after a `find` command, the card shows only the name.
 
-#### Commands tab
+#### Help tab
 
 `CommandListPanel` lists every command in the app, so users can look up a command without leaving the main window.
 
 * The list comes from `HelpCommand.COMMAND_SUMMARIES`. Each `CommandSummary` holds a command word, its parameter format and a short description. When adding a new command, add a `CommandSummary` for it there so that it shows up in the list.
 * The list is read-only. `CommandListPanel` wraps it in an unmodifiable `ObservableList` so the `ListView` cannot change it.
-* Executing `help` returns a `CommandResult` with `isShowHelp()` set, and `MainWindow` then switches to the Commands tab instead of opening a separate window.
+* Executing `help` returns a `CommandResult` with `isShowHelp()` set, and `MainWindow` then switches to the Help tab instead of opening a separate window.
 * The banner above the list points users to `F1` for the full user guide. `F1` is the accelerator of the **F1 User Guide** menu item, which opens `HelpWindow` with the user guide URL and a button to copy it. The panel does not open a browser itself, so it does not depend on `java.awt.Desktop` or the system clipboard.
 
 ### Logic component

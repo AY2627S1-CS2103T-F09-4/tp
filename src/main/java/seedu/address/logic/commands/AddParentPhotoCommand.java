@@ -19,8 +19,9 @@ import seedu.address.model.person.PhotoPath;
 /** Adds a photo to a parent contact. */
 public class AddParentPhotoCommand extends Command {
     public static final String COMMAND_WORD = "add-parent-photo";
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a photo to a parent. Parameters: "
-            + "INDEX f/FILE_PATH";
+    public static final String MESSAGE_USAGE = COMMAND_WORD
+            + ": Adds or replaces the photo of a parent. Parameters: INDEX f/FILE_PATH\n"
+            + "Example: " + COMMAND_WORD + " 1 f/./photos/mrs_tan.png";
     private static final long MAX_SIZE = 5L * 1024 * 1024;
     private final Index index;
     private final Path path;
