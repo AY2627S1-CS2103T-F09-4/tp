@@ -36,6 +36,8 @@ public class HelpCommand extends Command {
             new CommandSummary(EditParentCommand.COMMAND_WORD,
                     "INDEX [n/NAME] [p/PHONE] [e/EMAIL] [link/STUDENT_INDEX] [r/REQUIREMENT]...",
                     "Edits a parent. Empty link/ unlinks; r/ replaces requirements, or clears them if empty."),
+            new CommandSummary(ViewChildCommand.COMMAND_WORD, "INDEX",
+                    "Shows the student linked to a parent."),
             new CommandSummary(AddPhotoCommand.COMMAND_WORD, "INDEX f/FILE_PATH",
                     "Adds or replaces the photo of a student."),
             new CommandSummary(AddParentPhotoCommand.COMMAND_WORD, "INDEX f/FILE_PATH",

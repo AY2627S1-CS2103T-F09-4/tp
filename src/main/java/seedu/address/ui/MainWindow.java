@@ -110,8 +110,9 @@ public class MainWindow extends UiPart<Stage> {
 
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
-        // Esc is not swallowed by text boxes, so it skips the workaround in setAccelerator. That workaround runs
-        // before the menu bar sees the key, which would stop Esc from closing a menu the user is already in.
+        // Esc is not swallowed by text boxes, so it skips the workaround in setAccelerator.
+        // That workaround runs before the menu bar sees the key,
+        // which would stop Esc from closing a menu the user is already in.
         getRoot().getScene().getAccelerators().put(KeyCombination.valueOf("Esc"), fileMenu::show);
         fileMenu.setOnShown(event -> selectExit());
     }
@@ -169,7 +170,7 @@ public class MainWindow extends UiPart<Stage> {
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
         commandListPanel = new CommandListPanel(HelpCommand.COMMAND_SUMMARIES);
         commandListPanelPlaceholder.getChildren().add(commandListPanel.getRoot());
-        parentListPanel = new ParentListPanel(logic.getParentContactList(), logic, this::selectStudent);
+        parentListPanel = new ParentListPanel(logic.getParentContactList(), logic);
         parentListPanelPlaceholder.getChildren().add(parentListPanel.getRoot());
 
         schedulePanel = new SchedulePanel(logic.getScheduleList(), logic.getPersonList(),
@@ -260,6 +261,9 @@ public class MainWindow extends UiPart<Stage> {
         return personListPanel;
     }
 
+    /**
+     * Switches to the Students tab and selects the student with {@code studentId}.
+     */
     private void selectStudent(String studentId) {
         recordTabs.getSelectionModel().select(0);
         personListPanel.selectStudent(studentId);
@@ -281,6 +285,7 @@ public class MainWindow extends UiPart<Stage> {
 
             personListPanel.setKeyword(commandResult.getKeyword());
             parentListPanel.setKeyword(commandResult.getKeyword());
+            commandResult.getStudentIdToShow().ifPresent(this::selectStudent);
 
             if (commandResult.isShowHelp()) {
                 showHelpTab();

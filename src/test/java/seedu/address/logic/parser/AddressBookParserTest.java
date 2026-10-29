@@ -33,6 +33,7 @@ import seedu.address.logic.commands.ListRemindersCommand;
 import seedu.address.logic.commands.MarkTaskCommand;
 import seedu.address.logic.commands.ScheduleStudentCommand;
 import seedu.address.logic.commands.UnscheduleStudentCommand;
+import seedu.address.logic.commands.ViewChildCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Person;
 import seedu.address.model.schedule.TimeSlot;
@@ -140,6 +141,12 @@ public class AddressBookParserTest {
         assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD) instanceof ClearCommand);
         assertThrows(ParseException.class, "Usage: clear", () ->
                 parser.parseCommand(ClearCommand.COMMAND_WORD + " 3"));
+    }
+
+    @Test
+    public void parseCommand_viewChild() throws Exception {
+        assertEquals(new ViewChildCommand(INDEX_FIRST_PERSON),
+                parser.parseCommand(ViewChildCommand.COMMAND_WORD + " 1"));
     }
 
     @Test

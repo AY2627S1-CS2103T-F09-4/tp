@@ -147,7 +147,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, null);
+                    contact, 1, createLogic(), null);
             Label id = getField(card, "id");
 
             assertEquals("1. ", id.getText());
@@ -172,7 +172,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             TextFlow email = getField(card, "email");
 
@@ -191,7 +191,7 @@ class ParentContactCardTest {
             ParentContact contact = new ParentContactBuilder().build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             TextFlow linkedStudent = getField(card, "linkedStudent");
 
@@ -222,7 +222,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, logic, () -> { }, "");
+                    contact, 1, logic, "");
 
             TextFlow linkedStudent = getField(card, "linkedStudent");
 
@@ -243,7 +243,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             TextFlow requirements = getField(card, "requirements");
 
@@ -260,7 +260,7 @@ class ParentContactCardTest {
             ParentContact contact = new ParentContactBuilder().build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             ImageView photo = getField(card, "photo");
             Label placeholder = getField(card, "photoPlaceholder");
@@ -284,7 +284,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             ImageView photo = getField(card, "photo");
             Label placeholder = getField(card, "photoPlaceholder");
@@ -307,7 +307,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "Alice");
+                    contact, 1, createLogic(), "Alice");
 
             TextFlow name = getField(card, "name");
 
@@ -340,7 +340,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, "");
+                    contact, 1, createLogic(), "");
 
             TextFlow name = getField(card, "name");
 
@@ -365,7 +365,7 @@ class ParentContactCardTest {
                     .build();
 
             ParentContactCard card = new ParentContactCard(
-                    contact, 1, createLogic(), () -> { }, null);
+                    contact, 1, createLogic(), null);
 
             TextFlow name = getField(card, "name");
 
