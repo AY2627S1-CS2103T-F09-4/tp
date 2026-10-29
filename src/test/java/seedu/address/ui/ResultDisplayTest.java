@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
@@ -25,11 +26,11 @@ public class ResultDisplayTest {
     @BeforeAll
     static void initialiseJavaFx() throws Exception {
         FxTestSupport.initialiseJavaFx();
-        FxTestSupport.runOnFxThread(() -> javafx.application.Platform.setImplicitExit(false));
+        FxTestSupport.runOnFxThread(() -> Platform.setImplicitExit(false));
     }
 
     @Test
-    public void down_once_scrollsStraightAway() throws Exception {
+    public void handleScrollKey_downOnce_scrollsStraightAway() throws Exception {
         checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
             KeyEvent down = pressKey(display, KeyCode.DOWN);
             assertTrue(text.getScrollTop() > 0);
@@ -38,7 +39,7 @@ public class ResultDisplayTest {
     }
 
     @Test
-    public void up_atStart_staysAtStart() throws Exception {
+    public void handleScrollKey_upAtStart_staysAtStart() throws Exception {
         checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
             pressKey(display, KeyCode.UP);
             assertEquals(0, text.getScrollTop(), 0.001);
@@ -46,7 +47,7 @@ public class ResultDisplayTest {
     }
 
     @Test
-    public void pageDown_scrollsFurtherThanDown() throws Exception {
+    public void handleScrollKey_pageDown_scrollsFurtherThanDown() throws Exception {
         checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
             pressKey(display, KeyCode.DOWN);
             double oneLine = text.getScrollTop();
@@ -57,7 +58,7 @@ public class ResultDisplayTest {
     }
 
     @Test
-    public void endThenHome_jumpToBottomAndBackToStart() throws Exception {
+    public void handleScrollKey_endThenHome_jumpToBottomAndBackToStart() throws Exception {
         checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
             pressKey(display, KeyCode.END);
             double bottom = text.getScrollTop();
@@ -72,7 +73,7 @@ public class ResultDisplayTest {
     }
 
     @Test
-    public void otherKeys_areLeftForTheTextBox() throws Exception {
+    public void handleScrollKey_otherKeys_leftForTheTextBox() throws Exception {
         checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
             assertFalse(pressKey(display, KeyCode.TAB).isConsumed());
             assertFalse(pressKey(display, new KeyEvent(KeyEvent.KEY_PRESSED, KeyEvent.CHAR_UNDEFINED, "",

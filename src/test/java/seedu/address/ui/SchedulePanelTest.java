@@ -154,7 +154,7 @@ public class SchedulePanelTest {
     }
 
     @Test
-    public void arrowKeys_scrollTimetableAndAreConsumed() throws Exception {
+    public void handleScrollKey_scrollKeys_scrollTimetableAndAreConsumed() throws Exception {
         SchedulePanel panel = createPanel(List.of(ALICE_MONDAY_MORNING), List.of(ALICE), List.of(ALICE));
 
         FxTestSupport.runOnFxThread(() -> {
@@ -186,7 +186,7 @@ public class SchedulePanelTest {
     }
 
     @Test
-    public void tabKey_isNotConsumedSoFocusCanMoveOn() throws Exception {
+    public void handleScrollKey_tab_notConsumedSoFocusCanMoveOn() throws Exception {
         SchedulePanel panel = createPanel(List.of(), List.of(ALICE), List.of(ALICE));
         KeyEvent tab = keyPressed(KeyCode.TAB);
 

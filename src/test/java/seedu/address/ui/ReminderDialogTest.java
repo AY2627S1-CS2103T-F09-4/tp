@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -133,8 +134,8 @@ class ReminderDialogTest {
         });
     }
 
-    @Test void manyReminders_contentScrollsAndIsKeyboardFocusable() throws Exception {
-        List<Reminder> reminders = java.util.stream.IntStream.rangeClosed(1, 30)
+    @Test void showIfNeeded_manyReminders_contentScrollsAndIsFocusable() throws Exception {
+        List<Reminder> reminders = IntStream.rangeClosed(1, 30)
                 .mapToObj(id -> new Reminder(id, "Reminder " + id))
                 .toList();
 
@@ -145,7 +146,7 @@ class ReminderDialogTest {
         });
     }
 
-    @Test void fewReminders_contentIsNotPaddedToMaximumHeight() throws Exception {
+    @Test void showIfNeeded_fewReminders_contentNotPaddedToMaximumHeight() throws Exception {
         checkReminderScroll(List.of(new Reminder(1, "First")), scroll ->
                 assertTrue(scroll.getPrefViewportHeight() < ReminderDialog.MAX_VISIBLE_HEIGHT));
     }

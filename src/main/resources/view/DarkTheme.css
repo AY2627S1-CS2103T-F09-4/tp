@@ -352,8 +352,8 @@
 }
 
 /*
- * Menus reached with F10, Alt or an Alt shortcut are filled with the same light blue. A drop-down menu opens in
- * its own window, so the colour is also defined on .context-menu above.
+ * Menus reached with F10, Alt or an Alt shortcut are filled with the same light blue.
+ * A drop-down menu opens in its own window, so the colour is also defined on .context-menu above.
  */
 .menu-bar .menu:hover,
 .menu-bar .menu:showing,

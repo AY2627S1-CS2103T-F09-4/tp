@@ -25,6 +25,8 @@ import seedu.address.model.person.Person;
  */
 public class ParentContactCard extends UiPart<Region> {
     private static final String FXML = "ParentContactCard.fxml";
+    private static final String LINKED_STUDENT_LABEL = "Linked student: ";
+    private static final String REQUIREMENTS_LABEL = "Requirements: ";
 
     private final String keyword;
 
@@ -88,21 +90,23 @@ public class ParentContactCard extends UiPart<Region> {
         linkedStudent.setVisible(contact.getLinkedStudentName() != null);
         linkedStudent.setManaged(contact.getLinkedStudentName() != null);
         if (contact.getLinkedStudentName() != null) {
-            setHighlightedText(linkedStudent, linkedStudentText, finder.getLinkedStudentIndex(16));
+            setHighlightedText(linkedStudent, linkedStudentText,
+                    finder.getLinkedStudentIndex(LINKED_STUDENT_LABEL.length()));
         }
     }
 
     private void setHighlightedTextForRequirements(ParentContact contact, ParentAttributesTextIndexFinder finder) {
         String requirementText = contact.getRequirements().isEmpty()
-                ? "Requirements: None"
-                : "Requirements: " + String.join(", ", contact.getRequirements());
-        setHighlightedText(requirements, requirementText, finder.getRequirementsIndex(14));
+                ? REQUIREMENTS_LABEL + "None"
+                : REQUIREMENTS_LABEL + String.join(", ", contact.getRequirements());
+        setHighlightedText(requirements, requirementText,
+                finder.getRequirementsIndex(REQUIREMENTS_LABEL.length()));
     }
 
     private static String setLinkedStudent(ParentContact contact, Logic logic) {
         requireNonNull(contact);
         requireNonNull(logic);
-        String linkedStudentText = "Linked student: N/A";
+        String linkedStudentText = LINKED_STUDENT_LABEL + "N/A";
         if (contact.getLinkedStudentId() == null) {
             return linkedStudentText;
         }
@@ -110,7 +114,7 @@ public class ParentContactCard extends UiPart<Region> {
         for (Person student : logic.getPersonList()) {
             String studentId = student.getStudentId();
             if (studentId.equals(contact.getLinkedStudentId())) {
-                linkedStudentText = "Linked student: " + student.getName().fullName;
+                linkedStudentText = LINKED_STUDENT_LABEL + student.getName().fullName;
                 break;
             }
         }

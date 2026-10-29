@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,10 +39,11 @@ public class SubjectTest {
     }
 
     @Test
-    public void copy_doesNotEqualOriginal() {
-        Subject first = new Subject("1");
-        Subject second = first.copy();
-        assertNotSame(first, second);
+    public void copy_returnsEqualSeparateObject() {
+        Subject original = new Subject("Mathematics");
+        Subject copy = original.copy();
+        assertEquals(original, copy);
+        assertNotSame(original, copy);
     }
 
     @Test

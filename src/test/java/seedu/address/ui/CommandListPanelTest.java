@@ -1,7 +1,6 @@
 package seedu.address.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,7 +48,7 @@ public class CommandListPanelTest {
     }
 
     @Test
-    public void shownInScene_showsCommandCardsInCells() throws Exception {
+    public void constructor_commandSummaries_cellsShowCommandCards() throws Exception {
         CommandListPanel panel = createPanel(List.of(DELETE_SUMMARY));
 
         boolean hasCommandCard = FxTestSupport.runOnFxThread(() -> {
@@ -61,13 +60,6 @@ public class CommandListPanelTest {
         });
 
         assertTrue(hasCommandCard);
-    }
-
-    @Test
-    public void updateItem_commandSummary_showsCommandCard() throws Exception {
-        CommandListPanel.CommandListViewCell cell = createCellShowing(DELETE_SUMMARY);
-
-        assertNotNull(cell.getGraphic());
     }
 
     @Test
