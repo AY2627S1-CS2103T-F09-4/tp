@@ -83,7 +83,7 @@ public class ParentContact {
 
     /** Returns a copy of ParentContact by copying every attribute */
     public ParentContact copy() {
-        ParentContact copy = new ParentContact(id, name.copy(), phone.copy(), email.copy(),
+        ParentContact copy = new ParentContact(id, name.copy(), phone.copy(), email == null ? null : email.copy(),
                 linkedStudentId, linkedStudentName, requirements, photoPath.copy());
 
         return copy;

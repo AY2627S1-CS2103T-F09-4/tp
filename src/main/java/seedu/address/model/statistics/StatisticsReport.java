@@ -57,9 +57,11 @@ public final class StatisticsReport {
         report.append("\nAttendance rate: ").append(denominator == 0 ? "N/A"
                 : BigDecimal.valueOf(completed * 100).divide(BigDecimal.valueOf(denominator), 2,
                         RoundingMode.HALF_UP).toPlainString() + "%");
+        // Source history is kept in recorded order and sorted() is stable, so same-date marks keep that order.
+        // IDs are random UUIDs and must not be used as a tie-break.
         List<AssessmentRecord> assessments = book.getAssessmentRecords().stream()
                 .filter(r -> r.studentId().equals(student.getStudentId()) && within(r.date(), from, to))
-                .sorted(Comparator.comparing(AssessmentRecord::date).thenComparing(AssessmentRecord::id)).toList();
+                .sorted(Comparator.comparing(AssessmentRecord::date)).toList();
         report.append("\nAssessments:");
         if (assessments.isEmpty()) {
             report.append(" none\nPercentage-point change: N/A");

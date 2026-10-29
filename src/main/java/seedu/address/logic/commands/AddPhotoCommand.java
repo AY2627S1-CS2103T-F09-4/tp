@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 import javax.imageio.ImageIO;
 
 import seedu.address.commons.core.index.Index;
@@ -28,8 +30,10 @@ public class AddPhotoCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Adds or replaces the photo of the student identified by the index number used in the displayed "
             + "student list.\n"
-            + "Parameters: INDEX f/FILE_PATH\n"
-            + "Example: " + COMMAND_WORD + " 3 f/./photos/john_tan.png";
+            + "Parameters: INDEX (must be a positive integer) f/FILE_PATH\n"
+            + "Relative paths are resolved from the folder where the app was launched.\n"
+            + "Relative path example: " + COMMAND_WORD + " 3 f/./photos/john_tan.png\n"
+            + "Absolute path example: " + COMMAND_WORD + " 3 f/C:/Users/John/Pictures/john_tan.png";
 
     public static final String MESSAGE_ADD_PHOTO_SUCCESS = "Added photo to student: %1$s";
     public static final String MESSAGE_PHOTO_FILE_MISSING = "Photo file does not exist: %1$s";
@@ -38,20 +42,29 @@ public class AddPhotoCommand extends Command {
             "Photo file must be a JPG, JPEG, or PNG image: %1$s";
     public static final String MESSAGE_PHOTO_FILE_TOO_LARGE = "Photo file must not exceed 5 MB: %1$s";
     public static final String MESSAGE_PHOTO_FILE_INVALID = "Photo file cannot be loaded as an image: %1$s";
+    public static final String MESSAGE_PHOTO_IMPORT_FAILED = "Photo could not be copied into app storage: %1$s";
 
     private static final long MAX_PHOTO_FILE_SIZE_BYTES = 5L * 1024 * 1024;
+    private static final Path MANAGED_PHOTO_DIRECTORY = Path.of("data", "photos");
 
     private final Index targetIndex;
     private final Path photoFilePath;
+    private final Path managedPhotoPath;
 
     /**
      * Creates an AddPhotoCommand to add or replace a student's photo.
      */
     public AddPhotoCommand(Index targetIndex, Path photoFilePath) {
+        this(targetIndex, photoFilePath, MANAGED_PHOTO_DIRECTORY);
+    }
+
+    AddPhotoCommand(Index targetIndex, Path photoFilePath, Path managedPhotoDirectory) {
         requireNonNull(targetIndex);
         requireNonNull(photoFilePath);
+        requireNonNull(managedPhotoDirectory);
         this.targetIndex = targetIndex;
         this.photoFilePath = photoFilePath;
+        this.managedPhotoPath = createManagedPhotoPath(photoFilePath, managedPhotoDirectory);
     }
 
     @Override
@@ -64,16 +77,37 @@ public class AddPhotoCommand extends Command {
         }
 
         validatePhotoFile(photoFilePath);
+        importPhoto(photoFilePath, managedPhotoPath);
 
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
         Person updatedPerson = new Person(personToUpdate.getName(), personToUpdate.getPhone(),
                 personToUpdate.getEmail(), personToUpdate.getAddress(), personToUpdate.getSubject(),
-            personToUpdate.getGradeLevel(), new PhotoPath(photoFilePath.toString()),
+            personToUpdate.getGradeLevel(), new PhotoPath(managedPhotoPath.toString()),
             personToUpdate.getTaskList(), personToUpdate.getTags());
 
         model.setPerson(personToUpdate, updatedPerson);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
         return new CommandResult(String.format(MESSAGE_ADD_PHOTO_SUCCESS, Messages.format(updatedPerson)));
+    }
+
+    private static Path createManagedPhotoPath(Path source, Path managedPhotoDirectory) {
+        String fileName = source.getFileName() == null ? "" : source.getFileName().toString();
+        int extensionStart = fileName.lastIndexOf('.');
+        String extension = extensionStart < 0 ? "" : fileName.substring(extensionStart).toLowerCase();
+        return managedPhotoDirectory.resolve(UUID.randomUUID() + extension);
+    }
+
+    private static void importPhoto(Path source, Path destination) throws CommandException {
+        try {
+            Files.createDirectories(destination.getParent());
+            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException | SecurityException exception) {
+            throw new CommandException(String.format(MESSAGE_PHOTO_IMPORT_FAILED, source), exception);
+        }
+    }
+
+    Path getManagedPhotoPath() {
+        return managedPhotoPath;
     }
 
     private static void validatePhotoFile(Path photoFilePath) throws CommandException {

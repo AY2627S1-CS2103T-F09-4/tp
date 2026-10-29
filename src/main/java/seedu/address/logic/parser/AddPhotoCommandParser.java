@@ -29,12 +29,7 @@ public class AddPhotoCommandParser implements Parser<AddPhotoCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_FILE_PATH);
 
-        Index index;
-        try {
-            index = ParserUtil.parseIndex(argMultimap.getPreamble());
-        } catch (ParseException pe) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddPhotoCommand.MESSAGE_USAGE), pe);
-        }
+        Index index = ParserUtil.parseIndex(argMultimap.getPreamble());
 
         String filePath = argMultimap.getValue(PREFIX_FILE_PATH).get().trim();
         if (filePath.isEmpty()) {
