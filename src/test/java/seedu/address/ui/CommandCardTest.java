@@ -3,7 +3,6 @@ package seedu.address.ui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -21,18 +20,18 @@ public class CommandCardTest {
 
     @Test
     public void constructor_commandWithFormat_showsWordFormatAndDescription() throws Exception {
-        CommandCard card = createCard(new CommandSummary("delete", "INDEX", "Deletes a student."));
+        CommandCard card = createCard(new CommandSummary("delete-student", "INDEX", "Deletes a student."));
 
-        assertEquals("delete", textOf(card, "commandWord"));
-        assertEquals("Format: delete INDEX", textOf(card, "format"));
+        assertEquals("delete-student", textOf(card, "commandWord"));
+        assertEquals("Format: delete-student INDEX", textOf(card, "format"));
         assertEquals("Deletes a student.", textOf(card, "description"));
     }
 
     @Test
     public void constructor_commandWithoutFormat_showsFormatWithoutTrailingSpace() throws Exception {
-        CommandCard card = createCard(new CommandSummary("list", "", "Lists all students."));
+        CommandCard card = createCard(new CommandSummary("list-students", "", "Lists all students."));
 
-        assertEquals("Format: list", textOf(card, "format"));
+        assertEquals("Format: list-students", textOf(card, "format"));
     }
 
     @Test
@@ -46,8 +45,7 @@ public class CommandCardTest {
     }
 
     private static String textOf(CommandCard card, String fieldName) throws ReflectiveOperationException {
-        Field field = CommandCard.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return ((Label) field.get(card)).getText();
+        Label label = UiTestUtil.fieldOf(card, fieldName);
+        return label.getText();
     }
 }

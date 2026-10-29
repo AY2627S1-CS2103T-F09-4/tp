@@ -209,7 +209,7 @@ public class StatisticsIntegrationTest {
             ASSESSMENT.replace("2026-10-21", "2026-10-22"), "delete-assessment 1"}) {
             CommandException error = assertThrows(CommandException.class, () -> logic.execute(input));
             String command = input.split(" ")[0];
-            assertTrue(error.getMessage().contains("Usage: " + command));
+            assertTrue(error.getMessage().contains("\n" + command + ": "));
             assertTrue(error.getMessage().contains("Example: " + command));
             assertEquals(before, model.getAddressBook());
         }

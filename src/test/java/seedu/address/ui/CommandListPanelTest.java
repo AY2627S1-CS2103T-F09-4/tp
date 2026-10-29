@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -21,7 +20,8 @@ import seedu.address.logic.commands.HelpCommand;
 
 public class CommandListPanelTest {
 
-    private static final CommandSummary DELETE_SUMMARY = new CommandSummary("delete", "INDEX", "Deletes a student.");
+    private static final CommandSummary DELETE_SUMMARY =
+            new CommandSummary("delete-student", "INDEX", "Deletes a student.");
 
     @BeforeAll
     static void initialiseJavaFx() throws Exception {
@@ -65,27 +65,16 @@ public class CommandListPanelTest {
 
     @Test
     public void updateItem_commandSummary_showsCommandCard() throws Exception {
-        CommandListPanel panel = createPanel(List.of(DELETE_SUMMARY));
-
-        CommandListPanel.CommandListViewCell cell = FxTestSupport.runOnFxThread(() -> {
-            CommandListPanel.CommandListViewCell newCell = panel.new CommandListViewCell();
-            newCell.updateItem(DELETE_SUMMARY, false);
-            return newCell;
-        });
+        CommandListPanel.CommandListViewCell cell = createCellShowing(DELETE_SUMMARY);
 
         assertNotNull(cell.getGraphic());
     }
 
     @Test
     public void updateItem_emptyCell_showsNothing() throws Exception {
-        CommandListPanel panel = createPanel(List.of(DELETE_SUMMARY));
+        CommandListPanel.CommandListViewCell cell = createCellShowing(DELETE_SUMMARY);
 
-        CommandListPanel.CommandListViewCell cell = FxTestSupport.runOnFxThread(() -> {
-            CommandListPanel.CommandListViewCell newCell = panel.new CommandListViewCell();
-            newCell.updateItem(DELETE_SUMMARY, false);
-            newCell.updateItem(null, true);
-            return newCell;
-        });
+        FxTestSupport.runOnFxThread(() -> cell.updateItem(null, true));
 
         assertNull(cell.getGraphic());
         assertNull(cell.getText());
@@ -95,10 +84,18 @@ public class CommandListPanelTest {
         return FxTestSupport.runOnFxThread(() -> new CommandListPanel(commandSummaries));
     }
 
-    @SuppressWarnings("unchecked")
+    /** Returns a new cell of a panel listing {@code commandSummary}, after it has been asked to show it. */
+    private static CommandListPanel.CommandListViewCell createCellShowing(CommandSummary commandSummary)
+            throws Exception {
+        CommandListPanel panel = createPanel(List.of(commandSummary));
+        return FxTestSupport.runOnFxThread(() -> {
+            CommandListPanel.CommandListViewCell cell = panel.new CommandListViewCell();
+            cell.updateItem(commandSummary, false);
+            return cell;
+        });
+    }
+
     private static ListView<CommandSummary> listView(CommandListPanel panel) throws ReflectiveOperationException {
-        Field field = CommandListPanel.class.getDeclaredField("commandListView");
-        field.setAccessible(true);
-        return (ListView<CommandSummary>) field.get(panel);
+        return UiTestUtil.fieldOf(panel, "commandListView");
     }
 }

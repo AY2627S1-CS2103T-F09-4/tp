@@ -1,5 +1,7 @@
 package seedu.address.logic;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,6 +69,7 @@ public class Messages {
      * Formats the {@code parent} for display to the user.
      */
     public static String format(ParentContact parent) {
+        requireNonNull(parent);
         final StringBuilder builder = new StringBuilder();
         builder.append(parent.getName())
                 .append("; Phone: ")

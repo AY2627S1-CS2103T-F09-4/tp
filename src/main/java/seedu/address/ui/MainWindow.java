@@ -68,7 +68,7 @@ public class MainWindow extends UiPart<Stage> {
     private TabPane recordTabs;
 
     @FXML
-    private Tab commandsTab;
+    private Tab helpTab;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -203,11 +203,11 @@ public class MainWindow extends UiPart<Stage> {
     /**
      * Switches to the tab that lists every command.
      */
-    private void showCommandsTab() {
-        assert commandsTab != null : "Help tab was not injected from MainWindow.fxml";
-        assert recordTabs.getTabs().contains(commandsTab) : "Help tab must be one of the record tabs";
+    private void showHelpTab() {
+        assert helpTab != null : "Help tab was not injected from MainWindow.fxml";
+        assert recordTabs.getTabs().contains(helpTab) : "Help tab must be one of the record tabs";
         logger.fine("Showing the Help tab.");
-        recordTabs.getSelectionModel().select(commandsTab);
+        recordTabs.getSelectionModel().select(helpTab);
     }
 
     void show() {
@@ -256,7 +256,7 @@ public class MainWindow extends UiPart<Stage> {
             parentListPanel.setKeyword(commandResult.getKeyword());
 
             if (commandResult.isShowHelp()) {
-                showCommandsTab();
+                showHelpTab();
             }
 
             if (commandResult.isExit()) {

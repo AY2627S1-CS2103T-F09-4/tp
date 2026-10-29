@@ -1,5 +1,7 @@
 package seedu.address.logic.commands;
 
+import static java.util.Objects.requireNonNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class HistoryCommand extends Command {
 
     /** Formats command-specific syntax and an example for parser and execution errors. */
     public static String usage(String operation) {
+        requireNonNull(operation);
         String example = "\nExample: " + operation;
         String assessmentFields = " date/YYYY-MM-DD subject/SUBJECT category/CATEGORY title/TITLE "
                 + "score/SCORE max/MAX";
@@ -46,12 +49,10 @@ public class HistoryCommand extends Command {
                     + "Parameters: RECORD_NUMBER (from list-assessments)" + example + " 1";
             case "record-assessment" -> operation + ": Records an assessment result for a student. "
                     + "Parameters: INDEX" + assessmentFields + example + assessmentExample;
-            default -> {
-                assert operation.equals("edit-assessment") : "Unknown history operation: " + operation;
-                yield operation + ": Replaces an assessment record. "
-                        + "Parameters: RECORD_NUMBER (from list-assessments)" + assessmentFields + example
-                        + assessmentExample;
-            }
+            case "edit-assessment" -> operation + ": Replaces an assessment record. "
+                    + "Parameters: RECORD_NUMBER (from list-assessments)" + assessmentFields + example
+                    + assessmentExample;
+            default -> throw new IllegalArgumentException("Unknown history operation: " + operation);
         };
     }
 

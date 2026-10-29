@@ -179,7 +179,8 @@ public class AttendanceIntegrationTest {
         assertTrue(weekday.getMessage().contains("Date must fall on MONDAY"));
         assertTrue(session.getMessage().contains("Invalid session number."));
         for (CommandException error : List.of(future, weekday, session)) {
-            assertTrue(error.getMessage().contains("Usage: mark-attendance SESSION_NUMBER date/YYYY-MM-DD"));
+            assertTrue(error.getMessage().contains("\nmark-attendance: "));
+            assertTrue(error.getMessage().contains("Parameters: SESSION_NUMBER date/YYYY-MM-DD"));
             assertTrue(error.getMessage().contains("Use Session #N from list-schedule, not the row number."));
             assertTrue(error.getMessage().contains("Example: mark-attendance 1 date/2026-10-19 status/completed"));
         }
@@ -290,7 +291,8 @@ public class AttendanceIntegrationTest {
                 CommandException error = assertThrows(CommandException.class, () ->
                         mark(2, "2026-10-19", status.name()));
                 assertTrue(error.getMessage().contains("Duplicate lesson #1 already exists on 2026-10-19 10:00-11:30"));
-                assertTrue(error.getMessage().contains("Usage: mark-attendance SESSION_NUMBER"));
+                assertTrue(error.getMessage().contains("\nmark-attendance: "));
+                assertTrue(error.getMessage().contains("Parameters: SESSION_NUMBER"));
                 assertTrue(error.getMessage().contains("Example: mark-attendance"));
                 assertEquals(before, model.getAddressBook());
                 assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
@@ -397,7 +399,8 @@ public class AttendanceIntegrationTest {
         String saved = Files.readString(storage.getAddressBookFilePath());
         CommandException error = assertThrows(CommandException.class, () -> logic.execute("delete-lesson 2"));
         assertTrue(error.getMessage().contains("Invalid lesson number"));
-        assertTrue(error.getMessage().contains("Usage: delete-lesson RECORD_NUMBER (from list-lessons)"));
+        assertTrue(error.getMessage().contains("\ndelete-lesson: "));
+        assertTrue(error.getMessage().contains("Parameters: RECORD_NUMBER (Lesson #N from list-lessons)"));
         assertTrue(error.getMessage().contains("Example: delete-lesson 1"));
         assertTrue(SnapshotManager.canRedo());
         assertEquals(before, model.getAddressBook());
