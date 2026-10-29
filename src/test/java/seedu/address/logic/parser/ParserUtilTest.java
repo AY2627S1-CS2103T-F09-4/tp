@@ -207,6 +207,18 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseTask_overLengthLimit_throwsParseException() {
+        assertThrows(ParseException.class, Task.MESSAGE_LENGTH_CONSTRAINTS, () ->
+                ParserUtil.parseTask("a".repeat(Task.MAX_DESCRIPTION_LENGTH + 1)));
+    }
+
+    @Test
+    public void parseTask_atLengthLimitWithWhitespace_returnsTrimmedTask() throws Exception {
+        String longest = "a".repeat(Task.MAX_DESCRIPTION_LENGTH);
+        assertEquals(new Task(longest), ParserUtil.parseTask("  " + longest + "  "));
+    }
+
+    @Test
     public void parseTask_validValueWithWhitespace_returnsTrimmedTask() throws Exception {
         assertEquals(new Task("do homework"), ParserUtil.parseTask("  do homework  "));
     }

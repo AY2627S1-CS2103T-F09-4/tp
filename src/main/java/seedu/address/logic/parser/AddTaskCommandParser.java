@@ -35,10 +35,15 @@ public class AddTaskCommandParser implements Parser<AddTaskCommand> {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE), pe);
         }
 
+        String description = argMultimap.getValue(PREFIX_TASK).get();
         Task task;
         try {
-            task = ParserUtil.parseTask(argMultimap.getValue(PREFIX_TASK).get());
+            task = ParserUtil.parseTask(description);
         } catch (ParseException pe) {
+            if (!Task.isWithinLengthLimit(description.trim())) {
+                // The format is right but the description is too long, so say exactly what to shorten.
+                throw pe;
+            }
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE), pe);
         }
         return new AddTaskCommand(index, task);

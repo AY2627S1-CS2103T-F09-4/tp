@@ -150,15 +150,6 @@
     -fx-text-fill: #cbd2d3;
 }
 
-.task-scroll-pane {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-
-.task-scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
-
 .task-number {
     -fx-font-family: "Segoe UI";
     -fx-font-size: 12px;

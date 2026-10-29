@@ -14,6 +14,14 @@ public class Task {
     public static final String MESSAGE_CONSTRAINTS = "Task description should not be blank.";
     public static final String VALIDATION_REGEX = "[^\\s].*";
 
+    /**
+     * The longest description a new task may have, so that a task takes at most two lines in a student card.
+     * Only new input is checked, so tasks saved before this limit existed still load.
+     */
+    public static final int MAX_DESCRIPTION_LENGTH = 30;
+    public static final String MESSAGE_LENGTH_CONSTRAINTS = "Task description should be at most "
+            + MAX_DESCRIPTION_LENGTH + " characters long.";
+
     public final String description;
     public final TaskStatus status;
 
@@ -44,6 +52,14 @@ public class Task {
      */
     public static boolean isValidDescription(String description) {
         return description.matches(VALIDATION_REGEX);
+    }
+
+    /**
+     * Returns true if the given description is short enough to be added as a new task.
+     */
+    public static boolean isWithinLengthLimit(String description) {
+        requireNonNull(description);
+        return description.length() <= MAX_DESCRIPTION_LENGTH;
     }
 
     /**

@@ -39,6 +39,19 @@ public class AddTaskCommandParserTest {
     }
 
     @Test
+    public void parse_descriptionOverLengthLimit_failureNamesLimit() {
+        assertParseFailure(parser, "1 " + PREFIX_TASK + "a".repeat(Task.MAX_DESCRIPTION_LENGTH + 1),
+                Task.MESSAGE_LENGTH_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_descriptionAtLengthLimit_success() {
+        String longest = "a".repeat(Task.MAX_DESCRIPTION_LENGTH);
+        assertParseSuccess(parser, "1 " + PREFIX_TASK + longest,
+                new AddTaskCommand(INDEX_FIRST_PERSON, new Task(longest)));
+    }
+
+    @Test
     public void parse_invalidIndex_failure() {
         assertParseFailure(parser, "0 " + PREFIX_TASK + "do homework", MESSAGE_INVALID_FORMAT);
     }

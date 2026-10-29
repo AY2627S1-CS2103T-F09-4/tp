@@ -9,7 +9,6 @@ import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -65,8 +64,6 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private FlowPane tags;
     @FXML
-    private ScrollPane taskScrollPane;
-    @FXML
     private VBox tasks;
 
     /**
@@ -85,7 +82,6 @@ public class PersonCard extends UiPart<Region> {
         setAttributes(person, finder);
 
         setPhoto(person);
-        taskScrollPane.setVvalue(1.0);
     }
 
     private void setAttributes(Person person, PersonAttributesTextIndexFinder finder) {

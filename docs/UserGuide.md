@@ -302,11 +302,13 @@ Adds a task to a student.
 
 Format: `add-task <INDEX> task/<DESCRIPTION>`
 
-* `<DESCRIPTION>` may contain spaces but must not be blank.
+* `<DESCRIPTION>` may contain spaces but must not be blank, and can be at most 30 characters long.
+* A student can have at most 5 tasks. To add another, first remove one with [`delete-task`](#deleting-a-task-delete-task).
 * New tasks start as not done.
 
 Examples:
 * `add-task 1 task/Prepare revision worksheet` adds a task to the first student.
+* `add-task 1 task/Complete the algebra worksheet on quadratic equations` is rejected, because the description is longer than 30 characters.
 
 #### Marking a task: `mark-task`
 Marks a student's task as done or not done.
@@ -691,7 +693,7 @@ table td code {
 
 | Command | Format and example |
 |---|---|
-| `add-task` | `add-task <INDEX> task/<DESCRIPTION>`<br>e.g. `add-task 1 task/Prepare revision worksheet` |
+| `add-task` | `add-task <INDEX> task/<DESCRIPTION>` (at most 30 characters, 5 tasks per student)<br>e.g. `add-task 1 task/Prepare revision worksheet` |
 | `mark-task` | `mark-task <INDEX> tid/<TASK_ID> status/<STATUS>`<br>e.g. `mark-task 1 tid/1 status/done` |
 | `delete-task` | `delete-task <INDEX> tid/<TASK_ID>`<br>e.g. `delete-task 1 tid/2` |
 

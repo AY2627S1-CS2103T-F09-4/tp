@@ -11,6 +11,7 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
 import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskList;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddTaskCommandTest {
@@ -59,6 +61,18 @@ public class AddTaskCommandTest {
 
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
         assertEquals(List.of(new Task("do homework")), updatedPerson.getTaskList().getTasks());
+    }
+
+    @Test
+    public void execute_studentHasMostTasksAllowed_failure() {
+        Person personToUpdate = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        String[] fullTasks = IntStream.rangeClosed(1, TaskList.MAX_TASKS)
+                .mapToObj(number -> "task " + number)
+                .toArray(String[]::new);
+        model.setPerson(personToUpdate, new PersonBuilder(personToUpdate).withTasks(fullTasks).build());
+
+        assertCommandFailure(new AddTaskCommand(INDEX_FIRST_PERSON, new Task("one too many")), model,
+                AddTaskCommand.MESSAGE_TOO_MANY_TASKS);
     }
 
     @Test
