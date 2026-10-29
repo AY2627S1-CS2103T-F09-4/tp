@@ -179,6 +179,36 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Parent contact editing
+
+`EditParentCommandParser` parses `edit-parent INDEX [n/NAME] [p/PHONE] [e/EMAIL] [link/STUDENT_INDEX] [r/REQUIREMENT]...`.
+The parent index and at least one edit are required. Name, phone, email, and link prefixes are single-valued;
+requirements may be repeated. Unsupported prefixes, duplicate single-valued prefixes, and invalid field values
+produce a specific reason followed by `EditParentCommand.MESSAGE_USAGE`, using the shared `withUsage` helper.
+Parent and student index errors identify which index is invalid.
+
+The command represents omitted and cleared fields separately:
+
+* `linkSpecified == false` keeps the existing student link. When true, a non-null `linkIndex` selects a student;
+  a null `linkIndex` (empty `link/`) clears both the linked student ID and name.
+* Null `requirements` keeps the existing list. A nonempty list replaces it in input order; an empty list
+  (a single empty `r/`) clears it. Mixing empty requirement entries with other entries is rejected.
+* Omitted name, phone, and email fields keep their existing values. Supplied values use the existing field validators.
+
+During execution, the parent index resolves against `Model.getParentContactList()` and the student index against
+`Model.getFilteredPersonList()`. The link stores the student's persistent ID and name. Link conflicts and duplicate
+parent identities are checked against the full address book, excluding the edited parent by ID, so filtering cannot
+hide a conflict and selecting the current student again succeeds. All validation completes before `setParentContact`;
+execution validation failures also include the reason and usage instructions.
+
+The replacement preserves the parent ID, photo, and omitted fields. Requirements remain a `List<String>` in
+`ParentContact` and a JSON array in `JsonAdaptedParentContact`, so this feature requires no storage migration.
+`ParentContact.copy()` preserves optional null email values so snapshots support parents without email.
+
+`EditParentCommandParserTest` covers invalid syntax and error feedback. `EditParentCommandTest` covers field edits,
+link changes and clearing, filtered indices and hidden conflicts, requirement replacement and clearing, validation
+without mutation, photo preservation, JSON save/reload, and undo/redo.
+
 ### Search
 
 Searches all _user-visible_ attributes of `Person` and `ParentContact` objects in the `AddressBook` for the user's keyword and highlights them for the user.
@@ -239,7 +269,7 @@ charts or exports. Reports derive from explicitly entered source history, never 
 `Person.copy` preserves it. Existing detail-based `Person.equals`, hashing and name/phone duplicate detection remain
 compatible with existing callers; historical relationships and distinct-student counts explicitly use `studentId`.
 Student IDs are unique in a loaded address book and are never derived from mutable names or phone numbers.
-The older parent-contact name/phone link mechanism is separate and is not migrated by this feature.
+Parent contacts also store student links by persistent ID; see [Parent contact editing](#parent-contact-editing).
 
 `model.statistics.LessonRecord` and `AssessmentRecord` are immutable Java records with their own UUID, student UUID
 and recorded student name. Lessons contain a date, subject, start/end time and explicit outcome. Assessments retain
