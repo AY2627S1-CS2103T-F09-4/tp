@@ -1,0 +1,116 @@
+package seedu.address.ui;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+
+public class ResultDisplayTest {
+    private static final String LONG_FEEDBACK = IntStream.rangeClosed(1, 40)
+            .mapToObj(line -> "Line " + line)
+            .collect(Collectors.joining("\n"));
+
+    @BeforeAll
+    static void initialiseJavaFx() throws Exception {
+        FxTestSupport.initialiseJavaFx();
+        FxTestSupport.runOnFxThread(() -> javafx.application.Platform.setImplicitExit(false));
+    }
+
+    @Test
+    public void down_once_scrollsStraightAway() throws Exception {
+        checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
+            KeyEvent down = pressKey(display, KeyCode.DOWN);
+            assertTrue(text.getScrollTop() > 0);
+            assertTrue(down.isConsumed());
+        });
+    }
+
+    @Test
+    public void up_atStart_staysAtStart() throws Exception {
+        checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
+            pressKey(display, KeyCode.UP);
+            assertEquals(0, text.getScrollTop(), 0.001);
+        });
+    }
+
+    @Test
+    public void pageDown_scrollsFurtherThanDown() throws Exception {
+        checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
+            pressKey(display, KeyCode.DOWN);
+            double oneLine = text.getScrollTop();
+            pressKey(display, KeyCode.HOME);
+            pressKey(display, KeyCode.PAGE_DOWN);
+            assertTrue(text.getScrollTop() > oneLine);
+        });
+    }
+
+    @Test
+    public void endThenHome_jumpToBottomAndBackToStart() throws Exception {
+        checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
+            pressKey(display, KeyCode.END);
+            double bottom = text.getScrollTop();
+            assertTrue(bottom > 0);
+
+            pressKey(display, KeyCode.DOWN);
+            assertEquals(bottom, text.getScrollTop(), 0.001);
+
+            pressKey(display, KeyCode.HOME);
+            assertEquals(0, text.getScrollTop(), 0.001);
+        });
+    }
+
+    @Test
+    public void otherKeys_areLeftForTheTextBox() throws Exception {
+        checkShownDisplay(LONG_FEEDBACK, (display, text) -> {
+            assertFalse(pressKey(display, KeyCode.TAB).isConsumed());
+            assertFalse(pressKey(display, new KeyEvent(KeyEvent.KEY_PRESSED, KeyEvent.CHAR_UNDEFINED, "",
+                    KeyCode.DOWN, true, false, false, false)).isConsumed());
+            assertEquals(0, text.getScrollTop(), 0.001);
+        });
+    }
+
+    /**
+     * Shows a result display holding {@code feedback}, runs {@code check} on it, then closes it.
+     */
+    private static void checkShownDisplay(String feedback, BiConsumer<ResultDisplay, TextArea> check)
+            throws Exception {
+        FxTestSupport.runOnFxThread(() -> {
+            ResultDisplay display = new ResultDisplay();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(display.getRoot(), 400, 120));
+            stage.show();
+            display.setFeedbackToUser(feedback);
+            display.getRoot().applyCss();
+            display.getRoot().layout();
+            try {
+                check.accept(display, (TextArea) display.getRoot().lookup("#resultDisplay"));
+            } finally {
+                stage.close();
+            }
+        });
+    }
+
+    private static KeyEvent pressKey(ResultDisplay display, KeyCode code) {
+        return pressKey(display, new KeyEvent(KeyEvent.KEY_PRESSED, KeyEvent.CHAR_UNDEFINED, "", code,
+                false, false, false, false));
+    }
+
+    /** Sends {@code event} to the display's key handling and returns it, so tests can see whether it was used. */
+    private static KeyEvent pressKey(ResultDisplay display, KeyEvent event) {
+        display.handleScrollKey(event);
+        display.getRoot().layout();
+        return event;
+    }
+}
