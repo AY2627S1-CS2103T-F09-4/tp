@@ -151,7 +151,9 @@ public class AttendanceIntegrationTest {
         String duplicateId = model.getScheduleList().getLast().getSessionId();
         assertNotEquals(sessionId, duplicateId);
         mark(1, "2026-10-19", "completed");
-        mark(2, "2026-10-19", "absent");
+        assertThrows(CommandException.class, () -> mark(2, "2026-10-19", "absent"));
+        assertThrows(CommandException.class, () -> mark(2, "2026-10-19", "cancelled"));
+        mark(2, "2026-10-12", "cancelled");
         assertEquals(2, model.getAddressBook().getLessonRecords().size());
         logic.execute("unschedule-student 1 day/monday from/10-00 to/11-30");
         assertEquals(duplicateId, model.getScheduleList().getFirst().getSessionId());
@@ -170,10 +172,17 @@ public class AttendanceIntegrationTest {
         mark(1, "2026-10-19", "completed");
         logic.execute("undo");
         String saved = Files.readString(storage.getAddressBookFilePath());
-        assertThrows(CommandException.class, () -> mark(1, "2026-10-26", "completed"));
-        assertThrows(CommandException.class, () -> mark(1, "2026-10-20", "completed"));
-        assertThrows(CommandException.class, () ->
-                mark(2, "2026-10-19", "completed"));
+        CommandException future = assertThrows(CommandException.class, () -> mark(1, "2026-10-26", "completed"));
+        CommandException weekday = assertThrows(CommandException.class, () -> mark(1, "2026-10-20", "completed"));
+        CommandException session = assertThrows(CommandException.class, () -> mark(2, "2026-10-19", "completed"));
+        assertTrue(future.getMessage().contains("Attendance cannot be recorded for a future date."));
+        assertTrue(weekday.getMessage().contains("Date must fall on MONDAY"));
+        assertTrue(session.getMessage().contains("Invalid session number."));
+        for (CommandException error : List.of(future, weekday, session)) {
+            assertTrue(error.getMessage().contains("Usage: mark-attendance SESSION_NUMBER date/YYYY-MM-DD"));
+            assertTrue(error.getMessage().contains("Use Session #N from list-schedule, not the row number."));
+            assertTrue(error.getMessage().contains("Example: mark-attendance 1 date/2026-10-19 status/completed"));
+        }
         assertTrue(model.getAddressBook().getLessonRecords().isEmpty());
         assertTrue(SnapshotManager.canRedo());
         assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
@@ -192,13 +201,14 @@ public class AttendanceIntegrationTest {
     }
 
     @Test
-    public void legacyManualRecords_remainUnlinkedAcrossMarkingAndReload() throws Exception {
+    public void legacyManualRecords_blockExactDuplicatesButRemainLoadableAndUnlinked() throws Exception {
         LessonRecord legacy = new LessonRecord(UUID.randomUUID().toString(),
                 model.getPersonList().getFirst().getStudentId(), "Amy Bee", "Mathematics",
                 LocalDate.of(2026, 10, 19), LocalTime.of(10, 0), LocalTime.of(11, 30), Outcome.COMPLETED);
         model.setHistory(List.of(legacy), List.of());
-        mark(1, "2026-10-19", "completed");
-        mark(1, "2026-10-19", "absent");
+        assertThrows(CommandException.class, () -> mark(1, "2026-10-19", "completed"));
+        assertThrows(CommandException.class, () -> mark(1, "2026-10-19", "cancelled"));
+        mark(1, "2026-10-12", "cancelled");
         assertEquals(2, model.getAddressBook().getLessonRecords().size());
         assertEquals(legacy, model.getAddressBook().getLessonRecords().getFirst());
         assertNull(model.getAddressBook().getLessonRecords().getFirst().sourceSessionId());
@@ -215,8 +225,7 @@ public class AttendanceIntegrationTest {
         AddressBook before = new AddressBook(model.getAddressBook());
         String saved = Files.readString(storage.getAddressBookFilePath());
         for (String command : List.of("record-lesson 1 date/2026-10-19 from/10:00 to/11:30 status/completed",
-                "edit-lesson 1 date/2026-10-19 from/09:00 to/10:00 status/absent subject/Science",
-                "delete-lesson 1")) {
+                "edit-lesson 1 date/2026-10-19 from/09:00 to/10:00 status/absent subject/Science")) {
             assertThrows(ParseException.class, () -> logic.execute(command));
             assertEquals(before, model.getAddressBook());
             assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
@@ -267,6 +276,134 @@ public class AttendanceIntegrationTest {
         logic.execute("redo");
         assertEquals(Outcome.ABSENT, model.getAddressBook().getLessonRecords().getFirst().outcome());
         assertEquals(secondId, model.getAddressBook().getLessonRecords().getFirst().sourceSessionId());
+    }
+
+    @Test
+    public void exactDuplicates_rejectedAcrossDistinctSessionsForEveryOutcome_withoutMutation() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        logic.execute("schedule-student 1 day/monday from/10-00 to/11-30");
+        for (Outcome existing : Outcome.values()) {
+            mark(1, "2026-10-19", existing.name());
+            for (Outcome status : Outcome.values()) {
+                AddressBook before = new AddressBook(model.getAddressBook());
+                String saved = Files.readString(storage.getAddressBookFilePath());
+                CommandException error = assertThrows(CommandException.class, () ->
+                        mark(2, "2026-10-19", status.name()));
+                assertTrue(error.getMessage().contains("Duplicate lesson #1 already exists on 2026-10-19 10:00-11:30"));
+                assertTrue(error.getMessage().contains("Usage: mark-attendance SESSION_NUMBER"));
+                assertTrue(error.getMessage().contains("Example: mark-attendance"));
+                assertEquals(before, model.getAddressBook());
+                assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
+            }
+        }
+        mark(1, "2026-10-19", "absent");
+        assertEquals(1, model.getAddressBook().getLessonRecords().size());
+        assertEquals(Outcome.ABSENT, model.getAddressBook().getLessonRecords().getFirst().outcome());
+    }
+
+    @Test
+    public void duplicateChecks_allowPartialOverlapsContainmentBoundariesAndOtherDates() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        String[][] intervals = {{"09-00", "10-30"}, {"11-00", "12-00"}, {"09-00", "12-00"},
+            {"10-30", "11-00"}, {"09-00", "10-00"}, {"11-30", "12-30"},
+            {"10-00", "12-00"}, {"09-00", "11-30"}};
+        for (String[] interval : intervals) {
+            logic.execute("schedule-student 1 day/monday from/" + interval[0] + " to/" + interval[1]);
+            mark(model.getScheduleList().size(), "2026-10-19", "completed");
+        }
+        mark(1, "2026-10-12", "unrecorded");
+        mark(1, "2026-10-19", "cancelled");
+        mark(1, "2026-10-19", "absent");
+        assertEquals(10, model.getAddressBook().getLessonRecords().size());
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
+    }
+
+    @Test
+    public void existingDuplicateHistory_remainsLoadableAndOriginalSessionCanBeUpdated() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        LessonRecord linked = model.getAddressBook().getLessonRecords().getFirst();
+        LessonRecord legacy = new LessonRecord(UUID.randomUUID().toString(), linked.studentId(), linked.studentName(),
+                linked.subject(), linked.date(), linked.start(), linked.end(), Outcome.CANCELLED);
+        model.setHistory(List.of(linked, legacy), List.of());
+        storage.saveAddressBook(model.getAddressBook());
+        model = new ModelManager(storage.readAddressBook().orElseThrow(), new UserPrefs(), CLOCK);
+        logic = new LogicManager(model, new StorageManager(storage,
+                new JsonUserPrefsStorage(folder.resolve("preferences.json"))));
+        mark(1, "2026-10-19", "absent");
+        assertEquals(2, model.getAddressBook().getLessonRecords().size());
+        assertEquals(linked.id(), model.getAddressBook().getLessonRecords().getFirst().id());
+        assertEquals(Outcome.ABSENT, model.getAddressBook().getLessonRecords().getFirst().outcome());
+        assertEquals(legacy, model.getAddressBook().getLessonRecords().getLast());
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
+    }
+
+    @Test
+    public void recreatedSchedule_rejectsDuplicateUntilExistingRecordDeleted_andPreservesRedo() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        LessonRecord original = model.getAddressBook().getLessonRecords().getFirst();
+        logic.execute("unschedule-student 1 day/monday from/10-00 to/11-30");
+        assertEquals(1, model.getAddressBook().getLessonRecords().size());
+        logic.execute("schedule-student 1 day/monday from/10-00 to/11-30");
+        assertNotEquals(sessionId, model.getScheduleList().getFirst().getSessionId());
+        mark(1, "2026-10-12", "completed");
+        logic.execute("undo");
+        String saved = Files.readString(storage.getAddressBookFilePath());
+        assertThrows(CommandException.class, () -> mark(1, "2026-10-19", "completed"));
+        assertEquals(List.of(original), model.getAddressBook().getLessonRecords());
+        assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
+        assertTrue(SnapshotManager.canRedo());
+        logic.execute("redo");
+        assertEquals(2, model.getAddressBook().getLessonRecords().size());
+        logic.execute("undo");
+        logic.execute("delete-lesson 1");
+        mark(1, "2026-10-19", "completed");
+        assertEquals(1, model.getAddressBook().getLessonRecords().size());
+        assertNotEquals(original.id(), model.getAddressBook().getLessonRecords().getFirst().id());
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
+    }
+
+    @Test
+    public void deleteLesson_preservesOtherData_recalculatesAndSupportsUndoRedoReload() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        LessonRecord first = model.getAddressBook().getLessonRecords().getFirst();
+        mark(1, "2026-10-12", "completed");
+        LessonRecord second = model.getAddressBook().getLessonRecords().getLast();
+        logic.execute("record-assessment 1 date/2026-10-19 subject/Math category/Quiz title/Test score/8 max/10");
+        String result = feedback("delete-lesson 1");
+        assertTrue(result.contains("Deleted lesson #1: Amy Bee | 2026-10-19 10:00-11:30"));
+        assertEquals(List.of(second), model.getAddressBook().getLessonRecords());
+        assertEquals(1, model.getScheduleList().size());
+        assertEquals(1, model.getAddressBook().getAssessmentRecords().size());
+        assertTrue(feedback("stats").contains("Completed lessons: 1; teaching hours: 1.50"));
+        assertTrue(feedback("list-lessons").contains("1. Amy Bee"));
+        assertEquals(model.getAddressBook(), storage.readAddressBook().orElseThrow());
+        logic.execute("undo");
+        assertEquals(List.of(first, second), model.getAddressBook().getLessonRecords());
+        logic.execute("redo");
+        assertEquals(List.of(second), model.getAddressBook().getLessonRecords());
+        mark(1, "2026-10-19", "completed");
+        assertNotEquals(first.id(), model.getAddressBook().getLessonRecords().getLast().id());
+    }
+
+    @Test
+    public void deleteLesson_orphanedRecordIsDeletable_invalidNumbersPreserveRedo() throws Exception {
+        mark(1, "2026-10-19", "completed");
+        logic.execute("delete-student 1");
+        String result = feedback("delete-lesson 1");
+        assertTrue(result.contains("Amy Bee (deleted)"));
+        assertTrue(model.getAddressBook().getLessonRecords().isEmpty());
+        logic.execute("undo");
+        AddressBook before = new AddressBook(model.getAddressBook());
+        String saved = Files.readString(storage.getAddressBookFilePath());
+        CommandException error = assertThrows(CommandException.class, () -> logic.execute("delete-lesson 2"));
+        assertTrue(error.getMessage().contains("Invalid lesson number"));
+        assertTrue(error.getMessage().contains("Usage: delete-lesson RECORD_NUMBER (from list-lessons)"));
+        assertTrue(error.getMessage().contains("Example: delete-lesson 1"));
+        assertTrue(SnapshotManager.canRedo());
+        assertEquals(before, model.getAddressBook());
+        assertEquals(saved, Files.readString(storage.getAddressBookFilePath()));
+        logic.execute("redo");
+        assertTrue(storage.readAddressBook().orElseThrow().getLessonRecords().isEmpty());
     }
 
     private String mark(int number, String date, String status) throws Exception {

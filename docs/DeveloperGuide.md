@@ -288,7 +288,11 @@ and `CommandException`/`ParseException`. Unknown and duplicate prefixes, missing
 dates, non-HH:mm times, overnight/zero durations, invalid outcomes and invalid marks are rejected before mutation.
 Future historical dates are checked at execution using `LocalDate.now(model.getClock())`, not wall-clock calls
 inside parsers. New lessons snapshot the student's current subject. Corrections supply all editable fields and
-retain record and student identities. Wrong-student corrections use delete and re-record.
+retain record and student identities. Wrong-student assessment corrections use delete and re-record.
+History and statistics parse failures include their specific reason, command syntax and an example, including
+checked `ParseException`s from index parsing and prefix validation. Shared command usage helpers also supply
+syntax and examples for execution validation failures. Numeric assessment conversion errors identify score or max
+instead of exposing `BigDecimal` conversion internals.
 
 Student-index operations use the displayed student list. Session and historical record numbers resolve against
 their complete current collections in storage order, independent of student filters. Parsers use `ParserUtil.parseIndex`
@@ -302,7 +306,9 @@ would otherwise discard the redo branch. Other commands retain their existing sn
 lessons alone contribute to business counts, duration and distinct student UUIDs. Calendar-month rows include zero
 months and obey the requested inclusive dates. Attendance is completed / (completed + absent), excluding cancelled
 and unrecorded entries. Zero denominators show N/A. Assessment groups use trimmed, case-insensitive subject and
-category keys, ordered by date then UUID for same-date ties; each group compares its first and last percentages.
+category keys, ordered by date with recorded order preserved for same-date ties; each group compares its first and
+last percentages. Group keys remain lowercase internally, but `Change` labels use the earliest record's original
+subject/category spelling. Assessment detail lines also preserve recorded spelling.
 One or zero comparable records gives N/A. Marks use `BigDecimal`, intermediate percentages have twelve decimal places,
 and displayed hours/percentages/changes round HALF_UP to two. Report defaults are January 1 through today from the
 injected clock. Explicit boundaries must be supplied together and ordered. No totals are cached or persisted.
@@ -323,8 +329,8 @@ contents. `StatisticsStorageTest` covers old data, UUID uniqueness, immutable hi
 records and deleted-student round trips. Manual smoke test: record a lesson and two assessments, run both reports,
 undo a mutation, run reports and lists, then redo; delete the student and check retained identifiable history.
 
-**MVP limits.** One lesson is one same-day interval. Repeated submissions create separate records; users must correct
-duplicates explicitly. Student reports require an active displayed student; retained deleted-student history remains
+**MVP limits.** One lesson is one same-day interval. Repeated attendance submissions for the same session/date update
+the existing record. Student reports require an active displayed student; retained deleted-student history remains
 available through lists and business totals. Historical lists show all entries and dates without pagination.
 
 ### Attendance linked to recurring sessions
@@ -342,8 +348,16 @@ instead of a UUID field, separate from its `Student:` label. `ScheduleGrid` maps
 positions in the original list before sorting cards into weekday/time lanes, so timetable numbers match command output.
 Cards retain their weekly layout. No dialog or separate attendance tab is introduced.
 
+The terminal listing sorts the original list indices by weekday (Monday through Sunday) and start time.
+Rows have consecutive display numbers and end with a separate `Session #N` label using the original index plus one.
+Equal weekday/start pairs retain insertion order. Storage order, attendance resolution, and timetable numbering are
+unchanged. Attendance uses `Session #N`, not the chronological row number.
+
 `MarkAttendanceCommandParser` reuses strict date parsing and the existing tokenizer, rejecting missing, unknown or
-duplicate arguments. `MarkAttendanceCommand` accepts an `Index`, resolves against the complete schedule, then uses
+duplicate arguments. Its error boundary includes prefix and index parsing, so checked parse failures also receive
+the specific reason, syntax, example, and session-number guidance from `MarkAttendanceCommand.withUsage`.
+Execution validation uses the same helper for invalid sessions, future dates, weekday mismatches, and exact duplicates.
+`MarkAttendanceCommand` accepts an `Index`, resolves against the complete schedule, then uses
 the resolved session UUID internally. It checks
 the requested weekday and future-date boundary using the model's injectable clock. Since weekly templates have no
 effective start/end dates, any matching weekday on or before today can be recorded; today's time need not have passed.
@@ -354,7 +368,24 @@ preserving the historical UUID and captured details. `AddressBook.setHistory`
 rejects duplicate linked occurrences and student mismatches against active templates, while allowing retained links
 to removed templates. `mark-attendance` is the sole command for creating or updating dated lessons;
 `list-lessons` provides read-only history. Legacy manual records remain unlinked and are never inferred or merged
-automatically. There are no commands for editing lesson details or deleting individual lessons.
+automatically. `list-lessons` sorts original history indices by date and start time, preserving recorded order for
+ties. Each row has a consecutive display number and ends with `Lesson #N`, the original history index plus one.
+Listing does not reorder stored history. `delete-lesson RECORD_NUMBER` uses that label, not the sorted row number,
+and resolves against the complete lesson collection in storage
+order and removes only the selected historical record through `Model.setHistory`. Its feedback includes the record
+number, current or retained student name, date and times. Schedules and assessments are preserved. Existing JSON
+storage and snapshots provide persistence and undo/redo; no schema changes are required. It also works for records
+whose student or source schedule has been removed. There is no manual lesson creation or detail-editing command.
+
+When creating a new attendance record, the command checks all lesson history for an exact match on student UUID,
+date, start time and end time, regardless of session ID or outcome. This prevents duplicates after removing and
+recreating a recurring session, and includes legacy unlinked records and records linked to removed schedules.
+The error identifies the existing `Lesson #N` and its date/times before any mutation. Partial overlaps, adjacent
+intervals, different students and different dates are allowed. Cancelled outcomes have no special exception.
+If the same `(sourceSessionId, date)` already exists, attendance updates that record and preserves its ID instead
+of running the new-record check. Existing duplicates remain loadable without automatic cleanup, so users can
+review them with `list-lessons` and remove incorrect records with `delete-lesson`.
+Deleting history allows it to be recreated by marking the same active session/date again.
 
 JSON adapters store `sessionId` and `sourceSessionId`. Missing session IDs migrate to UUIDs on loading and persist on
 the next save; missing source links remain null. Malformed IDs, duplicate template IDs and duplicate linked occurrences
