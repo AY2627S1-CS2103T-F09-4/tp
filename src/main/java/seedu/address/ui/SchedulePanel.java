@@ -2,6 +2,7 @@ package seedu.address.ui;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -11,9 +12,11 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
 import seedu.address.model.schedule.ScheduledSession;
 
@@ -28,6 +31,7 @@ public class SchedulePanel extends UiPart<Region> {
         "#e8837a", "#7fb1e8", "#d6c08f", "#a3d9a5", "#e8a0c4"
     };
 
+    private final Logger logger = LogsCenter.getLogger(SchedulePanel.class);
     private final ObservableList<ScheduledSession> sessions;
     private final ObservableList<Person> persons;
     private final ObservableList<Person> displayedPersons;
@@ -54,6 +58,8 @@ public class SchedulePanel extends UiPart<Region> {
                 .addListener((observable, oldBounds, newBounds) -> onViewportChanged());
         scheduleScroll.hvalueProperty().addListener((observable, oldValue, newValue) -> syncPinnedLabels());
         scheduleScroll.vvalueProperty().addListener((observable, oldValue, newValue) -> syncPinnedLabels());
+        scheduleScroll.setFocusTraversable(true);
+        scheduleScroll.addEventFilter(KeyEvent.KEY_PRESSED, this::handleScrollKey);
 
         sessions.addListener((ListChangeListener<ScheduledSession>) change -> refresh());
         persons.addListener((ListChangeListener<Person>) change -> refresh());
@@ -73,6 +79,64 @@ public class SchedulePanel extends UiPart<Region> {
         double scrollableHeight = Math.max(0, grid.prefHeight(-1) - bounds.getHeight());
         grid.setScrollOffsets(scheduleScroll.getHvalue() * scrollableWidth,
                 scheduleScroll.getVvalue() * scrollableHeight);
+    }
+
+    /**
+     * Scrolls the timetable from the keyboard: left and right arrows move by one hour, up and down arrows by
+     * one row, Page Up and Page Down by one screen, and Home and End jump to the earliest and latest hours.
+     * Other keys, such as Tab, are left alone so focus can still move on.
+     */
+    void handleScrollKey(KeyEvent event) {
+        Bounds bounds = scheduleScroll.getViewportBounds();
+        switch (event.getCode()) {
+            case LEFT:
+                scrollBy(-grid.hourWidth(), 0);
+                break;
+            case RIGHT:
+                scrollBy(grid.hourWidth(), 0);
+                break;
+            case UP:
+                scrollBy(0, -grid.rowHeight());
+                break;
+            case DOWN:
+                scrollBy(0, grid.rowHeight());
+                break;
+            case PAGE_UP:
+                scrollBy(0, -bounds.getHeight());
+                break;
+            case PAGE_DOWN:
+                scrollBy(0, bounds.getHeight());
+                break;
+            case HOME:
+                scheduleScroll.setHvalue(scheduleScroll.getHmin());
+                break;
+            case END:
+                scheduleScroll.setHvalue(scheduleScroll.getHmax());
+                break;
+            default:
+                return;
+        }
+        logger.fine("Scrolled the schedule with " + event.getCode());
+        event.consume();
+    }
+
+    /** Scrolls the timetable by {@code dx} and {@code dy} pixels, stopping at its edges. */
+    private void scrollBy(double dx, double dy) {
+        Bounds bounds = scheduleScroll.getViewportBounds();
+        double scrollableWidth = grid.prefWidth(-1) - bounds.getWidth();
+        double scrollableHeight = grid.prefHeight(-1) - bounds.getHeight();
+        if (scrollableWidth > 0) {
+            scheduleScroll.setHvalue(clamp(scheduleScroll.getHvalue() + dx / scrollableWidth));
+        }
+        if (scrollableHeight > 0) {
+            scheduleScroll.setVvalue(clamp(scheduleScroll.getVvalue() + dy / scrollableHeight));
+        }
+        assert scheduleScroll.getHvalue() >= 0 && scheduleScroll.getHvalue() <= 1;
+        assert scheduleScroll.getVvalue() >= 0 && scheduleScroll.getVvalue() <= 1;
+    }
+
+    private static double clamp(double value) {
+        return Math.max(0, Math.min(1, value));
     }
 
     private String colourOf(Person student) {

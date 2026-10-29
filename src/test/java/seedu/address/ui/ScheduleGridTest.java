@@ -50,20 +50,32 @@ public class ScheduleGridTest {
     }
 
     @Test
-    public void layout_timesAreRoundedOutwardsToThirtyMinutes() throws Exception {
+    public void layout_cardsUseExactTimes() throws Exception {
         ScheduleGrid grid = layoutGrid(List.of(
                 session(ALICE, DayOfWeek.MONDAY, "10-00", "11-00"),
-                session(ALICE, DayOfWeek.TUESDAY, "10-10", "10-40"),
-                session(ALICE, DayOfWeek.WEDNESDAY, "10-10", "10-20")));
+                session(ALICE, DayOfWeek.TUESDAY, "10-20", "10-40"),
+                session(ALICE, DayOfWeek.WEDNESDAY, "12-00", "12-10"),
+                session(ALICE, DayOfWeek.THURSDAY, "12-00", "12-20")));
         List<Region> cards = cards(grid);
         double hourWidth = hourWidth(grid);
 
-        // 10:10-10:40 is covered by 10:00-11:00
-        assertEquals(AXIS_WIDTH, cards.get(1).getLayoutX(), 0.001);
-        assertEquals(hourWidth, cards.get(1).getWidth(), 0.001);
-        // 10:10-10:20 is covered by 10:00-10:30
-        assertEquals(AXIS_WIDTH, cards.get(2).getLayoutX(), 0.001);
-        assertEquals(hourWidth / 2, cards.get(2).getWidth(), 0.001);
+        // 10:20 starts a third of an hour after 10:00
+        assertEquals(AXIS_WIDTH + hourWidth / 3, cards.get(1).getLayoutX(), 0.001);
+        assertEquals(hourWidth / 3, cards.get(1).getWidth(), 0.001);
+        // 12:10 and 12:20 end at different places
+        double endOfTen = cards.get(2).getLayoutX() + cards.get(2).getWidth();
+        double endOfTwenty = cards.get(3).getLayoutX() + cards.get(3).getWidth();
+        assertEquals(hourWidth / 6, endOfTwenty - endOfTen, 0.001);
+    }
+
+    @Test
+    public void layout_sessionsSharingAThirtyMinuteBlockWithoutOverlapShareALane() throws Exception {
+        ScheduleGrid grid = layoutGrid(List.of(
+                session(ALICE, DayOfWeek.MONDAY, "10-00", "10-10"),
+                session(BENSON, DayOfWeek.MONDAY, "10-20", "10-30")));
+        List<Region> cards = cards(grid);
+
+        assertEquals(cards.get(0).getLayoutY(), cards.get(1).getLayoutY(), 0.001);
     }
 
     @Test
