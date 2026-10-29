@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -51,6 +53,12 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private MenuItem helpMenuItem;
+
+    @FXML
+    private Menu fileMenu;
+
+    @FXML
+    private MenuItem exitMenuItem;
 
     @FXML
     private StackPane personListPanelPlaceholder;
@@ -102,6 +110,24 @@ public class MainWindow extends UiPart<Stage> {
 
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
+        // Esc is not swallowed by text boxes, so it skips the workaround in setAccelerator. That workaround runs
+        // before the menu bar sees the key, which would stop Esc from closing a menu the user is already in.
+        getRoot().getScene().getAccelerators().put(KeyCombination.valueOf("Esc"), fileMenu::show);
+        fileMenu.setOnShown(event -> selectExit());
+    }
+
+    /**
+     * Selects Exit in the open File menu, so a keyboard user can quit by pressing Esc and then Enter.
+     */
+    private void selectExit() {
+        assert fileMenu.isShowing() : "Exit can only be selected while the File menu is open";
+        Node exitEntry = exitMenuItem.getStyleableNode();
+        if (exitEntry == null) {
+            logger.warning("The File menu opened without an Exit entry to select");
+            return;
+        }
+        exitEntry.requestFocus();
+        logger.fine("Opened the File menu with Exit selected");
     }
 
     /**
@@ -109,6 +135,7 @@ public class MainWindow extends UiPart<Stage> {
      * @param keyCombination the KeyCombination value of the accelerator
      */
     private void setAccelerator(MenuItem menuItem, KeyCombination keyCombination) {
+        assert menuItem.getOnAction() != null : "A menu item with a shortcut must have an action to run";
         menuItem.setAccelerator(keyCombination);
 
         /*
