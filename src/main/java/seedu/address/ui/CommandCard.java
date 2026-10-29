@@ -2,9 +2,12 @@ package seedu.address.ui;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.logging.Logger;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.CommandSummary;
 
 /**
@@ -14,6 +17,8 @@ public class CommandCard extends UiPart<Region> {
 
     private static final String FXML = "CommandListCard.fxml";
     private static final String FORMAT_LABEL = "Format: ";
+
+    private static final Logger logger = LogsCenter.getLogger(CommandCard.class);
 
     @FXML
     private Label commandWord;
@@ -33,6 +38,7 @@ public class CommandCard extends UiPart<Region> {
         commandWord.setText(commandSummary.commandWord());
         format.setText(formatLineOf(commandSummary));
         description.setText(commandSummary.description());
+        logger.finer("Showing the help card for " + commandSummary.commandWord());
     }
 
     /**
@@ -41,6 +47,8 @@ public class CommandCard extends UiPart<Region> {
      */
     static String formatLineOf(CommandSummary commandSummary) {
         String usage = commandSummary.commandWord() + " " + commandSummary.format();
-        return FORMAT_LABEL + usage.trim();
+        String formatLine = FORMAT_LABEL + usage.trim();
+        assert !formatLine.endsWith(" ") : "The format line must not end with a space";
+        return formatLine;
     }
 }

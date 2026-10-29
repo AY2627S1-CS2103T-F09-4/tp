@@ -21,7 +21,8 @@ public record CommandSummary(String commandWord, String format, String descripti
     /**
      * Every field must be present and not null.
      *
-     * @throws IllegalArgumentException if {@code commandWord} is not a single word or {@code description} is blank.
+     * @throws IllegalArgumentException if {@code commandWord} is not a single word
+     *         or {@code description} is blank.
      */
     public CommandSummary {
         requireNonNull(commandWord);

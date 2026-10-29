@@ -52,7 +52,9 @@ public class GradeLevel {
         if (Objects.equals(this.value, "")) {
             return GradeLevel.NONE;
         }
-        return new GradeLevel(this.value);
+        GradeLevel copy = new GradeLevel(this.value);
+        assert copy.equals(this) : "A copied grade level must equal the original";
+        return copy;
     }
 
     /**

@@ -55,7 +55,8 @@ public class PersonUtil {
         descriptor.getPhone().ifPresent(phone -> sb.append(PREFIX_PHONE).append(phone.value).append(" "));
         descriptor.getEmail().ifPresent(email -> sb.append(PREFIX_EMAIL).append(email.value).append(" "));
         descriptor.getAddress().ifPresent(address -> sb.append(PREFIX_ADDRESS).append(address.value).append(" "));
-        descriptor.getSubject().ifPresent(subject -> sb.append(PREFIX_SUBJECT).append(subject.value).append(" "));
+        descriptor.getSubject().ifPresent(subject ->
+                sb.append(PREFIX_SUBJECT).append(subject.value).append(" "));
         descriptor.getGradeLevel().ifPresent(
             gradeLevel -> sb.append(PREFIX_GRADE_LEVEL).append(gradeLevel.value).append(" "));
         if (descriptor.getTags().isPresent()) {

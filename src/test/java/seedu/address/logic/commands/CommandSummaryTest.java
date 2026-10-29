@@ -10,15 +10,18 @@ public class CommandSummaryTest {
     @Test
     public void constructor_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new CommandSummary(null, "", "Lists all students."));
-        assertThrows(NullPointerException.class, () -> new CommandSummary("list", null, "Lists all students."));
+        assertThrows(NullPointerException.class, () ->
+                new CommandSummary("list", null, "Lists all students."));
         assertThrows(NullPointerException.class, () -> new CommandSummary("list", "", null));
     }
 
     @Test
     public void constructor_invalidCommandWord_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> new CommandSummary("", "", "Lists all students."));
-        assertThrows(IllegalArgumentException.class, () -> new CommandSummary("  ", "", "Lists all students."));
-        assertThrows(IllegalArgumentException.class, () -> new CommandSummary("list all", "", "Lists all students."));
+        assertThrows(IllegalArgumentException.class, () ->
+                new CommandSummary("  ", "", "Lists all students."));
+        assertThrows(IllegalArgumentException.class, () ->
+                new CommandSummary("list all", "", "Lists all students."));
     }
 
     @Test

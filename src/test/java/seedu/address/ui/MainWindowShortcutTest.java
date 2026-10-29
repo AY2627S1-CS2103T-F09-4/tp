@@ -85,7 +85,8 @@ public class MainWindowShortcutTest {
      */
     private void checkShownWindow(Consumer<Stage> check) throws Exception {
         FxTestSupport.runOnFxThread(() -> {
-            StorageManager storage = new StorageManager(new JsonAddressBookStorage(folder.resolve("book.json")),
+            StorageManager storage = new StorageManager(
+                    new JsonAddressBookStorage(folder.resolve("book.json")),
                     new JsonUserPrefsStorage(folder.resolve("prefs.json")));
             Stage stage = new Stage();
             new MainWindow(stage, new LogicManager(new ModelManager(), storage), folder.resolve("book.json"))
@@ -101,8 +102,8 @@ public class MainWindowShortcutTest {
     }
 
     /**
-     * Presses and releases {@code code} on {@code target}. Keys go to the main window even while a menu is open,
-     * as real key presses do, and the window passes them on to the open menu.
+     * Presses and releases {@code code} on {@code target}. Keys go to the main window
+     * even while a menu is open, as real key presses do, and the window passes them on to the open menu.
      */
     private static void pressKey(Node target, KeyCode code) {
         Event.fireEvent(target, new KeyEvent(KeyEvent.KEY_PRESSED, KeyEvent.CHAR_UNDEFINED, "", code,

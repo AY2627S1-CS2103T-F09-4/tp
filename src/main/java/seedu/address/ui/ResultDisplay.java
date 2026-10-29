@@ -38,9 +38,10 @@ public class ResultDisplay extends UiPart<Region> {
     }
 
     /**
-     * Scrolls the result text from the keyboard: up and down arrows move by one line, Page Up and Page Down by
-     * one screen, and Home and End jump to the start and end. The text cannot be edited, so without this these
-     * keys would move an invisible caret and only scroll once it left the visible lines.
+     * Scrolls the result text from the keyboard: up and down arrows move by one line,
+     * Page Up and Page Down by one screen, and Home and End jump to the start and end.
+     * The text cannot be edited, so without this these keys would move an invisible caret
+     * and only scroll once it left the visible lines.
      * Keys held with Shift, Ctrl or Alt are left alone so text can still be selected and copied.
      */
     void handleScrollKey(KeyEvent event) {
@@ -72,7 +73,10 @@ public class ResultDisplay extends UiPart<Region> {
         event.consume();
     }
 
-    /** Scrolls the text so that {@code top} pixels are above the view, stopping at its start and {@code bottom}. */
+    /**
+     * Scrolls the text so that {@code top} pixels are above the view,
+     * stopping at its start and {@code bottom}.
+     */
     private void scrollTo(double top, double bottom) {
         assert bottom >= 0 : "The bottom of the text cannot be above its start";
         resultDisplay.setScrollTop(Math.max(0, Math.min(bottom, top)));

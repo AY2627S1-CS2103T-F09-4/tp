@@ -26,7 +26,8 @@ public class AddContactCommandParser implements Parser<AddContactCommand> {
                 PREFIX_LINK, PREFIX_REQUIREMENT);
         if (!map.getPreamble().isEmpty() || map.getValue(PREFIX_NAME).isEmpty()
                 || map.getValue(PREFIX_PHONE).isEmpty()) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddContactCommand.MESSAGE_USAGE));
+            throw new ParseException(
+                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddContactCommand.MESSAGE_USAGE));
         }
         map.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_LINK);
         Name name = ParserUtil.parseName(map.getValue(PREFIX_NAME).get());

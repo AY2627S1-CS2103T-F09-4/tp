@@ -29,8 +29,8 @@ public class DeleteParentCommandTest {
 
         CommandResult result = new DeleteParentCommand(Index.fromOneBased(1)).execute(model);
 
-        assertEquals(String.format(DeleteParentCommand.MESSAGE_DELETE_PARENT_SUCCESS, Messages.format(PARENT)),
-                result.getFeedbackToUser());
+        assertEquals(String.format(DeleteParentCommand.MESSAGE_DELETE_PARENT_SUCCESS,
+                Messages.format(PARENT)), result.getFeedbackToUser());
         assertTrue(model.getParentContactList().isEmpty());
     }
 

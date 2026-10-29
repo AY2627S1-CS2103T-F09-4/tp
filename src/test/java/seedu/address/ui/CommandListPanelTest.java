@@ -95,7 +95,8 @@ public class CommandListPanelTest {
         });
     }
 
-    private static ListView<CommandSummary> listView(CommandListPanel panel) throws ReflectiveOperationException {
+    private static ListView<CommandSummary> listView(CommandListPanel panel)
+            throws ReflectiveOperationException {
         return UiTestUtil.fieldOf(panel, "commandListView");
     }
 }

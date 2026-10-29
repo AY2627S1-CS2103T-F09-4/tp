@@ -32,7 +32,8 @@ public class HelpCommandTest {
 
     @Test
     public void commandSummaries_noDuplicateCommandWords() {
-        long uniqueCommandWords = COMMAND_SUMMARIES.stream().map(CommandSummary::commandWord).distinct().count();
+        long uniqueCommandWords = COMMAND_SUMMARIES.stream().map(CommandSummary::commandWord)
+                .distinct().count();
         assertEquals(COMMAND_SUMMARIES.size(), uniqueCommandWords);
     }
 

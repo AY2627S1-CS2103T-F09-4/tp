@@ -44,8 +44,8 @@ public class Person {
     /**
      * Every field must be present and not null. Use {@link GradeLevel#NONE} if there is no grade level.
      */
-    public Person(Name name, Phone phone, Email email, Address address, Subject subject, GradeLevel gradeLevel,
-            Set<Tag> tags) {
+    public Person(Name name, Phone phone, Email email, Address address, Subject subject,
+            GradeLevel gradeLevel, Set<Tag> tags) {
         this(name, phone, email, address, subject, gradeLevel, PhotoPath.NONE, new TaskList(), tags);
     }
 

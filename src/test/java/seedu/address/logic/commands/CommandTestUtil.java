@@ -61,8 +61,10 @@ public class CommandTestUtil {
     public static final String INVALID_PHONE_DESC = " " + PREFIX_PHONE + "911a"; // 'a' not allowed in phones
     public static final String INVALID_EMAIL_DESC = " " + PREFIX_EMAIL + "bob!yahoo"; // missing '@' symbol
     public static final String INVALID_ADDRESS_DESC = " " + PREFIX_ADDRESS; // empty string not allowed for addresses
-    public static final String INVALID_SUBJECT_DESC = " " + PREFIX_SUBJECT; // empty string not allowed for subjects
-    public static final String INVALID_GRADE_LEVEL_FOR_ADD_DESC = " " + PREFIX_GRADE_LEVEL; // empty string not allowed
+    // empty string not allowed for subjects
+    public static final String INVALID_SUBJECT_DESC = " " + PREFIX_SUBJECT;
+    // empty string not allowed for grade levels
+    public static final String INVALID_GRADE_LEVEL_FOR_ADD_DESC = " " + PREFIX_GRADE_LEVEL;
     public static final String VALID_EMPTY_GRADE_LEVEL_FOR_EDIT_DESC = " "
             + PREFIX_GRADE_LEVEL; // empty string allowed when editing to remove optional grade level
     public static final String INVALID_TAG_DESC = " " + PREFIX_TAG + "hubby*"; // '*' not allowed in tags
