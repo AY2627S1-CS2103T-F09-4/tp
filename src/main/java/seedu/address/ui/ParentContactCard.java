@@ -7,13 +7,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import seedu.address.logic.Logic;
@@ -52,8 +50,7 @@ public class ParentContactCard extends UiPart<Region> {
     /**
      * Creates a {@code ParentContactCard} with the given parent contact and index to display.
      */
-    public ParentContactCard(ParentContact contact, int displayedIndex, Logic logic, Runnable selectStudent,
-                             String keyword) {
+    public ParentContactCard(ParentContact contact, int displayedIndex, Logic logic, String keyword) {
         super(FXML);
         this.keyword = keyword == null ? "" : keyword;
         requireNonNull(contact);
@@ -64,19 +61,13 @@ public class ParentContactCard extends UiPart<Region> {
         assert displayedIndex > 0 : "Displayed index must be positive";
         id.setText(displayedIndex + ". ");
         setPhoto(contact);
-
-        if (contact.getLinkedStudentId() != null) {
-            linkedStudent.setOnMouseClicked(event -> selectStudent.run());
-            linkedStudent.setCursor(Cursor.HAND);
-        }
-
         setAttributes(contact, logic, finder);
     }
 
     private void setAttributes(ParentContact contact, Logic logic, ParentAttributesTextIndexFinder finder) {
         requireNonNull(logic);
-        setHighlightedText(name, contact.getName().fullName, finder.getNameIndex(), false);
-        setHighlightedText(phone, contact.getPhone().value, finder.getPhoneIndex(), false);
+        setHighlightedText(name, contact.getName().fullName, finder.getNameIndex());
+        setHighlightedText(phone, contact.getPhone().value, finder.getPhoneIndex());
         setHighlightedTextForEmail(contact, finder);
         setHighlightedTextForLinkedStudent(contact, logic, finder);
         setHighlightedTextForRequirements(contact, finder);
@@ -86,7 +77,7 @@ public class ParentContactCard extends UiPart<Region> {
         email.setVisible(contact.getEmail() != null);
         email.setManaged(contact.getEmail() != null);
         if (contact.getEmail() != null) {
-            setHighlightedText(email, contact.getEmail().value, finder.getEmailIndex(), false);
+            setHighlightedText(email, contact.getEmail().value, finder.getEmailIndex());
         }
     }
 
@@ -97,8 +88,7 @@ public class ParentContactCard extends UiPart<Region> {
         linkedStudent.setVisible(contact.getLinkedStudentName() != null);
         linkedStudent.setManaged(contact.getLinkedStudentName() != null);
         if (contact.getLinkedStudentName() != null) {
-            setHighlightedText(linkedStudent, linkedStudentText,
-                    finder.getLinkedStudentIndex(16), true);
+            setHighlightedText(linkedStudent, linkedStudentText, finder.getLinkedStudentIndex(16));
         }
     }
 
@@ -106,7 +96,7 @@ public class ParentContactCard extends UiPart<Region> {
         String requirementText = contact.getRequirements().isEmpty()
                 ? "Requirements: None"
                 : "Requirements: " + String.join(", ", contact.getRequirements());
-        setHighlightedText(requirements, requirementText, finder.getRequirementsIndex(14), false);
+        setHighlightedText(requirements, requirementText, finder.getRequirementsIndex(14));
     }
 
     private static String setLinkedStudent(ParentContact contact, Logic logic) {
@@ -127,8 +117,8 @@ public class ParentContactCard extends UiPart<Region> {
         return linkedStudentText;
     }
 
-    private void setHighlightedText(TextFlow attribute, String text, List<MatchRange> ranges, boolean isLinkedStudent) {
-        attribute.getChildren().setAll(createHighlightedText(text, ranges, isLinkedStudent).getChildren());
+    private void setHighlightedText(TextFlow attribute, String text, List<MatchRange> ranges) {
+        attribute.getChildren().setAll(createHighlightedText(text, ranges).getChildren());
     }
 
     private void setPhoto(ParentContact contact) {
@@ -164,13 +154,12 @@ public class ParentContactCard extends UiPart<Region> {
         photoPlaceholder.setManaged(true);
     }
 
-    private TextFlow createHighlightedText(
-            String text, List<MatchRange> ranges, boolean isLinkedStudent) {
+    private TextFlow createHighlightedText(String text, List<MatchRange> ranges) {
 
         TextFlow textFlow = new TextFlow();
         int currentIndex = 0;
 
-        if (text == null || text.isEmpty() || (isLinkedStudent && this.linkedStudent == null)) {
+        if (text == null || text.isEmpty()) {
             return textFlow;
         }
 
@@ -184,36 +173,27 @@ public class ParentContactCard extends UiPart<Region> {
                 continue;
             }
 
-            setTextBeforeMatch(text, isLinkedStudent, currentIndex, start, textFlow);
+            setTextBeforeMatch(text, currentIndex, start, textFlow);
 
-            currentIndex = setTextAtMatch(text, isLinkedStudent, start, end, textFlow, currentIndex);
+            currentIndex = setTextAtMatch(text, start, end, textFlow, currentIndex);
         }
-        setTextAfterMatch(text, isLinkedStudent, currentIndex, textFlow);
+        setTextAfterMatch(text, currentIndex, textFlow);
 
         return textFlow;
     }
 
-    private static void setTextAfterMatch(String text, boolean isLinkedStudent, int currentIndex, TextFlow textFlow) {
+    private static void setTextAfterMatch(String text, int currentIndex, TextFlow textFlow) {
         if (currentIndex < text.length()) {
             Text normalText = new Text(text.substring(currentIndex));
             normalText.getStyleClass().add("normal-card-text");
-            if (isLinkedStudent) {
-                normalText.getStyleClass().add("linked-card-text");
-                normalText.setFill(Color.web("#1a73e8"));
-                normalText.setUnderline(true);
-            }
             textFlow.getChildren().add(normalText);
         }
     }
 
-    private int setTextAtMatch(String text, boolean isLinkedStudent, int start, int end,
-                               TextFlow textFlow, int currentIndex) {
+    private int setTextAtMatch(String text, int start, int end, TextFlow textFlow, int currentIndex) {
         if (!keyword.isEmpty()) {
             Text match = new Text(text.substring(start, end));
             match.getStyleClass().add("search-match");
-            if (isLinkedStudent) {
-                match.setUnderline(true);
-            }
             textFlow.getChildren().add(match);
 
             currentIndex = end;
@@ -221,17 +201,11 @@ public class ParentContactCard extends UiPart<Region> {
         return currentIndex;
     }
 
-    private static void setTextBeforeMatch(String text, boolean isLinkedStudent, int currentIndex,
-                                           int start, TextFlow textFlow) {
+    private static void setTextBeforeMatch(String text, int currentIndex, int start, TextFlow textFlow) {
         if (currentIndex < start) {
             Text normalText =
                     new Text(text.substring(currentIndex, start));
             normalText.getStyleClass().add("normal-card-text");
-            if (isLinkedStudent) {
-                normalText.getStyleClass().add("linked-card-text");
-                normalText.setFill(Color.web("#1a73e8"));
-                normalText.setUnderline(true);
-            }
             textFlow.getChildren().add(normalText);
         }
     }

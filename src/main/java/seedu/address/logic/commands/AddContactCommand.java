@@ -23,7 +23,8 @@ public class AddContactCommand extends Command {
             + " n/Mrs Tan p/98765432 e/tanmrs@email.com link/1 r/No food during session";
     public static final String MESSAGE_SUCCESS = "New parent added: %1$s";
     public static final String MESSAGE_DUPLICATE_PARENT = "This parent already exists in Tutoria.";
-    public static final String MESSAGE_STUDENT_ALREADY_LINKED = "This student already has a parent in Tutoria.";
+    public static final String MESSAGE_STUDENT_ALREADY_LINKED =
+            "This student already has a parent in Tutoria.";
     private final ParentContact contact;
     private final Index linkIndex;
 

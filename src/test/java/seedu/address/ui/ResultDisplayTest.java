@@ -107,7 +107,10 @@ public class ResultDisplayTest {
                 false, false, false, false));
     }
 
-    /** Sends {@code event} to the display's key handling and returns it, so tests can see whether it was used. */
+    /**
+     * Sends {@code event} to the display's key handling and returns it,
+     * so tests can see whether it was used.
+     */
     private static KeyEvent pressKey(ResultDisplay display, KeyEvent event) {
         display.handleScrollKey(event);
         display.getRoot().layout();

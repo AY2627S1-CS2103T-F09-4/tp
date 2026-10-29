@@ -39,7 +39,9 @@ public class Subject {
 
     /** Returns a copy of this Subject instance */
     public Subject copy() {
-        return new Subject(this.value);
+        Subject copy = new Subject(this.value);
+        assert copy.equals(this) : "A copied subject must equal the original";
+        return copy;
     }
 
     @Override

@@ -107,7 +107,8 @@ public class EditStudentCommand extends Command {
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
         Address updatedAddress = editPersonDescriptor.getAddress().orElse(personToEdit.getAddress());
         Subject updatedSubject = editPersonDescriptor.getSubject().orElse(personToEdit.getSubject());
-        GradeLevel updatedGradeLevel = editPersonDescriptor.getGradeLevel().orElse(personToEdit.getGradeLevel());
+        GradeLevel updatedGradeLevel = editPersonDescriptor.getGradeLevel()
+                .orElse(personToEdit.getGradeLevel());
         PhotoPath updatedPhotoPath = personToEdit.getPhotoPath();
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 

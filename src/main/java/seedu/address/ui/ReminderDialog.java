@@ -44,6 +44,10 @@ class ReminderDialog {
     }
 
     ReminderDialog(Stage owner, List<Reminder> reminders, Clock clock, String header, Runnable onDismiss) {
+        requireNonNull(reminders);
+        requireNonNull(clock);
+        requireNonNull(onDismiss);
+        assert header != null && !header.isBlank() : "A reminder dialog needs a header to show";
         this.owner = owner;
         this.reminders = List.copyOf(reminders);
         this.clock = clock;

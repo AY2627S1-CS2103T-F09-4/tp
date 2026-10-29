@@ -238,6 +238,18 @@ Examples:
 * If parent 1 has the requirements `No food`, `Call before lessons`, and `Send weekly updates`, then `edit-parent 1 r/No food r/Send weekly updates` removes `Call before lessons`.
 * `edit-parent 1 link/ r/` removes the first parent's student link and all of their requirements.
 
+#### Viewing a parent's linked student: `view-child`
+Shows the student linked to a parent: switches to the Students tab and selects that student.
+
+Format: `view-child <INDEX>`
+
+* `<INDEX>` refers to the displayed parent list.
+* Any search on the student list is cleared first, so the linked student is always shown.
+* The parent must be linked to a student. Each parent card shows its link as **Linked student: \<name\>**. To add a link, use `edit-parent <INDEX> link/<STUDENT_INDEX>`.
+
+Examples:
+* `list-parents` followed by `view-child 1` shows the student linked to the first parent.
+
 #### Deleting a parent: `delete-parent`
 Deletes a parent.
 
@@ -678,6 +690,7 @@ table td code {
 | `add-parent` | `add-parent n/<NAME> p/<PHONE> [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`<br>e.g. `add-parent n/Mrs Tan p/98765432 link/1 r/No food during session` |
 | `list-parents` | `list-parents` |
 | `edit-parent` | `edit-parent <INDEX> [n/<NAME>] [p/<PHONE>] [e/<EMAIL>] [link/<STUDENT_INDEX>] [r/<REQUIREMENT>]...`<br>e.g. `edit-parent 1 link/2 r/Send weekly updates` |
+| `view-child` | `view-child <INDEX>`<br>e.g. `view-child 1` |
 | `delete-parent` | `delete-parent <INDEX>`<br>e.g. `delete-parent 2` |
 
 ### Photos

@@ -463,10 +463,6 @@
     -fx-fill: white;
 }
 
-.linked-card-text {
-    -fx-fill: #1a73e8;
-}
-
 .search-match {
     -fx-fill: orange;
 }

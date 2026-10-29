@@ -3,7 +3,10 @@ package seedu.address.logic.commands;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -53,11 +56,37 @@ public class CommandResultTest {
     }
 
     @Test
+    public void showingStudent_setsOnlyStudentToShow() {
+        CommandResult result = CommandResult.showingStudent("feedback", "student-id");
+
+        assertEquals("feedback", result.getFeedbackToUser());
+        assertEquals(Optional.of("student-id"), result.getStudentIdToShow());
+        assertFalse(result.isShowHelp() || result.isExit() || result.isSearch()
+                || result.isUndo() || result.isRedo());
+        assertEquals(Optional.empty(), new CommandResult("feedback").getStudentIdToShow());
+    }
+
+    @Test
+    public void showingStudent_equalsAndHashCodeUseStudent() {
+        CommandResult result = CommandResult.showingStudent("feedback", "student-id");
+
+        assertEquals(result, CommandResult.showingStudent("feedback", "student-id"));
+        assertEquals(result.hashCode(), CommandResult.showingStudent("feedback", "student-id").hashCode());
+        assertNotEquals(result, CommandResult.showingStudent("feedback", "other-id"));
+        assertNotEquals(result, new CommandResult("feedback"));
+    }
+
+    @Test
+    public void showingStudent_nullStudentId_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> CommandResult.showingStudent("feedback", null));
+    }
+
+    @Test
     public void toStringMethod() {
         CommandResult commandResult = new CommandResult("feedback");
         String expected = CommandResult.class.getCanonicalName() + "{feedbackToUser="
                 + commandResult.getFeedbackToUser() + ", showHelp=" + commandResult.isShowHelp()
-                + ", exit=" + commandResult.isExit() + "}";
+                + ", exit=" + commandResult.isExit() + ", studentIdToShow=null}";
         assertEquals(expected, commandResult.toString());
     }
 

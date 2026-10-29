@@ -1,6 +1,5 @@
 package seedu.address.ui;
 
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -17,7 +16,6 @@ public class ParentListPanel extends UiPart<Region> {
     private static final String FXML = "PersonListPanel.fxml";
     private final Logger logger = LogsCenter.getLogger(PersonListPanel.class);
     private final Logic logic;
-    private final Consumer<String> selectStudent;
     private String keyword;
 
     @FXML
@@ -26,13 +24,9 @@ public class ParentListPanel extends UiPart<Region> {
     /**
      * Creates a panel displaying parent contacts.
      */
-    public ParentListPanel(
-            ObservableList<ParentContact> contacts,
-            Logic logic,
-            Consumer<String> selectStudent) {
+    public ParentListPanel(ObservableList<ParentContact> contacts, Logic logic) {
         super(FXML);
         this.logic = logic;
-        this.selectStudent = selectStudent;
 
         personListView.setItems(contacts);
         personListView.setCellFactory(view -> new ParentListViewCell());
@@ -60,13 +54,10 @@ public class ParentListPanel extends UiPart<Region> {
                 setGraphic(null);
                 setText(null);
             } else {
-                Runnable selectLinkedStudent = () -> selectStudent.accept(contact.getLinkedStudentId());
-
                 setGraphic(new ParentContactCard(
                         contact,
                         getIndex() + 1,
                         logic,
-                        selectLinkedStudent,
                         keyword
                 ).getRoot());
 

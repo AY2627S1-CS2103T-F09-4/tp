@@ -10,7 +10,8 @@ final class UiTestUtil {
     private UiTestUtil() {}
 
     /**
-     * Returns the value of the private field {@code fieldName}, such as an FXML-injected control, of {@code owner}.
+     * Returns the value of the private field {@code fieldName} of {@code owner},
+     * such as an FXML-injected control.
      */
     @SuppressWarnings("unchecked")
     static <T> T fieldOf(Object owner, String fieldName) throws ReflectiveOperationException {

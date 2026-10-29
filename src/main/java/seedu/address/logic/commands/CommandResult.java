@@ -3,6 +3,7 @@ package seedu.address.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import seedu.address.commons.util.ToStringBuilder;
 
@@ -27,6 +28,9 @@ public class CommandResult {
 
     private final String keyword;
 
+    /** The id of the student the window should switch to and select, or null to leave the selection alone. */
+    private final String studentIdToShow;
+
     /**
      * Constructs a {@code CommandResult} with the specified fields.
      */
@@ -38,6 +42,7 @@ public class CommandResult {
         this.undo = undo;
         this.redo = redo;
         this.search = false;
+        this.studentIdToShow = null;
     }
 
     /**
@@ -59,6 +64,28 @@ public class CommandResult {
         undo = false;
         redo = false;
         this.search = true;
+        this.studentIdToShow = null;
+    }
+
+    private CommandResult(String feedbackToUser, boolean showHelp, boolean exit, boolean undo, boolean redo,
+            boolean search, String keyword, String studentIdToShow) {
+        this.feedbackToUser = requireNonNull(feedbackToUser);
+        this.showHelp = showHelp;
+        this.exit = exit;
+        this.undo = undo;
+        this.redo = redo;
+        this.search = search;
+        this.keyword = keyword;
+        this.studentIdToShow = studentIdToShow;
+    }
+
+    /**
+     * Returns a {@code CommandResult} that asks the window to switch to the Students tab and select the
+     * student with {@code studentId}.
+     */
+    public static CommandResult showingStudent(String feedbackToUser, String studentId) {
+        requireNonNull(studentId);
+        return new CommandResult(feedbackToUser, false, false, false, false, false, null, studentId);
     }
 
     public String getFeedbackToUser() {
@@ -89,6 +116,13 @@ public class CommandResult {
         return keyword;
     }
 
+    /**
+     * Returns the id of the student the window should switch to and select, if this result asks for one.
+     */
+    public Optional<String> getStudentIdToShow() {
+        return Optional.ofNullable(studentIdToShow);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {
@@ -103,12 +137,13 @@ public class CommandResult {
         return feedbackToUser.equals(otherCommandResult.feedbackToUser)
                 && showHelp == otherCommandResult.showHelp
                 && exit == otherCommandResult.exit
-                && Objects.equals(keyword, otherCommandResult.keyword);
+                && Objects.equals(keyword, otherCommandResult.keyword)
+                && Objects.equals(studentIdToShow, otherCommandResult.studentIdToShow);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(feedbackToUser, showHelp, exit, keyword);
+        return Objects.hash(feedbackToUser, showHelp, exit, keyword, studentIdToShow);
     }
 
     @Override
@@ -117,6 +152,7 @@ public class CommandResult {
                 .add("feedbackToUser", feedbackToUser)
                 .add("showHelp", showHelp)
                 .add("exit", exit)
+                .add("studentIdToShow", studentIdToShow)
                 .toString();
     }
 
