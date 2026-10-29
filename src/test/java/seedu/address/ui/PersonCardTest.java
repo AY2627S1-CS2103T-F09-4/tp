@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -20,16 +21,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import seedu.address.model.person.Person;
+import seedu.address.model.task.Task;
+import seedu.address.model.task.TaskList;
 import seedu.address.model.task.TaskStatus;
 import seedu.address.testutil.PersonBuilder;
 
@@ -299,15 +306,32 @@ class PersonCardTest {
         });
     }
 
-    @Test void constructor_setsTaskScrollPositionToBottom() throws Exception {
+    @Test void constructor_mostTasksAllowedWrapping_cardShowsEveryTaskWithoutScrolling() throws Exception {
+        String widestTask = "W".repeat(Task.MAX_DESCRIPTION_LENGTH);
+        String[] tasks = IntStream.range(0, TaskList.MAX_TASKS).mapToObj(i -> widestTask).toArray(String[]::new);
         runOnFxThread(() -> {
-            Person person = new PersonBuilder().build();
-            PersonCard card = new PersonCard(person, 1, "");
+            PersonCard card = new PersonCard(new PersonBuilder().withTasks(tasks).build(), 1, "");
+            StackPane holder = new StackPane(card.getRoot());
+            holder.setAlignment(Pos.TOP_LEFT);
+            card.getRoot().setMaxHeight(Region.USE_PREF_SIZE);
+            Scene scene = new Scene(holder, 700, 600);
+            scene.getStylesheets().add(PersonCard.class.getResource("/view/DarkTheme.css").toExternalForm());
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+            try {
+                holder.applyCss();
+                holder.layout();
+                VBox taskRows = getField(card, "tasks");
 
-            ScrollPane taskScrollPane = getField(card, "taskScrollPane");
-
-            assertEquals(1.0, taskScrollPane.getVvalue(), 0.0001);
-
+                assertTrue(taskRows.lookupAll(".scroll-pane").isEmpty());
+                assertTrue(taskRows.getHeight() >= taskRows.prefHeight(taskRows.getWidth()) - 0.5);
+                double taskRowsBottom = card.getRoot().sceneToLocal(
+                        taskRows.localToScene(taskRows.getLayoutBounds())).getMaxY();
+                assertTrue(taskRowsBottom <= card.getRoot().getHeight() + 0.5);
+            } finally {
+                stage.close();
+            }
             return null;
         });
     }

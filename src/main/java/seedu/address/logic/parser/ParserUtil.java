@@ -183,6 +183,9 @@ public class ParserUtil {
         if (!Task.isValidDescription(trimmedDescription)) {
             throw new ParseException(Task.MESSAGE_CONSTRAINTS);
         }
+        if (!Task.isWithinLengthLimit(trimmedDescription)) {
+            throw new ParseException(Task.MESSAGE_LENGTH_CONSTRAINTS);
+        }
         return new Task(trimmedDescription);
     }
 

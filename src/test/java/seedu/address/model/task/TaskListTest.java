@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,26 @@ public class TaskListTest {
         source.add(new Task("revise notes"));
 
         assertEquals(List.of(new Task("do homework")), taskList.getTasks());
+    }
+
+    @Test
+    public void isFull_atMaximum_true() {
+        assertFalse(new TaskList().isFull());
+        assertFalse(listOfSize(TaskList.MAX_TASKS - 1).isFull());
+        assertTrue(listOfSize(TaskList.MAX_TASKS).isFull());
+    }
+
+    @Test
+    public void constructor_overMaximum_stillCreatedSoSavedTasksLoad() {
+        assertEquals(TaskList.MAX_TASKS + 1, listOfSize(TaskList.MAX_TASKS + 1).size());
+    }
+
+    private static TaskList listOfSize(int size) {
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 1; i <= size; i++) {
+            tasks.add(new Task("task " + i));
+        }
+        return new TaskList(tasks);
     }
 
     @Test

@@ -28,6 +28,19 @@ public class TaskTest {
     }
 
     @Test
+    public void isWithinLengthLimit() {
+        assertThrows(NullPointerException.class, () -> Task.isWithinLengthLimit(null));
+        assertTrue(Task.isWithinLengthLimit("a".repeat(Task.MAX_DESCRIPTION_LENGTH)));
+        assertFalse(Task.isWithinLengthLimit("a".repeat(Task.MAX_DESCRIPTION_LENGTH + 1)));
+    }
+
+    @Test
+    public void constructor_overLengthLimit_stillCreatedSoSavedTasksLoad() {
+        String savedDescription = "a".repeat(Task.MAX_DESCRIPTION_LENGTH + 1);
+        assertEquals(savedDescription, new Task(savedDescription).description);
+    }
+
+    @Test
     public void constructor_nullStatus_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Task("do homework", null));
     }
