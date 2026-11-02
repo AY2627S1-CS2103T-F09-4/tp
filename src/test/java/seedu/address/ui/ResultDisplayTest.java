@@ -89,10 +89,10 @@ public class ResultDisplayTest {
             throws Exception {
         FxTestSupport.runOnFxThread(() -> {
             ResultDisplay display = new ResultDisplay();
+            display.setFeedbackToUser(feedback);
             Stage stage = new Stage();
             stage.setScene(new Scene(display.getRoot(), 400, 120));
             stage.show();
-            display.setFeedbackToUser(feedback);
             display.getRoot().applyCss();
             display.getRoot().layout();
             try {
