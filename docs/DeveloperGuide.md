@@ -101,7 +101,7 @@ The `UI` component,
 * `ScheduleGrid` draws one row for each day of the week, with time running from left to right. Each session becomes a `ScheduleSessionCard` placed according to its day and time slot.
 * Each card starts and ends at the session's exact times, so a 13:10 end and a 13:20 end are drawn at different places. The exception is a session shorter than 30 minutes: its card is drawn 30 minutes long (but never past midnight), because a narrower card is too small to show its details. The card still shows the session's real times. Each card is only as tall as its details need. A card that overlaps earlier cards on the same day is placed just below them, which can make that day's row taller.
 * The timetable can be focused with Tab. Left and right arrows then scroll by one hour, up and down arrows by one row, Page Up and Page Down by one screen, and Home and End jump to the earliest and latest hours.
-* Each student is given a colour based on their position in the student list, so all of a student's sessions share one colour. The legend lists the scheduled students and their colours.
+* Each student is given a colour based on their position in the student list, so all of a student's sessions share one colour. The legend lists the scheduled students and their colours. This allows tutors to identify a student's scheduled sessions more easily across the timetable.
 * Each card shows the student's name, subject, grade level, address, time slot and session number. The title also includes the student's index in the displayed student list. If the student is not in the displayed list, for example after a `search` command, the title shows the name without an index; the other card details remain visible. A detail too long for one line wraps onto the next, and that day's row grows so the whole card shows.
 
 #### Help tab
@@ -160,7 +160,7 @@ The `Model` component,
 * stores `ScheduledSession` objects in a `Schedule`, which exposes them as an unmodifiable `ObservableList<ScheduledSession>`.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * stores `AssessmentRecord` and `LessonRecord` objects in lists in the `AddressBook` object.
-* uses `SnapshotManager` from the `storage` package to retain `AddressBook` snapshots for undo and redo. The search predicates in the model also reference `LogicManager` as a logging category. These are direct dependencies on other components.
+* uses `SnapshotManager` from the `storage` package to retain `AddressBook` snapshots for undo and redo. The search predicates also use LogicManager as their logging category so that their diagnostic messages can be associated with the Logic component. These are direct dependencies on other components.
 * uses other model classes, such as `PersonContainsKeywordsPredicate`, to filter data for commands; these are omitted from the class diagram.
 
 ### Storage component
@@ -225,7 +225,7 @@ How `Search` works:
 
 This is illustrated in the following diagram:
 
-[![SearchCommandSequenceDiagram.png](images/SearchCommandSequenceDiagram.png)](images/SearchCommandSequenceDiagram.png)
+![SearchCommandSequenceDiagram.png](images/SearchCommandSequenceDiagram.png)
 
 ### Undo and Redo
 
@@ -236,7 +236,7 @@ Take note:
 * If some changes were undone and new changes are introduced, the changes that could have been redone will be lost.
 
 How `Undo`/`Redo` works:
-1. Whenever a command is executed, `SnapshotManager` saves a snapshot of the current `AddressBook` and the relevant command text in separate `List` objects. `currentIndex` tracks the current position in the snapshot history.
+1. Whenever a command that changes the `AddressBook` is executed, `SnapshotManager` saves a snapshot of the current `AddressBook` and the relevant command text in separate `List` objects. `currentIndex` tracks the current position in the snapshot history.
 2. `SnapshotManager` is managed by `ModelManager`, which provides access to the snapshot history for `undo` and `redo` operations.
 3. When `UndoCommand` is executed, it uses `ModelManager` to move `currentIndex` back by one position and retrieve a copy of the corresponding `AddressBook` snapshot. The relevant command text is then included in the resulting `CommandResult`.
 4. If a new command is executed after some changes have been undone, `currentIndex` is no longer at the end of the snapshot history. In this case, the snapshots beyond `currentIndex` are removed, discarding changes that could previously have been redone.
@@ -332,7 +332,7 @@ How attendance is recorded:
 **Target user profile**:
 
 * needs to manage large numbers of contacts
-* needs to manage different kinds of contacts (students, parents, coworkers)
+* needs to manage different kinds of contacts (students, parents)
 * needs to manage information within contacts
 * prefers desktop apps over other types of applications
 * can type fast
@@ -346,36 +346,38 @@ How attendance is recorded:
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`.
 
-| Priority | As a… | I want to… | So that I can… |
-|----------|-------|------------|----------------|
-| `* * *` | tutor | create, view and delete student profiles and their information | manage my students' details |
-| `* * *` | tutor | edit a student's existing information | keep the profile current when details change |
-| `* * *` | tutor | add tasks to students | know what work each student needs to do |
-| `* * *` | tutor | add parent profiles and link them to students | keep parent contacts and requirements together |
-| `* * *` | tutor | add photos to student and parent profiles | tell contacts apart |
-| `* * *` | tutor | search student and parent details | find client information quickly |
-| `* * *` | tutor | record assessments and view student progress statistics | evaluate attendance and assessment results |
-| `* * *` | tutor | mark attendance for scheduled sessions | keep an accurate record of lesson outcomes |
-| `* * *` | tutor | keep my records between launches | continue managing information after restarting Tutoria |
-| `* *` | first-time user | have sample data | explore the features |
-| `* *` | first-time user | have a user guide or help sheet | learn what features are available |
-| `* *` | tutor | choose dates using a calendar pop-up | enter dates more easily |
-| `* *` | tutor | search for information using keywords | find relevant records without scanning the full list |
-| `* *` | returning user | see suggested questions about topics such as payment, food, address or phone number | remember what information to collect |
-| `* *` | tutor | create, view and delete reminders, with due reminders shown in a pop-up | remember follow-up items |
-| `* *` | tutor | receive notifications about tasks that need attention | avoid overlooking student work |
-| `* *` | tutor | organise tasks in an Eisenhower matrix | know which tasks to prioritise |
-| `* *` | tutor | filter and sort students by subject, grade level or other details | manage a selected group more efficiently |
-| `* *` | power user | use keyboard shortcuts for common actions | navigate more quickly without relying on the mouse |
-| `* *` | tutor | submit suggestions and feedback | request improvements to the app |
-| `* *` | tutor | view the schedule for a selected day | see that day's activities across students |
-| `* *` | tutor | undo and redo changes | recover from recent edits |
-| `*` | tutor | change the path of the app's data file | organize app data on my computer |
-| `*` | user who prefers a darker display | use a dark-mode interface | view the app more comfortably |
+| Priority       | As a… | I want to… | So that I can… |
+|----------------|-------|------------|----------------|
+| `* * *`        | tutor | create, view and delete student profiles and their information | manage my students' details |
+| `* * *`        | tutor | edit a student's existing information | keep the profile current when details change |
+| `* * *`        | tutor | add tasks to students | know what work each student needs to do |
+| `* * *`        | tutor | add parent profiles and link them to students | keep parent contacts and requirements together |
+| `* * *`        | tutor | add photos to student and parent profiles | tell contacts apart |
+| `* * *`        | tutor | search student and parent details | find client information quickly |
+| `* * *`        | tutor | record assessments and view student progress statistics | evaluate attendance and assessment results |
+| `* * *`        | tutor | mark attendance for scheduled sessions | keep an accurate record of lesson outcomes |
+| `* * *`        | tutor | keep my records between launches | continue managing information after restarting Tutoria |
+| `* *`          | first-time user | have sample data | explore the features |
+| `* *`          | first-time user | have a user guide or help sheet | learn what features are available |
+| `* *` (future) | tutor | choose dates using a calendar pop-up | enter dates more easily |
+| `* *`          | tutor | search for information using keywords | find relevant records without scanning the full list |
+| `* *` (future) | returning user | see suggested questions about topics such as payment, food, address or phone number | remember what information to collect |
+| `* *`          | tutor | create, view and delete reminders, with due reminders shown in a pop-up | remember follow-up items |
+| `* *`          | tutor | receive notifications about tasks that need attention | avoid overlooking student work |
+| `* *` (future) | tutor | organise tasks in an Eisenhower matrix | know which tasks to prioritise |
+| `* *` (future) | tutor | filter and sort students by subject, grade level or other details | manage a selected group more efficiently |
+| `* *` (future) | power user | use keyboard shortcuts for common actions | navigate more quickly without relying on the mouse |
+| `* *` (future) | tutor | submit suggestions and feedback | request improvements to the app |
+| `* *`          | tutor | view the schedule for a selected day | see that day's activities across students |
+| `* *`          | tutor | undo and redo changes | recover from recent edits |
+| `*` (future) | tutor | change the path of the app's data file | organize app data on my computer |
+| `*` (future) | user who prefers a darker display | use a dark-mode interface | view the app more comfortably |
 
 ### Use cases
 
 (For all use cases below, the **System** is Tutoria and the **Actor** is the tutor.)
+
+<br>
 
 **Use case: UC01 - Add a student**
 
@@ -394,6 +396,13 @@ Use case ends.
 
     Use case resumes at step 1.
 
+* 1a. The student is a duplicate of an existing student.
+   * 1a1. Tutoria displays an error and does not add the student.
+
+  Use case resumes at step 1.
+
+<br>
+
 **Use case: UC02 - Manage a parent contact**
 
 **MSS**
@@ -411,11 +420,18 @@ Use case ends.
 
     Use case resumes at step 1.
 
+* 1b. The selected student already has 2 parents linked to it.
+    * 1b1. Tutoria displays an error and does not add the parent contact.
+
+    Use case resumes at step 1.
+
+<br>
+
 **Use case: UC03 - Manage a student's task**
 
 **MSS**
 
-1. The tutor selects a student and enters `add-task` with a task description.
+1. The tutor enters `add-task` with the student's index and task description.
 2. Tutoria adds the task and displays the updated student details.
 3. The tutor may mark the task done or delete it using its task ID.
 
@@ -428,11 +444,18 @@ Use case ends.
 
     Use case resumes at step 1.
 
+* 1b. The student has the maximum number of tasks.
+     * 1b1. Tutoria displays an error and leaves the task list unchanged.
+
+     Use case resumes at step 1.
+
+<br>
+
 **Use case: UC04 - Schedule a weekly session**
 
 **MSS**
 
-1. The tutor selects a student and enters `schedule-student` with a weekday and start and end times.
+1. The tutor enters `schedule-student` with the student's index, a weekday and start and end times.
 2. Tutoria validates the student and time range, then adds the weekly session.
 3. The tutor enters `list-schedule` to view the sessions and their `Session #N` labels.
 
@@ -444,6 +467,8 @@ Use case ends.
     * 1a1. Tutoria displays an error and does not add the session.
 
     Use case resumes at step 1.
+
+<br>
 
 **Use case: UC05 - Record attendance**
 
@@ -462,16 +487,18 @@ Use case ends.
 
     Use case resumes at step 1.
 
-* 2b. A lesson for the same student, date and exact time already exists for a different session or has no session link.
+* 2b. A lesson for the same student, date and exact time already exists for a different session (there is a duplicate) or has no session link.
     * 2b1. Tutoria identifies the existing lesson and does not create a duplicate.
 
-    Use case ends.
+    Use case resumes at step 1.
+
+<br>
 
 **Use case: UC06 - Record an assessment and view student progress**
 
 **MSS**
 
-1. The tutor enters `record-assessment` with a student index, date, subject, category, title and mark.
+1. The tutor enters `record-assessment` with a student index, date, subject, category, title, actual score and maximum score.
 2. Tutoria validates the details and records the assessment.
 3. The tutor enters `stats-student` with the student's index and, optionally, a date range.
 4. Tutoria displays the student's attendance and assessment report for that range.
@@ -490,6 +517,8 @@ Use case ends.
 
     Use case resumes at step 3.
 
+<br>
+
 **Use case: UC07 - Manage a reminder**
 
 **MSS**
@@ -500,6 +529,20 @@ Use case ends.
 
 Use case ends.
 
+**Extensions**
+
+* 1a. The reminder text is blank.
+   * 1a1. Tutoria displays an error and does not create the reminder.
+
+   Use case resumes at step 1.
+
+* 1b. The date range is invalid.
+   * 1b1. Tutoria displays an error and does not create the reminder.
+
+  Use case resumes at step 1.
+
+<br>
+
 **Use case: UC08 - Search for a contact**
 
 **MSS**
@@ -508,6 +551,8 @@ Use case ends.
 2. Tutoria filters the displayed student and parent lists to matching contacts and highlights matching text.
 
 Use case ends.
+
+<br>
 
 **Use case: UC09 - Delete a student**
 
@@ -529,16 +574,24 @@ Use case ends.
 
 ### Non-Functional Requirements
 
-1. Tutoria is built for Java `25`; running it requires Java `25` or later.
-2. Core workflows, including managing records and viewing schedules, can be performed through the command input without using a mouse.
+1. Compatibility: Tutoria is built for Java `25`; running it requires Java `25` or later.
+2. Usability: Core workflows, including managing records and viewing schedules, can be performed through the command input without using a mouse.
+3. Performance: If a command fails, Tutoria should display an error message within 2 seconds for a dataset of up to 1000 students and/or parents.
+4. Visibility: All main application tabs should remain accessible in both fullscreen and windowed modes, with overflowing content accessible through scrolling.
+5. Offline operation: Should function without an Internet connection. 
+6. Reliability: Invalid commands must not partially modify existing records.
+7. Guidance: Error messages must identify the cause of invalid commands and provide corrective guidance where possible.
 
 ### Glossary
 
+* **AddressBook**: The main data structure that stores student, parent and historical records in Tutoria.
 * **Assessment record**: A dated assessment result associated with a student's persistent identity.
+* **Command**: An instruction entered by the tutor to perform an operation in Tutoria.
 * **Lesson record**: A dated lesson outcome, optionally linked to the recurring session from which it was recorded.
 * **Parent contact**: A contact profile that can store requirements and link to a student.
 * **Scheduled session**: A recurring weekly time slot associated with a student.
 * **Session #N**: The stored schedule position used by `mark-attendance`; it is not necessarily the displayed row number.
+* **Snapshot**: A saved copy of the address book's state used by `undo` and `redo`.
 * **Student index**: The position of a student in the currently displayed student list.
 * **Tutor**: The user who manages student and parent information in Tutoria.
 
@@ -555,22 +608,36 @@ release JAR are required.
 
 1. Copy `tutoria.jar` into a new, empty test home folder. Open a terminal in that folder and run
    `java -jar tutoria.jar`.
+
    Expected: The GUI opens with sample contacts. Preferences are stored in `preferences.json` and address-book data is
    stored in `data/addressbook.json`, both relative to the test home folder.
+
+
 2. Resize and move the window, then close Tutoria. Run `java -jar tutoria.jar` again from the same folder.
+
    Expected: The most recent window size and position are restored.
+
+
 3. Enter `exit`.
+
    Expected: Tutoria closes.
 
 ### Managing students and parents
 
 1. Add a student with `add-student n/Manual Test p/91234560 e/manual@example.com a/1 Test St s/Mathematics`.
+
    Expected: Tutoria adds the student and displays the updated student list.
+
+
 2. Run `list-students`, then edit the new student's subject with `edit-student <STUDENT_INDEX> s/Science`, using the
    index shown in the list.
+
    Expected: The subject changes and the other student details remain unchanged.
+
+
 3. Add a parent linked to that student with
    `add-parent n/Manual Parent p/91234561 link/<STUDENT_INDEX> r/Call before lessons`.
+
    Expected: The parent appears in `list-parents` with the requirement and student link. `view-child <PARENT_INDEX>`
    selects the linked student.
 
@@ -578,8 +645,12 @@ release JAR are required.
 
 1. Use a student index from `list-students`. Run `add-task <STUDENT_INDEX> task/Prepare revision`, then use the task ID
    shown in the student details with `mark-task <STUDENT_INDEX> tid/<TASK_ID> status/done`.
+
    Expected: The task is shown as done. Run `delete-task <STUDENT_INDEX> tid/<TASK_ID>` and verify it is removed.
+
+
 2. Run `add-reminder r/Manual test reminder`, then `list-reminders`.
+
    Expected: The reminder appears in the list and in the reminder pop-up the next time Tutoria starts. Close the
    pop-up; verify the reminder remains until removed with `delete-reminder <ID>`.
 
@@ -587,43 +658,74 @@ release JAR are required.
 
 1. For a student without that weekly time slot, run `schedule-student <STUDENT_INDEX> day/Monday from/16-00 to/17-00`,
    then `list-schedule`.
+
    Expected: The weekly session appears. Use its `Session #N` label, not its row number.
+
+
 2. Replace `<DATE>` with a date on or before today that falls on the session's weekday. Run
    `mark-attendance <SESSION_NUMBER> date/<DATE> status/completed`.
+
    Expected: Tutoria records a lesson for that dated session. `list-lessons` shows the lesson.
+
+
 3. Run `mark-attendance` again with the same session and date but `status/absent`.
+
    Expected: The existing lesson's outcome changes to absent; no second lesson is added.
+
+
 4. Try a future date or a date that falls on a different weekday.
+
    Expected: Tutoria reports an error and leaves the lesson unchanged.
 
 ### Assessments and statistics
 
 1. Record an assessment for a student, replacing `<DATE>` with a date that is not in the future:
    `record-assessment <STUDENT_INDEX> date/<DATE> subject/Mathematics category/Test title/Manual score/80 max/100`.
+   
    Expected: The assessment appears in `list-assessments`.
+
+
 2. Run `stats from/<DATE> to/<DATE>` and `stats-student <STUDENT_INDEX> from/<DATE> to/<DATE>`.
+   
    Expected: The reports include the selected date range and the student's assessment for that date.
+
+
 3. Update the record with
    `edit-assessment <RECORD_NUMBER> date/<DATE> subject/Mathematics category/Test title/Manual score/90 max/100`,
    then run `list-assessments` again.
+   
    Expected: The selected assessment is updated. `delete-assessment <RECORD_NUMBER>` removes it.
 
 ### Deleting a student
 
 1. Using the test student from the earlier steps, run `list-students` and note their displayed index.
+
+
 2. Run `delete-student <STUDENT_INDEX>`.
+   
    Expected: The student and recurring session disappear. Their lesson and assessment history remains in
    `list-lessons` and `list-assessments`, labelled with the deleted student's name.
+
+
 3. Try `delete-student 0`, `delete-student x`, and an index larger than the displayed list.
+   
    Expected: Each command reports an error and deletes no student.
 
 ### Search, undo and redo
 
 1. Run `search <NAME_OR_KEYWORD>` for a student or parent that exists in the list.
+   
    Expected: Matching student or parent details are displayed and matching text is highlighted. Run `list-students` or
    `list-parents` to show the full corresponding list again.
+
+
 2. Add a uniquely named test student, then run `undo` followed by `list-students`.
-   Expected: The newly added student is absent. Run `redo` and `list-students`.
+   
+   Expected: The newly added student is absent. 
+
+
+3. Run `redo` and `list-students`.
+   
    Expected: The student is restored.
 
 ### Student and parent walkthrough
@@ -632,47 +734,67 @@ This walkthrough uses fixed indices, so it starts from an empty Tutoria. Run `cl
 
 1. Students
    1. Run `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 2`.
+   
       Expected: The student `John Tan` is created and appears in the `Students` tab.
    2. Run `edit-student 1 p/12345678 g/`.
+   
       Expected: `John Tan`'s phone number changes from `91234567` to `12345678` and his grade level is removed.
    3. Run `add-task 1 task/do homework`.
+   
       Expected: The task `do homework` appears in red on the right of `John Tan`'s card.
    4. Run `mark-task 1 tid/1 status/done`.
+   
       Expected: `do homework` turns green.
    5. Run `mark-task 1 tid/1 status/not done`.
+   
       Expected: `do homework` turns red again.
    6. Run `delete-task 1 tid/1`.
+   
       Expected: `do homework` is removed from `John Tan`'s card.
    7. Run `add-student n/Jane Tan p/91234567 e/janetan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics`.
+   
       Expected: `Jane Tan` is added at index 2.
    8. Run `search Jane`.
+   
       Expected: `John Tan` disappears and only `Jane Tan` is left in the `Students` tab.
    9. Run `list-students`.
+   
       Expected: The `Students` tab shows the same list as after step 7.
    10. Run `delete-student 2`.
+   
        Expected: `Jane Tan` is removed from Tutoria.
    11. Run `clear`. Note that this clears _all_ data from Tutoria. You can undo this with `undo`.
+   
        Expected: `John Tan` is removed from Tutoria.
 
 2. Parents
    1. Run `add-parent n/Mrs Tan p/98765432`.
+      
       Expected: The parent `Mrs Tan` is created and appears in the `Parents` tab.
    2. Run `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Mathematics g/Sec 2`.
    3. Run `edit-parent 1 p/12345678 link/1`.
+      
       Expected: `Mrs Tan`'s phone number changes from `98765432` to `12345678`, and she is linked to `John Tan`.
    4. Run `view-child 1`.
+      
       Expected: Tutoria switches to the `Students` tab and selects `Mrs Tan`'s linked student, `John Tan`.
    5. Run `add-parent n/Mr Tan p/98765432 link/1`.
+      
       Expected: `Mr Tan` is added and linked to `John Tan`.
    6. Run `add-parent n/Mrs Lim p/98765432 link/1`.
+      
       Expected: Tutoria rejects the command because `John Tan` already has two parents, `Mrs Tan` and `Mr Tan`.
-   7. Run `search Mrs Tan`.
+   7. Run `search Mrs Tan`. 
+   
       Expected: Only `Mrs Tan` is shown in the `Parents` tab, because `search` matches the whole phrase `Mrs Tan`.
    8. Run `delete-parent 1`.
+   
       Expected: `Mrs Tan` is removed.
    9. Run `list-parents`.
+   
       Expected: Only `Mr Tan` is shown in the `Parents` tab.
    10. Run `clear`. Note that this clears _all_ data from Tutoria. You can undo this with `undo`.
+   
        Expected: `Mr Tan` and `John Tan` are removed from Tutoria.
 
 ### Commands after searching
@@ -681,12 +803,23 @@ This shows how index-based commands behave after the displayed list is filtered.
 but any command that takes an `INDEX` behaves the same way, including the parent commands.
 
 1. Run `clear` to start from an empty Tutoria.
+
+
 2. Run `add-student n/John p/91234567 e/john@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Math`.
+
+
 3. Run `add-student n/Jane p/91234567 e/jane@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Math`.
+   
    Expected: The list contains `John` at index 1 and `Jane` at index 2.
+
+
 4. Run `search Jane`.
+   
    Expected: The list contains only `Jane`, at index 1.
+
+
 5. Run `delete-student 1`.
+   
    Expected: `Jane` is deleted and the list shows `John` at index 1. `INDEX` refers to the filtered list shown after
    `search`, which contained only `Jane`, not the full list in which `Jane` was at index 2.
 
@@ -694,19 +827,25 @@ but any command that takes an `INDEX` behaves the same way, including the parent
 
 1. Undoing and redoing a command
    1. Run `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Math`.
+   
    2. Run `undo`.
+      
       Expected: Tutoria returns to its previous set of students and parents, undoing the `add-student` command.
    3. Run `redo`.
+      
       Expected: Tutoria restores the set of students and parents after the `add-student` command.
    4. Run `list-students`.
    5. Run `undo`.
+      
       Expected: Tutoria undoes the `add-student` command. `list-students` did not change any students or parents, so
       `undo` skips it and acts on the last command that did. `redo` behaves the same way.
 2. Redoing after undoing and running another command
    1. Run `add-student n/John Tan p/91234567 e/johntan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Math`.
+
    2. Run `undo`.
    3. Run `add-student n/Jane Tan p/91234567 e/janetan@example.com a/Blk 22 Ang Mo Kio Ave 3 s/Math`.
    4. Run `redo`.
+      
       Expected: Tutoria reports `Nothing to redo!`, because the new `add-student` for `Jane Tan` replaces the undone
       `add-student` for `John Tan`.
 
@@ -714,12 +853,19 @@ but any command that takes an `INDEX` behaves the same way, including the parent
 
 1. In the test home folder, add a uniquely named student and then close Tutoria. Relaunch it from the same folder and run
    `list-students`.
+   
    Expected: The student is still present, confirming that data-changing commands are saved automatically.
+
+
 2. To test a missing data file, launch Tutoria from a separate empty test home folder with no `data/addressbook.json`.
+   
    Expected: Tutoria starts with sample contacts.
+
+
 3. To test a corrupted data file, first create a valid test dataset in a disposable test home folder and close Tutoria.
    Back up that folder's `data/addressbook.json` outside the test home, then replace the test copy's contents with
    invalid JSON and relaunch Tutoria from that folder.
-   Expected: Tutoria logs a loading warning and starts with an empty address book. Do not enter any commands: commands
-   that are not read-only, including commands that only display a list, save the in-memory address book and could
-   overwrite the invalid file. Close the window and restore the backup before continuing.
+
+   Expected: Tutoria logs a loading warning and starts with an empty address book. Do not execute any commands during 
+   this test. In this scenario, even commands that appear read-only, such as list commands, may trigger a save of the 
+   in-memory address book and overwrite the invalid file. Close the window and restore the backup before continuing.

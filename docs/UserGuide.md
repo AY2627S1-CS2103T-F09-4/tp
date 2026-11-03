@@ -71,7 +71,7 @@ Tutoria helps tutors maintain student and parent records, manage tasks and remin
 * Parameters with a prefix, such as `n/` or `p/`, can be in any order.<br>
   For example, if the command specifies `n/<NAME> p/<PHONE>`, `p/<PHONE> n/<NAME>` is also acceptable.
 
-* Extraneous parameters for `help`, `list-students`, `list-parents`, `undo`, `redo`, and `exit` are ignored.<br>
+* Unnecessary parameters for `help`, `list-students`, `list-parents`, `undo`, `redo`, and `exit` are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
 * `<INDEX>` refers to the index shown beside a student or parent in the list that is currently displayed. It must be a positive integer such as `1`, `2`, or `3`.<br>
@@ -88,7 +88,18 @@ Tutoria helps tutors maintain student and parent records, manage tasks and remin
 
 * The main window has four tabs: **Students**, **Parents**, **Schedule**, and **Help**. Tutoria switches to the relevant tab after a successful command. For example, `list-parents` shows the Parents tab and `list-schedule` shows the Schedule tab.
 
-* Tutoria can be used without a mouse. Press `F1` from anywhere in the main window to open the User Guide window, and press `Esc` to close it again. Press `Tab` to move between parts of the window; the part that will receive your key presses is outlined in light blue. To use the menu bar, press `Alt+F` for the **File** menu or `Alt+U` for the **F1 User Guide** menu, or press `F10` and use the arrow keys, then press `Enter` to choose an item or `Esc` to close the menu. To quit, press `Esc` from anywhere in the main window, even while scrolling a list or the timetable, to open the **File** menu with **Exit** selected, then press `Enter`. To read a long result, press `Tab` to move into the result box, then use the up and down arrow keys to scroll a line at a time, `Page Up` and `Page Down` to scroll a screen at a time, or `Home` and `End` to jump to the start or end. The timetable and the reminder pop-up can both be scrolled with the keyboard, as described in [`list-schedule`](#listing-scheduled-sessions-list-schedule) and [Reminder pop-ups](#reminder-pop-ups).
+* Tutoria can be used without a mouse. 
+  * Press `F1` from anywhere in the main window to open the User Guide window, and press `Esc` to close it again. 
+  * Press `Tab` to move between parts of the window; the part that will receive your key presses is outlined in light blue. 
+Here the command input is highlighted, and can receive any input from the keyboard.
+  ![img_2.png](images/navigating-example-1.png)
+Here the students tab is selected, and can receive the arrow keys as input to switch between the tabs.
+  ![img_3.png](images/navigating-example-2.png)
+  * To use the menu bar, press `Alt+F` for the **File** menu or `Alt+U` for the **F1 User Guide** menu, or press `F10` and use the arrow keys, 
+  then press `Enter` to choose an item or `Esc` to close the menu. 
+  * To quit, press `Esc` from anywhere in the main window to open the **File** menu with **Exit** selected, then press `Enter`. This works even while scrolling a list or the timetable.
+  * To read a long result, press `Tab` to move into the result box, then use the up and down arrow keys to scroll a line at a time, `Page Up` and `Page Down` to scroll a screen at a time, or `Home` and `End` to jump to the start or end. 
+  * The timetable and the reminder pop-up can both be scrolled with the keyboard, as described in [`list-schedule`](#listing-scheduled-sessions-list-schedule) and [Reminder pop-ups](#reminder-pop-ups).
 </div>
 
 ### General commands
@@ -144,7 +155,7 @@ Format: `add-student n/<NAME> p/<PHONE> e/<EMAIL> a/<ADDRESS> s/<SUBJECT> [g/<GR
 * `<ADDRESS>` must not be blank and may be up to 200 characters long.
 * `<SUBJECT>` is the subject you teach the student. It must not be blank, and may contain spaces and digits, such as `H2 Chemistry`.
 * `<GRADE_LEVEL>` is optional free text, such as `P6`, `Sec 3`, or `JC1`.
-* `<TAG>` is optional, must be alphanumeric with no spaces, and may be repeated.
+* `<TAG>` is optional, must be letters and numbers with no spaces, and may be repeated.
 * A student with the same name (ignoring case) and phone number as an existing student is rejected as a duplicate.
 
 Examples:
@@ -188,7 +199,7 @@ Searches the details of students and parents, and shows only the matches.
 
 Format: `search <KEYWORD>`
 
-* The search is case-insensitive. For example, `mathematics` matches `Mathematics`.
+* The search treats upper-case and lower-case as equivalent. For example, `mathematics` matches `Mathematics`.
 * Everything after `search` is treated as one keyword. For example, `search John Doe` looks for `John Doe`, not `John` and `Doe` separately.
 * After a search, commands that use `<INDEX>` refer to the search results. Use `list-students` or `list-parents` to show everyone again.
 
@@ -269,7 +280,7 @@ Adds or replaces a student's photo.
 
 Format: `add-photo <INDEX> f/<FILE_PATH>`
 
-* `<FILE_PATH>` may be an absolute path or a relative path. A relative path is resolved from the folder where Tutoria was launched, which is normally the folder containing the JAR file.
+* `<FILE_PATH>` may be an absolute path (full file location) or a relative path (file location relative to the folder Tutoria is in). A relative path is resolved from the folder where Tutoria was launched, which is normally the folder containing the JAR file.
 * The file must exist, be readable, and be a JPG, JPEG, or PNG image no larger than 5 MB.
 * If the student already has a photo, it is replaced.
 * Tutoria keeps its own copy of the photo, so you can move or delete the original file afterwards.
@@ -279,7 +290,7 @@ Examples:
 * `add-photo 1 f/C:/Users/John/Pictures/john_tan.png` uses an absolute path on Windows.
 
 #### Deleting a student photo: `delete-photo`
-Deletes a student's photo.
+Deletes a student's photo. This removes it from Tutoria, not from your device.
 
 Format: `delete-photo <INDEX>`
 
@@ -299,7 +310,7 @@ Examples:
 * `add-parent-photo 1 f/./photos/mrs_tan.png` adds a photo to the first parent.
 
 #### Deleting a parent photo: `delete-parent-photo`
-Deletes a parent's photo.
+Deletes a parent's photo. This removes it from Tutoria, not from your device.
 
 Format: `delete-parent-photo <INDEX>`
 
@@ -356,6 +367,8 @@ Format: `add-reminder r/<REMINDER_TEXT> [at/<YYYY-MM-DD HH:mm>]`
 * The optional `at/` time uses the 24-hour clock.
 * Each reminder is given an ID, which stays the same until the reminder is deleted.
 * All reminders are shown in a pop-up when Tutoria starts. A reminder with a time also pops up when it becomes due while Tutoria is open.
+* Reminders look like this:
+![img.png](images/reminders-example.png)
 
 Examples:
 * `add-reminder r/Collect October fees` adds a reminder that is shown at every startup.
@@ -406,6 +419,10 @@ Format: `schedule-student <INDEX> day/<DAY> from/<HH-mm> to/<HH-mm>`
 
 * `<DAY>` is a day of the week, as a full name or its first three letters, in any case. For example, `Monday`, `monday`, and `Mon` are all accepted.
 * The end time must be later than the start time.
+* The result should be something like this:
+![img_4.png](images/schedule-example-1.png)
+* Note that while Tutoria initially displays schedule times from 1000 to 1700, they can become earlier or later respectively if a student is scheduled as such:
+![img_5.png](images/schedule-example-2.png)
 
 Examples:
 * `schedule-student 1 day/Monday from/16-00 to/18-00` schedules the first student every Monday from 4 pm to 6 pm.
@@ -489,7 +506,7 @@ Format: `delete-lesson <RECORD_NUMBER>`
 Examples:
 * `list-lessons` followed by `delete-lesson 1` deletes Lesson #1.
 
-### Assessments and statistics
+### Assessments, progress tracking and statistics
 
 #### Recording an assessment: `record-assessment`
 Records an assessment result for a student.
@@ -568,17 +585,7 @@ Examples:
 * `stats-student 1` shows the first student's progress so far this year.
 * `stats-student 1 from/2026-10-01 to/2026-10-31` shows their progress in October 2026, like this:
 
-```text
-Student: Alex Yeoh | 2026-10-01 to 2026-10-31
-completed: 2
-absent: 0
-cancelled: 0
-unrecorded: 0
-Attendance rate: 100.00%
-Assessments:
-2026-10-13 | Mathematics | Test | Trigonometry | 84.00%
-Change Mathematics / Test: N/A
-```
+![img_6.png](images/stats-student-example.png)
 
 ### Data management
 
@@ -636,8 +643,10 @@ Format: `clear`
 2. **If you minimize the User Guide window**, it may remain minimized when `F1` or the **F1 User Guide** menu is used again. Restore the minimized window manually.
 3. **Parent photos depend on the original image file.** If the image is moved, renamed, or deleted, Tutoria can no longer display the parent's photo. Add the photo again using its new path. Student photos are not affected, because Tutoria keeps its own copy.
 4. **Older data files may not contain historical records.** Tutoria does not reconstruct lessons or assessments from existing students or sessions.
-5. **Invalid manual data-file edits may cause data loss.** If `data/addressbook.json` becomes invalid, Tutoria starts with an empty dataset and overwrites the file when it next saves. Back up the file before editing it.
+5. **Invalid manual data-file edits may cause data loss.** If `data/addressbook.json` becomes invalid, Tutoria starts empty and overwrites the file when it next saves. Back up the file before editing it.
 6. **Displayed record numbers may change.** Session, lesson, and assessment numbers can change after deletion, clearing, undo, or redo. Run the relevant list command again before using a number.
+7. **Scheduling multiple students on the same date** currently must be done manually for each student rather than as a group. Future versions of Tutoria will include a group schedule feature to perform some commands on multiple students at once.
+8. **Some error messages are not standardized**. Though they provide sufficient feedback and guidance for users to use the commands correctly.
 
 --------------------------------------------------------------------------------------------------------------------
 
